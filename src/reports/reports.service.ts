@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { jsPDF } from "jspdf";
 import { join } from 'path';
-import { PaginationQueryDto } from 'src/user/dto/pagination-query.dto';
-import { UserService } from 'src/user/user.service';
+import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
+import { UsuarioService } from 'src/usuario/usuario.service';
 import { v4 as uuidv4 } from 'uuid';
 
 
 @Injectable()
 export class ReportsService {
 
-    constructor(private _userService:UserService){}
+    constructor(private _userService:UsuarioService){}
 
     async generateReportUser(pagination:PaginationQueryDto){
         
@@ -21,10 +21,10 @@ export class ReportsService {
 
         const data:any[] = [];
 
-        listUsers.users.forEach( res => {
+        listUsers.data.forEach( res => {
             const user = { idUser:String(res.Id),
-                           name: res.Name, 
-                           lastName:res.LastName, 
+                           name: res.Nombres, 
+                           lastName:res.ApellidoPaterno, 
                            email:res.Email,
                            isActive: 'yes'
                         }

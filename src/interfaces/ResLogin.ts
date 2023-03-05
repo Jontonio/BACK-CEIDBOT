@@ -17,8 +17,8 @@ export class LoginUser{
     Id:number;
     DNI?:string;
     Email?:string;
-    Name:string;
-    FirstName:string;
-    LastName?:string;
-    TypeRole?:string;
+    Nombres:string;
+    ApellidoPaterno:string;
+    ApellidoMaterno?:string;
+    TipoRol?:string;
 }

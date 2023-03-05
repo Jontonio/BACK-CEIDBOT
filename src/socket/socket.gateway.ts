@@ -11,14 +11,14 @@ import { Buttons, Client, LocalAuth, Location, MessageMedia, List, Chat } from "
 
 import { Cron } from '@nestjs/schedule';
 import * as moment from 'moment';
-import { CourseService } from 'src/course/course.service';
+import { CursoService } from 'src/curso/curso.service';
+import { DocenteService } from 'src/docente/docente.service';
+import { UsuarioService } from 'src/usuario/usuario.service';
 
 moment.locale('es');
 
 @WebSocketGateway({
-  cors:{
-    origin:'*'
-  }
+  cors:{ origin:'*' }
 })
 export class AppGateway implements OnGatewayInit, 
                                    OnGatewayConnection,
@@ -26,11 +26,15 @@ export class AppGateway implements OnGatewayInit,
   client    : Client;
   @WebSocketServer() server:Server;
   
+  constructor(private readonly _curso:CursoService,
+              private readonly _docente:DocenteService,
+              private readonly _usuario:UsuarioService){}
+
   afterInit(server: Server) {
 
     this.server = server;
-    this.client = new Client({ puppeteer: { headless: true,args: ['--no-sandbox']},
-            authStrategy: new LocalAuth({dataPath:'auth-whatsapp'}),
+    this.client = new Client({ puppeteer: { headless: true,args: ['--no-sandbox'] },
+            authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
     });
 
     // this.boot()
@@ -43,20 +47,40 @@ export class AppGateway implements OnGatewayInit,
   
   handleConnection(client: Socket) {
     console.log(`Connected ${client.id}`);
-    this.handleSendMessage(client);
-    client.emit('welcome',{msg:"Bienvenido usario"});
+    /** Emit welcome socket */
+    client.emit('welcome-ceidbot',{ data:'', ok:true, msg:'Bienvenido al sistema CEIDBOT' } );
   }
 
   @SubscribeMessage('sendMessage')
   async handleSendMessage(client:Socket){
-    console.log("sendMessage");
-    this.server.emit('sendMessage', {msg:"Hola mundo from NESTJS"});
+    client.emit('sendMessage', { msg:"Hola mundo from NESTJS" });
   }
 
-  @SubscribeMessage('message')
-  handleMessage(client: Socket, payload: any): void {
-    this.server.emit('message', payload);
+  @SubscribeMessage('Nuevo_curso')
+  async handleNewCourse(client: Socket, payload: any){
+    const res = await this._curso.findAll({limit:5, offset:0})
+    client.broadcast.emit('list_actualizada_cursos', res );
   }
+
+  @SubscribeMessage('Nuevo_docente')
+  async handleNewTeacher(client: Socket){
+    const res = await this._docente.findAll({limit:5, offset:0})
+    client.broadcast.emit('list_actualizada_docentes', res );
+  }
+
+  @SubscribeMessage('Nuevo_usuario')
+  async handleNewUser(client:Socket){
+    const res =  await this._usuario.findAll({ limit:5, offset:0 });
+    client.broadcast.emit('list_actualizada_usuarios', res );
+  }
+
+  @SubscribeMessage('usuario_eliminado')
+  async handleDeleleteUser(){
+    const res =  await this._usuario.findAll({ limit:5, offset:0 });
+    this.server.emit('list_actualizada_usuarios', res );
+  }
+
+  
 
   private boot(){
 

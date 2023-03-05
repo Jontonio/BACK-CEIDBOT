@@ -2,29 +2,48 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
-import { UserModule } from './user/user.module';
+import { UsuarioModule } from './usuario/usuario.module';
 import { AppGateway } from './socket/socket.gateway';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { ReportsModule } from './reports/reports.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { RoleModule } from './role/role.module';
-import { TeacherModule } from './teacher/teacher.module';
-import { CourseModule } from './course/course.module';
+import { RolModule } from './rol/rol.module';
+import { DocenteModule } from './docente/docente.module';
+import { CursoModule } from './curso/curso.module';
+import { CursoService } from './curso/curso.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Curso } from './curso/entities/curso.entity';
+import { Docente } from './docente/entities/docente.entity';
+import { DocenteService } from './docente/docente.service';
+import { Usuario } from './usuario/entities/usuario.entity';
+import { UsuarioService } from './usuario/usuario.service';
+import { HorarioModule } from './horario/horario.module';
+import { GrupoModule } from './grupo/grupo.module';
 
 @Module({
   imports: [ 
-    DatabaseModule, 
-    UserModule, 
     ScheduleModule.forRoot(),
+    TypeOrmModule.forFeature([Curso, Docente, Usuario]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'public'),
       exclude:['/api*']
     }),
-    AuthModule, ReportsModule, RoleModule, TeacherModule, CourseModule
+    DatabaseModule, 
+    UsuarioModule,
+    AuthModule, 
+    ReportsModule, 
+    RolModule, 
+    DocenteModule, 
+    CursoModule, HorarioModule, GrupoModule
   ],
   controllers: [AppController],
-  providers: [AppService, AppGateway],
+  providers: [AppService, 
+              AppGateway, 
+              CursoService,
+              DocenteService,
+              UsuarioService
+            ]
 })
 export class AppModule {}
