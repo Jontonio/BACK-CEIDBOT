@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Grupo } from "src/grupo/entities/grupo.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Horario {
@@ -14,4 +15,10 @@ export class Horario {
     
     @Column({nullable:true, type:'varchar', length:100})
     DescHorario:string;
+
+    @Column({default:true})
+    Estado:boolean;
+    
+    @OneToMany(() => Grupo, (grupo:Grupo) => grupo.Id)
+    grupos: Grupo[];
 }

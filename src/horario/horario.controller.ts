@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { HorarioService } from './horario.service';
 import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
+import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
+import { Query } from '@nestjs/common/decorators';
 
 @Controller('horario')
 export class HorarioController {
@@ -12,9 +14,9 @@ export class HorarioController {
     return this.horarioService.create(createHorarioDto);
   }
 
-  @Get()
-  findAll() {
-    return this.horarioService.findAll();
+  @Get('get-horarios')
+  findAll(@Query() pagination: PaginationQueryDto) {
+    return this.horarioService.findAll(pagination);
   }
 
   @Get(':id')

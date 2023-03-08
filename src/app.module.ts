@@ -21,6 +21,7 @@ import { Usuario } from './usuario/entities/usuario.entity';
 import { UsuarioService } from './usuario/usuario.service';
 import { HorarioModule } from './horario/horario.module';
 import { GrupoModule } from './grupo/grupo.module';
+import { UbigeoModule } from './ubigeo/ubigeo.module';
 
 @Module({
   imports: [ 
@@ -36,7 +37,10 @@ import { GrupoModule } from './grupo/grupo.module';
     ReportsModule, 
     RolModule, 
     DocenteModule, 
-    CursoModule, HorarioModule, GrupoModule
+    CursoModule, 
+    HorarioModule, 
+    GrupoModule, 
+    UbigeoModule
   ],
   controllers: [AppController],
   providers: [AppService, 

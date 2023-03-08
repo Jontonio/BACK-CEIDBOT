@@ -1,26 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { GrupoService } from './grupo.service';
-import { CreateGrupoDto } from './dto/create-grupo.dto';
+import { CreateTipoGrupoDto } from './dto/create-tipo-grupo.dto';
 import { UpdateGrupoDto } from './dto/update-grupo.dto';
+import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
+import { CreateGrupoDto } from './dto/create-grupo.dto';
 
 @Controller('grupo')
 export class GrupoController {
   
   constructor(private readonly grupoService: GrupoService) {}
 
+  @Post('create-tipo-grupo')
+  createTipoGrupo(@Body() createTipoGrupo: CreateTipoGrupoDto) {
+    return this.grupoService.createTipoGrupo(createTipoGrupo);
+  }
+
   @Post('create-grupo')
-  create(@Body() createGrupoDto: CreateGrupoDto) {
-    return this.grupoService.create(createGrupoDto);
+  createGrupo(@Body() createGrupo: CreateGrupoDto) {
+    return this.grupoService.createGrupo(createGrupo);
   }
 
-  @Get()
-  findAll() {
-    return this.grupoService.findAll();
+  @Get('get-tipo-grupos')
+  findAllTipoGrupos(@Query() pagination: PaginationQueryDto) {
+    return this.grupoService.findAllTipoGrupos(pagination);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.grupoService.findOne(+id);
+  @Get('get-grupos')
+  findAllGrupos(@Query() pagination: PaginationQueryDto) {
+    return this.grupoService.findAllGrupos(pagination);
+  }
+
+  @Get('get-one-grupo/:id')
+  findOneGrupo(@Param('id') id: string) {
+    return this.grupoService.findOneGrupo(+id);
   }
 
   @Patch(':id')

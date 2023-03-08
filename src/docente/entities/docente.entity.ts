@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Grupo } from "src/grupo/entities/grupo.entity";
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Docente {
@@ -40,6 +41,9 @@ export class Docente {
 
     @Column({default:true})
     Estado:boolean;
+
+    @OneToMany(() => Grupo, (grupo:Grupo) => grupo.Id)
+    grupos: Grupo[];
 
     @CreateDateColumn()
     createdAt:Date;

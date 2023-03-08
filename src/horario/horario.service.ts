@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { Repository } from 'typeorm';
 import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
@@ -16,8 +17,12 @@ export class HorarioService {
     return { msg:`Nuevo horario registrado correctamente`, ok:true, data:horario };
   }
 
-  findAll() {
-    return `This action returns all horario`;
+  async findAll({ limit, offset }: PaginationQueryDto) {
+    const count = await this.horarioModel.countBy({ Estado:true });
+    const data = await this.horarioModel.find({ 
+                                            where:{ Estado:true }, 
+                                            skip:offset, take:limit });
+    return { data, count, ok:true, msg:'Lista de horarios registrados'};
   }
 
   findOne(id: number) {
