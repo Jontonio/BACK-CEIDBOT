@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { HorarioService } from './horario.service';
 import { HorarioController } from './horario.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,6 +14,6 @@ export class HorarioModule {
 
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(VerifyTokenMiddleware).forRoutes(HorarioController)
+      .apply(VerifyTokenMiddleware).exclude({ path:'/horario/get-horarios-matricula', method:RequestMethod.GET }).forRoutes(HorarioController)
   }
 }

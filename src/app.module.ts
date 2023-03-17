@@ -22,11 +22,21 @@ import { UsuarioService } from './usuario/usuario.service';
 import { HorarioModule } from './horario/horario.module';
 import { GrupoModule } from './grupo/grupo.module';
 import { UbigeoModule } from './ubigeo/ubigeo.module';
+import { GrupoService } from './grupo/grupo.service';
+import { Grupo } from './grupo/entities/grupo.entity';
+import { TipoGrupo } from './grupo/entities/tipo-grupo.entity';
+import { HorarioService } from './horario/horario.service';
+import { Horario } from './horario/entities/horario.entity';
+import { DenominacionServicioModule } from './denominacion-servicio/denominacion-servicio.module';
+import { MatriculaModule } from './matricula/matricula.module';
+import { ApoderadoModule } from './apoderado/apoderado.module';
+import { EstudianteModule } from './estudiante/estudiante.module';
+import { InstitucionModule } from './institucion/institucion.module';
 
 @Module({
   imports: [ 
     ScheduleModule.forRoot(),
-    TypeOrmModule.forFeature([Curso, Docente, Usuario]),
+    TypeOrmModule.forFeature([Curso, Docente, Usuario, Grupo, TipoGrupo, Horario]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'public'),
       exclude:['/api*']
@@ -40,14 +50,16 @@ import { UbigeoModule } from './ubigeo/ubigeo.module';
     CursoModule, 
     HorarioModule, 
     GrupoModule, 
-    UbigeoModule
+    UbigeoModule, DenominacionServicioModule, MatriculaModule, ApoderadoModule, EstudianteModule, InstitucionModule
   ],
   controllers: [AppController],
   providers: [AppService, 
               AppGateway, 
               CursoService,
               DocenteService,
-              UsuarioService
+              UsuarioService,
+              GrupoService,
+              HorarioService
             ]
 })
 export class AppModule {}

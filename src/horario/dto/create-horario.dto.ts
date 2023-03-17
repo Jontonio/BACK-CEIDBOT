@@ -1,17 +1,16 @@
-import { IsDate, IsNotEmpty, IsOptional, IsString, Length } from "class-validator";
+import { IsDate, IsNotEmpty, IsOptional, MaxLength } from "class-validator";
 
 export class CreateHorarioDto {
 
-    @IsNotEmpty()
-    @IsDate()
+    @IsNotEmpty({message:'HoraInicio es requerido'})
+    @IsDate({message:'HoraInicio tienen que ser de tipo DATE'})
     HoraInicio:Date;
     
-    @IsNotEmpty()
-    @IsDate()
+    @IsNotEmpty({message:'HoraFinal es requerido'})
+    @IsDate({message:'HoraFinal tienen que ser de tipo DATE'})
     HoraFinal:Date;
     
     @IsOptional()
-    @IsString()
-    @Length(0, 99)
+    @MaxLength(350, {message:'DescHorario tiene permitido como máximo 350 carácteres'})
     DescHorario:string;
 }

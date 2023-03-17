@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Length } from "class-validator";
+import { IsDate, IsNotEmpty, IsNumber, MaxLength } from "class-validator";
 import { Curso } from "src/curso/entities/curso.entity";
 import { Docente } from "src/docente/entities/docente.entity";
 import { Horario } from "src/horario/entities/horario.entity";
@@ -6,22 +6,27 @@ import { TipoGrupo } from "../entities/tipo-grupo.entity";
 
 export class CreateGrupoDto {
 
-    @IsNotEmpty({message:'La FechaInicio no tiene que ser vacía'})
-    @IsDate({message:'La FechaInicio tiene que ser de tipo Date'})
+    @IsNotEmpty({message:'FechaInicio es requerido'})
+    @IsDate({message:'FechaInicio tienen que ser de tipo Date'})
     FechaInicioGrupo:Date;
 
-    @IsNotEmpty({message:'La FechaFin no tiene que ser vacía'})
+    @IsNotEmpty({message:'FechaFin es requerido'})
     @IsDate({message:'La FechaFin tiene que ser de tipo Date'})
     FechaFinalGrupo:Date;
     
-    @IsNotEmpty({message:'La DescGrupo no tiene que ser vacía'})
-    @Length(0, 340,{message:'La DescGrupo tiene un logitud de 0-250 carácteres'})
+    @IsNotEmpty({message:'DescGrupo es requerido'})
+    @MaxLength(350, {message:'DescGrupo tiene permitido como máximo 350 carácteres'})
     DescGrupo:string;
     
-    @IsNotEmpty({message:'El MaximoEstudiantes no tiene que ser vacía'})
+    @IsNotEmpty({message:'MaximoEstudiantes es requerido'})
     @IsNumber()
     MaximoEstudiantes:number;
 
+    @IsNotEmpty({message:'Modalidad es requerido'})
+    @MaxLength(15, {message:'Modalidad tiene permitido como máximo 15 carácteres'})
+    Modalidad:string;
+
+    /** Ids de tablas relacionadas */
     @IsNotEmpty({message:'Es necesario el Id del docente dentro del objeto docente'})
     docente:Docente;
 
@@ -34,6 +39,4 @@ export class CreateGrupoDto {
     @IsNotEmpty({message:'Es necesario el Id del tipoGrupo dentro del objeto tipoGrupo'})
     tipoGrupo:TipoGrupo;
 
-    @IsNotEmpty({message:'La Modalidad no tiene que ser un campo vacio'})
-    Modalidad:string;
 }

@@ -21,15 +21,15 @@ export class ReportsService {
 
         const data:any[] = [];
 
-        listUsers.data.forEach( res => {
-            const user = { idUser:String(res.Id),
-                           name: res.Nombres, 
-                           lastName:res.ApellidoPaterno, 
-                           email:res.Email,
-                           isActive: 'yes'
-                        }
-            data.push(user)
-        });
+        // listUsers.data.forEach( res => {
+        //     const user = { idUser:String(res.Id),
+        //                    name: res.Nombres, 
+        //                    lastName:res.ApellidoPaterno, 
+        //                    email:res.Email,
+        //                    isActive: 'yes'
+        //                 }
+        //     data.push(user)
+        // });
 
         doc.table(20, 25, data, headersUsers,null);
 

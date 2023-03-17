@@ -8,7 +8,7 @@ export class Usuario {
     Id:number;
     
     @Column({type:'varchar', length:10})
-    DNI:number;
+    DNI:string;
 
     @Column({type:'varchar', length:45})
     Nombres:string;
@@ -21,7 +21,7 @@ export class Usuario {
 
     @Column({type:'varchar', length:15})
     // @Index({unique:true})
-    Celular:number;
+    Celular:string;
 
     @Column({type:'varchar', length:45})
     @Index({unique:true})
@@ -51,16 +51,19 @@ export class Usuario {
     @Column({nullable:true, type:'varchar', length:10})
     CodePhone:string;
 
+    @CreateDateColumn()
+    createdAt:Date;
+
+    @UpdateDateColumn()
+    updatedAt:Date;
+
+    /** tablas relacionadas  */
+    
     @ManyToOne( () => Rol, (rol:Rol) => rol.usuarios )
     rol:Rol;
 
     @Column()
     rolId: number;
     
-    @CreateDateColumn()
-    createdAt:Date;
-
-    @UpdateDateColumn()
-    updatedAt:Date;
 
 }

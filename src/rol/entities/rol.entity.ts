@@ -16,6 +16,7 @@ export class Rol{
     @UpdateDateColumn()
     updatedAt:Date;
 
+    /** tablas relacionadas  */
     @OneToMany(() => Usuario, (usuario:Usuario) => usuario.rol)
     usuarios: Usuario[];
 

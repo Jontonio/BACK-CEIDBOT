@@ -13,11 +13,13 @@ export class Horario {
     @Column({type:'datetime'})
     HoraFinal:Date;
     
-    @Column({nullable:true, type:'varchar', length:100})
+    @Column({nullable:true, type:'varchar', length:350})
     DescHorario:string;
 
     @Column({default:true})
     Estado:boolean;
+    
+    /** Tablas relacionadas */
     
     @OneToMany(() => Grupo, (grupo:Grupo) => grupo.Id)
     grupos: Grupo[];

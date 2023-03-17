@@ -19,13 +19,13 @@ export class UsuarioModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware).forRoutes(UserController)
-      .apply(VerifyEmailUsuarioMiddleware,VerifyDniUsuarioMiddleware)
+      .apply(VerifyEmailUsuarioMiddleware, VerifyDniUsuarioMiddleware)
       .forRoutes({ path:'usuario/add-usuario', method: RequestMethod.POST})
       .apply(VerifyIdUsuarioMiddleware)
       .forRoutes({ path:'usuario/get-one-usuario/:id', method: RequestMethod.GET},
-                 { path:'usuario/delete-usuario/:id', method: RequestMethod.DELETE},
-                 { path:'usuario/update-usuario/:id', method: RequestMethod.PATCH},
-                 { path:'usuario/enable-usuario/:id', method: RequestMethod.PATCH})
+                 { path:'usuario/delete-usuario/:id',  method: RequestMethod.DELETE},
+                 { path:'usuario/enable-usuario/:id',  method: RequestMethod.PATCH},
+                 { path:'usuario/update-usuario/:id',  method: RequestMethod.PATCH})
   }
 
 }

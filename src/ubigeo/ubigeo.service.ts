@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProvinviaDto } from './dto/create-distrito.dto';
-import { UpdateUbigeoDto } from './dto/update-distrito.dto';
 import { Departamento } from './entities/departamento.entity';
 import { Distrito } from './entities/distrito.entity';
 import { Provincia } from './entities/provincia.entity';

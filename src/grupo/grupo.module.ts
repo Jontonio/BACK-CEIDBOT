@@ -19,7 +19,8 @@ export class GrupoModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware).forRoutes(GrupoController)
-      .apply(VerifyIdGrupoMiddleware).forRoutes({path:'grupo/get-one-grupo/:id', method: RequestMethod.GET})
+      .apply(VerifyIdGrupoMiddleware)
+      .forRoutes({path:'grupo/get-one-grupo/:id', method: RequestMethod.GET})
   }
 
 }

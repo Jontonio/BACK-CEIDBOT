@@ -1,48 +1,47 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString, Length } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsString, Length, MaxLength } from "class-validator";
 import { Rol } from "src/rol/entities/rol.entity";
 export class CreateUsuarioDto {
     
+    @IsNotEmpty({message:'DNI es requerido'})
     @IsNumber()
-    @IsNotEmpty()
-    DNI:number;
+    DNI:string;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'Nombres es requerido'})
+    @IsString({message:'Nombres tienen que ser de tipo STRING'})
     Nombres:string;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'ApellidoPaterno es requerido'})
+    @IsString({message:'ApellidoPaterno tienen que ser de tipo STRING'})
     ApellidoPaterno:string;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'ApellidoMaterno es requerido'})
+    @IsString({message:'ApellidoMaterno tienen que ser de tipo STRING'})
     ApellidoMaterno:string;
 
-    @IsNotEmpty()
+    @IsNotEmpty({message:'Celular es requerido'})
     @IsNumber()
-    Celular:number;
+    Celular:string;
 
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty({message:'Email es requerido'})
     @IsEmail()
     Email:string;
 
-    @IsNotEmpty()
-    @IsString()
-    @Length(1, 99)
+    @IsNotEmpty({message:'Direccion es requerido'})
+    @IsString({message:'Direccion tiene que ser de tipo STRING'})
+    @MaxLength(100, {message:'Direccion tiene permitido como máximo 100 carácteres'})
     Direccion:string;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'Code es requerido'})
+    @IsString({message:'Code tienen que ser de tipo STRING'})
     Code:string;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'CodePhone es requerido'})
+    @IsString({message:'CodePhone tienen que ser de tipo STRING'})
     CodePhone:string;
 
     Password:string;
 
-    @IsNotEmpty()
+    @IsNotEmpty({message:'Id rol es requerido de tipo objeto Rol'})
     rol:Rol;
     
 }

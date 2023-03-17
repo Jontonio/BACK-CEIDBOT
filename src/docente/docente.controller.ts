@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res } from '@nestjs/common';
 import { DocenteService } from './docente.service';
 import { CreateDocenteDto } from './dto/create-docente.dto';
 import { UpdateDocenteDto } from './dto/update-docente.dto';
@@ -8,27 +8,27 @@ import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 export class DocenteController {
   constructor(private readonly docenteService: DocenteService) {}
 
-  @Post('/add-docente')
+  @Post('add-docente')
   create(@Body() createDocenteDto: CreateDocenteDto) {
     return this.docenteService.create(createDocenteDto);
   }
 
-  @Get('/get-docentes')
+  @Get('get-docentes')
   findAll(@Query() pagination: PaginationQueryDto) {
     return this.docenteService.findAll(pagination);
   }
 
-  @Get('/:id')
+  @Get('get-one-docente/:id')
   findOne(@Param('id') id: string) {
     return this.docenteService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch('update-docente/:id')
   update(@Param('id') id: string, @Body() updateDocenteDto: UpdateDocenteDto) {
     return this.docenteService.update(+id, updateDocenteDto);
   }
 
-  @Delete(':id')
+  @Delete('delete-docente/:id')
   remove(@Param('id') id: string) {
     return this.docenteService.remove(+id);
   }

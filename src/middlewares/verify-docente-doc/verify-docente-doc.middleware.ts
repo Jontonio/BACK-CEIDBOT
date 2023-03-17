@@ -14,7 +14,7 @@ export class VerifyDocenteDocMiddleware implements NestMiddleware {
     const teacher = await this._docente.getDocenteWithDocument(Documento);
 
     if(teacher){
-      return res.json({msg:`El ${teacher.TipoDocumento} ${teacher.Documento} del docente ${teacher.Nombres} ya se encuentra registrado`, ok:false, data:''})
+      return res.json({msg:`El ${teacher.TipoDocumento} ${teacher.Documento} del docente ${teacher.Nombres} ya se encuentra registrado.`, ok:false, data:''})
     }
 
     next();

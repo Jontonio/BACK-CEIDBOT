@@ -1,32 +1,33 @@
-import { IsNotEmpty, IsNumber, IsString, IsUrl, Length } from "class-validator"
+import { IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator"
 
 export class CreateCursoDto {
 
-    @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'NombrePais es requerido'})
+    @IsString({message:'NombrePais tiene que ser de tipo STRING'})
+    @MaxLength(40,{message:'NombrePais tiene permitido como máximo 40 carácteres'})
     NombrePais:string
 
-    @IsString()
-    @IsNotEmpty()
-    @IsUrl()
+    @IsNotEmpty({message:'UrlBandera es requerido'})
+    @IsString({message:'UrlBandera tiene que ser de tipo STRING'})
+    @MaxLength(50,{message:'UrlBandera tiene permitido como máximo 50 carácteres'})
     UrlBandera:string
 
+    @IsNotEmpty({message:'NumModulos es requerido'})
     @IsNumber()
-    @IsNotEmpty()
     NumModulos:number;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'NombreCurso es requerido'})
+    @IsString({message:'NombreCurso tiene que ser de tipo STRING'})
+    @MaxLength(45,{message:'NombreCurso tiene permitido como máximo 45 carácteres'})
     NombreCurso:string
 
-    @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'NivelCurso es requerido'})
+    @IsString({message:'NivelCurso tiene que ser de tipo STRING'})
+    @MaxLength(20,{message:'NivelCurso tiene permitido como máximo 20 carácteres'})
     NivelCurso:string
 
-    @IsString()
-    @IsNotEmpty()
-    @Length(1, 355)
+    @IsNotEmpty({message:'DescripcionCurso es requerido'})
+    @IsString({message:'DescripcionCurso tiene que ser de tipo STRING'})
+    @MaxLength(350,{message:'DescripcionCurso tiene permitido como máximo 350 carácteres'})
     DescripcionCurso:string
-
-
 }

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Estudiante } from "src/estudiante/entities/estudiante.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Departamento {
@@ -25,5 +26,11 @@ export class Departamento {
     NivelUbigeo:number;
 	
     @Column({type:'int'})
-    IdPadreUbigeo:number;      
+    IdPadreUbigeo:number;    
+    
+    /** tablas relacionadas  */
+    @OneToMany(() => Estudiante, (estudiante:Estudiante) => estudiante.departamento, {
+        cascade:true
+    })
+    estudiantes: Estudiante[];
 }

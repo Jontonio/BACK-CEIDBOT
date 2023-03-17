@@ -14,6 +14,8 @@ import * as moment from 'moment';
 import { CursoService } from 'src/curso/curso.service';
 import { DocenteService } from 'src/docente/docente.service';
 import { UsuarioService } from 'src/usuario/usuario.service';
+import { GrupoService } from 'src/grupo/grupo.service';
+import { HorarioService } from 'src/horario/horario.service';
 
 moment.locale('es');
 
@@ -28,6 +30,8 @@ export class AppGateway implements OnGatewayInit,
   
   constructor(private readonly _curso:CursoService,
               private readonly _docente:DocenteService,
+              private readonly _grupo:GrupoService,
+              private readonly _horario:HorarioService,
               private readonly _usuario:UsuarioService){}
 
   afterInit(server: Server) {
@@ -56,31 +60,42 @@ export class AppGateway implements OnGatewayInit,
     client.emit('sendMessage', { msg:"Hola mundo from NESTJS" });
   }
 
-  @SubscribeMessage('Nuevo_curso')
-  async handleNewCourse(client: Socket, payload: any){
+  @SubscribeMessage('updated_list_curso')
+  async handleCursos(){
     const res = await this._curso.findAll({limit:5, offset:0})
-    client.broadcast.emit('list_actualizada_cursos', res );
+    this.server.emit('list_cursos', res );
   }
 
-  @SubscribeMessage('Nuevo_docente')
-  async handleNewTeacher(client: Socket){
-    const res = await this._docente.findAll({limit:5, offset:0})
-    client.broadcast.emit('list_actualizada_docentes', res );
-  }
-
-  @SubscribeMessage('Nuevo_usuario')
-  async handleNewUser(client:Socket){
+  @SubscribeMessage('updated_list_usuario')
+  async handleUserio(){
     const res =  await this._usuario.findAll({ limit:5, offset:0 });
-    client.broadcast.emit('list_actualizada_usuarios', res );
+    this.server.emit('list_usuarios', res );
   }
 
-  @SubscribeMessage('usuario_eliminado')
-  async handleDeleleteUser(){
-    const res =  await this._usuario.findAll({ limit:5, offset:0 });
-    this.server.emit('list_actualizada_usuarios', res );
+  @SubscribeMessage('updated_list_docente')
+  async handleDocente(){
+    const res =  await this._docente.findAll({ limit:5, offset:0 });
+    this.server.emit('list_docentes', res );
   }
 
-  
+  @SubscribeMessage('updated_list_grupo')
+  async handleGrupo(){
+    const res =  await this._grupo.findAllGrupos({ limit:5, offset:0 });
+    this.server.emit('list_grupos', res );
+  }
+
+  @SubscribeMessage('updated_list_nombre_grupo')
+  async handleTNombreGrupo(){
+    const res =  await this._grupo.findTipoGrupos();
+    this.server.emit('list_tNombre_grupos', res );
+  }
+
+  @SubscribeMessage('updated_list_horario')
+  async handleListHorario(){
+    const res =  await this._horario.findListHorarios();
+    this.server.emit('list_horarios', res );
+  }
+
 
   private boot(){
 

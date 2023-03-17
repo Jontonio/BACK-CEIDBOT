@@ -6,16 +6,13 @@ import { compareToken } from 'src/helpers/token';
 export class VerifyTokenMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: () => void) {
-
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-
     try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader && authHeader.split(' ')[1];
       compareToken(token);
-    } catch(err) {
-      return res.json({msg:"Acceso denegado - necesita un token de autorización", ok:false, err});
+    } catch(e) {
+      return res.json({msg:"Acceso denegado - necesita un token de autorización", ok:false, e});
     }
-
     next();
   }
 }

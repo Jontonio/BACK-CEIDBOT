@@ -3,9 +3,9 @@ import { IsEmail, IsNotEmpty } from "class-validator";
 export class CreateAuthDto {
     
     @IsEmail()
-    @IsNotEmpty()
+    @IsNotEmpty({message:'Email es requerido'})
     Email:string;
 
-    @IsNotEmpty()
+    @IsNotEmpty({message:'Password es requerido'})
     Password:string;
 }

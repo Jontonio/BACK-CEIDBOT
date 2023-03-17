@@ -19,6 +19,11 @@ export class HorarioController {
     return this.horarioService.findAll(pagination);
   }
 
+  @Get('get-horarios-matricula')
+  findAllHorarios() {
+    return this.horarioService.findListHorarios();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.horarioService.findOne(+id);

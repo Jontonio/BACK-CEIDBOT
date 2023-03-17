@@ -12,7 +12,7 @@ export class Docente {
     
     @Column({type:'varchar', length:11})
     @Index({unique:true})
-    Documento:number;
+    Documento:string;
 
     @Column({type:'varchar', length:45})
     Nombres:string;
@@ -26,12 +26,12 @@ export class Docente {
     @Column({type:'varchar', length:100})
     Direccion:string;
 
-    @Column({type:'varchar', length:45})
+    @Column({type:'varchar', length:50})
     @Index({unique:true})
     Email:string;
 
     @Column({type:'varchar', length:15})
-    Celular:number;
+    Celular:string;
 
     @Column({nullable:true, type:'varchar', length:5})
     Code:string;
