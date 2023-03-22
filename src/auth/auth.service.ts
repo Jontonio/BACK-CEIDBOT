@@ -67,10 +67,9 @@ export class AuthService {
     try {
       const data:any = compareToken(token);
       const payload:Payload = data.payload;
-      const { Id, Nombres, ApellidoPaterno, ApellidoMaterno, Email, rol } = await this._user.findOneByEmail(payload.Email);
-
-      return new HandleLogin(`Usuario ${Nombres} verificado`, true, token, 
-                          {Id, Nombres, ApellidoPaterno, ApellidoMaterno, Email, TipoRol:rol.TipoRol });
+      const { Id, Nombres, ApellidoPaterno, ApellidoMaterno, Email, rol, DNI, Celular, Direccion } = await this._user.findOneByEmail(payload.Email);
+      const usuario = new Login(Id, Nombres, ApellidoPaterno, ApellidoMaterno, Email, rol.TipoRol, DNI, Celular, Direccion)
+      return new HandleLogin(`Usuario ${Nombres} verificado`, true, token, usuario );
     } catch(err) {
       return new HandleLogin(err.message, false, token, null);
     }

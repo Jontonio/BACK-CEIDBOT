@@ -6,6 +6,7 @@ import { HandleMatricula } from 'src/class/global-handles';
 import { Curso } from 'src/curso/entities/curso.entity';
 import { DenominacionServicio } from 'src/denominacion-servicio/entities/denominacion-servicio.entity';
 import { Estudiante } from 'src/estudiante/entities/estudiante.entity';
+import { EstudianteService } from 'src/estudiante/estudiante.service';
 import { Institucion } from 'src/institucion/entities/institucion.entity';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { Repository } from 'typeorm';
@@ -20,12 +21,7 @@ export class MatriculaService {
               private matModel:Repository<Matricula>,
               @InjectRepository(Apoderado) 
               private apoderadoModel:Repository<Apoderado>,
-              @InjectRepository(Estudiante) 
-              private estudianteModel:Repository<Estudiante>,
-              @InjectRepository(DenominacionServicio) 
-              private denominModel:Repository<DenominacionServicio>,
-              @InjectRepository(Curso) 
-              private cursoModel:Repository<Curso>,
+              private estudianteService:EstudianteService,
               @InjectRepository(Institucion) 
               private institucionModel:Repository<Institucion> ){}
 
@@ -33,21 +29,30 @@ export class MatriculaService {
 
     try {
       //TODO: insertar apoderado si estudiante es menor de edad y verificar si existe apoderado
-      if(createMatDto.estudiante.EsMayor){ // Insertar si apoderado
-        // const apoderado = await this.apoderadoModel.save(createMatDto.estudiante.apoderado)
-        // console.log(apoderado)
+      if(createMatDto.estudiante.EsMayor){ 
         //TODO: Insertar estudiante
         createMatDto.estudiante.apoderado = null;
-        const estudiante = await this.estudianteModel.save(createMatDto.estudiante as Estudiante);
+        const estudiante = await this.estudianteService.saveEstudiante(createMatDto.estudiante as Estudiante);
         //TODO: Insertar institucion
         const institucion = await this.institucionModel.save(createMatDto.institucion);
-        console.log(institucion)
         // //TODO: guardar matricula
         createMatDto.estudiante = estudiante;
         createMatDto.institucion = institucion;
         const matricula = await this.matModel.save(createMatDto);
 
-        return new HandleMatricula(`${estudiante.Nombres} se ha registrad su matricula correctamente`, true, matricula);
+        return new HandleMatricula(`${estudiante.Nombres} se ha registrado su matricula correctamente`, true, matricula);
+      }else{
+         //TODO: Insertar si apoderado
+        const apoderado = await this.apoderadoModel.save(createMatDto.estudiante.apoderado)
+         //TODO: Insertar estudiante
+         createMatDto.estudiante.apoderado = apoderado;
+         const estudiante = await this.estudianteService.saveEstudiante(createMatDto.estudiante as Estudiante);
+         const institucion = await this.institucionModel.save(createMatDto.institucion);
+         // //TODO: guardar matricula
+         createMatDto.estudiante = estudiante;
+         createMatDto.institucion = institucion;
+         const matricula = await this.matModel.save(createMatDto);
+         return new HandleMatricula(`${estudiante.Nombres} se ha registrado su matricula correctamente`, true, matricula);
       }
 
     } catch (e) {
@@ -67,7 +72,7 @@ export class MatriculaService {
                                               relations:['estudiante','denomiServicio','curso','institucion'] });
       return new HandleMatricula('Lista registro de matriculas', true, data, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_TIPOS_GRUPOS');
+      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_MATRICULADOS');
     }
   }
 

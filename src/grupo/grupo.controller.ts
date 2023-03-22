@@ -35,7 +35,7 @@ export class GrupoController {
     return this.grupoService.findOneGrupo(+id);
   }
 
-  @Patch(':id')
+  @Patch('update-grupo/:id')
   update(@Param('id') id: string, @Body() updateGrupoDto: UpdateGrupoDto) {
     return this.grupoService.update(+id, updateGrupoDto);
   }

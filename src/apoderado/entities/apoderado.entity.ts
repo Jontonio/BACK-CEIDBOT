@@ -9,19 +9,19 @@ export class Apoderado {
 
     @Column({type:'varchar', length:8})
     @Index({unique:true})
-    DNI:string;
+    DNIApoderado:string;
 
     @Column({type:'varchar', length:45})
-    Nombres:string;
+    NomApoderado:string;
 
     @Column({type:'varchar', length:45})
-    ApellidoPaterno:string;
+    ApellidoPApoderado:string;
 
     @Column({type:'varchar', length:45})
-    ApellidoMaterno:string;
+    ApellidoMApoderado:string;
 
     @Column({type:'varchar', length:9})
-    Celular:string;
+    CelApoderado:string;
 
     @Column({default:true})
     Estado:boolean;

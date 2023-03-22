@@ -3,7 +3,6 @@ import { Rol } from "src/rol/entities/rol.entity";
 export class CreateUsuarioDto {
     
     @IsNotEmpty({message:'DNI es requerido'})
-    @IsNumber()
     DNI:string;
 
     @IsNotEmpty({message:'Nombres es requerido'})
@@ -19,7 +18,6 @@ export class CreateUsuarioDto {
     ApellidoMaterno:string;
 
     @IsNotEmpty({message:'Celular es requerido'})
-    @IsNumber()
     Celular:string;
 
     @IsNotEmpty({message:'Email es requerido'})

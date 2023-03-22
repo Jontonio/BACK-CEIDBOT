@@ -15,7 +15,7 @@ export class ApoderadoService {
   async create(createApoderadoDto: CreateApoderadoDto) {
     try {
       const apoderado = await this.apoderadoModel.save(createApoderadoDto);
-      return new HandleApoderado(`Apoderado ${apoderado.Nombres} registrado correctamente`, true, apoderado);
+      return new HandleApoderado(`Apoderado ${apoderado.NomApoderado} registrado correctamente`, true, apoderado);
     } catch (e) {
       console.log(e)
       throw new InternalServerErrorException('ERROR_CREATE_APODERADO');

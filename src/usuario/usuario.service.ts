@@ -2,14 +2,15 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import { PasswordUsuarioDto } from './dto/password-usuario.dto';
 import { UpdateUserDto } from './dto/update-usuario.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { Usuario } from './entities/usuario.entity';
-import { hashPassword } from 'src/helpers/hashPassword';
+import { comparePassword, hashPassword } from 'src/helpers/hashPassword';
 import { ReniecUsuarioDto } from './dto/usuario-reniec.dto';
-import axios from 'axios';
 import { Person } from 'src/interfaces/Person';
 import { EnableUserDto } from './dto/enable-usuario.dto';
+import axios from 'axios';
 
 import { faker } from '@faker-js/faker';
 import { HandleUsuario } from 'src/class/global-handles';
@@ -156,6 +157,30 @@ export class UsuarioService {
       return new HandleUsuario(`Datos encontrados para el DNI ${dniDto.DNI}`, true, data);
     } catch (error) {
       throw new InternalServerErrorException('ERROR_QUERY_RENIEC');
+    }
+  }
+
+  async updatePassword(Id :number, passUsuarioDto:PasswordUsuarioDto){
+    try {
+
+      const { CurrentPassword, NewPassword, RepeatPassword } = passUsuarioDto;
+      const usuario  = await this.userModel.findOneBy({Id});
+
+      if(!comparePassword(CurrentPassword, usuario.Password)){
+        return new HandleUsuario(`Digite bien su contraseña actual`, false, null);
+      }
+      if(NewPassword!==RepeatPassword){
+        return new HandleUsuario(`Las contraseñas nuevas no son iguales`, false, null);
+      }
+
+      const Password = hashPassword(NewPassword);
+      const { affected } = await this.userModel.update(Id, { Password });
+
+      if(affected==0) return new HandleUsuario(`Actualización de password sin afectar`, false, null);
+      return new HandleUsuario(`Contraseña actualizada correctamente`, true, null);
+
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR_UPDATE_PASSWORD');
     }
   }
 

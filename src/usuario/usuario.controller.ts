@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-usuario.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { ReniecUsuarioDto } from './dto/usuario-reniec.dto';
 import { EnableUserDto } from './dto/enable-usuario.dto';
+import { PasswordUsuarioDto } from './dto/password-usuario.dto';
 
 @Controller('usuario')
 export class UserController {
@@ -33,6 +34,11 @@ export class UserController {
   @Patch('update-usuario/:id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
+  }
+
+  @Patch('update-password-usuario/:id')
+  updatePassword(@Param('id') id: string, @Body() passwordUsuarioDto: PasswordUsuarioDto) {
+    return this.userService.updatePassword(+id, passwordUsuarioDto);
   }
 
   @Patch('enable-usuario/:id')

@@ -22,6 +22,15 @@ export class EstudianteService {
     }
   }
 
+  async saveEstudiante(createEstudianteDto: CreateEstudianteDto) {
+    try {
+      return await this.estudianteModel.save(createEstudianteDto);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_CREATE_ESTUDIANTE');
+    }
+  }
+
   findAll() {
     return `This action returns all estudiante`;
   }

@@ -16,6 +16,8 @@ import { DocenteService } from 'src/docente/docente.service';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { GrupoService } from 'src/grupo/grupo.service';
 import { HorarioService } from 'src/horario/horario.service';
+import { MatriculaService } from 'src/matricula/matricula.service';
+import { whatsApp } from 'src/helpers/whatsapp';
 
 moment.locale('es');
 
@@ -27,11 +29,13 @@ export class AppGateway implements OnGatewayInit,
                                    OnGatewayDisconnect{
   client    : Client;
   @WebSocketServer() server:Server;
+  whatsapp:whatsApp;
   
   constructor(private readonly _curso:CursoService,
               private readonly _docente:DocenteService,
               private readonly _grupo:GrupoService,
               private readonly _horario:HorarioService,
+              private readonly _matri:MatriculaService,
               private readonly _usuario:UsuarioService){}
 
   afterInit(server: Server) {
@@ -41,7 +45,10 @@ export class AppGateway implements OnGatewayInit,
             authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
     });
 
-    // this.boot()
+    this.whatsapp = new whatsApp(this.client, this.server, this._curso);
+    
+    this.whatsapp.start();
+    
   }
 
   handleDisconnect(client: Socket) {
@@ -52,6 +59,7 @@ export class AppGateway implements OnGatewayInit,
   handleConnection(client: Socket) {
     console.log(`Connected ${client.id}`);
     /** Emit welcome socket */
+    this.whatsapp.statusWhatsapp();
     client.emit('welcome-ceidbot',{ data:'', ok:true, msg:'Bienvenido al sistema CEIDBOT' } );
   }
 
@@ -67,7 +75,7 @@ export class AppGateway implements OnGatewayInit,
   }
 
   @SubscribeMessage('updated_list_usuario')
-  async handleUserio(){
+  async handleUsuario(){
     const res =  await this._usuario.findAll({ limit:5, offset:0 });
     this.server.emit('list_usuarios', res );
   }
@@ -96,43 +104,10 @@ export class AppGateway implements OnGatewayInit,
     this.server.emit('list_horarios', res );
   }
 
-
-  private boot(){
-
-    this.client.on('authenticated', () => {
-        console.log("Session iniciada");
-        // this.io.emit('boot',{ msg:"Usuario autenticado", qr:'', authenticated:true })
-    })
-    
-    this.client.on('qr', (qr:any) => {
-        // qrcode.generate(qr,{small:true});
-        console.log("escane el qr de whatsapp");
-        // this.io.emit('boot',{ msg:"Escane el código QR de whatsApp", qr , authenticated:false })
-    });
-    
-    this.client.on('ready', () => {
-        // this.io.emit('boot',{ msg:"Código escaneado correctamete", qr:'' , authenticated:true })
-        console.log('Client is ready!');
-    });
-    
-    this.client.on("disconnected",(reson)=> {
-        console.log("se cerró sesión: ", reson);
-        this.client.destroy();
-        this.client.initialize();
-    })
-
-    this.client.on('message', async (message) => {
-
-        const chat:Chat = await message.getChat()
-
-        if(!chat.isGroup){
-            onMessagePeople(this.client, message);
-            onMessageObjects(this.client, message);
-        }
-        
-    })
-
-    this.client.initialize();
+  @SubscribeMessage('updated_list_matriculados')
+  async handleListMatriculados(){
+    const res =  await this._matri.findAll({ limit:5, offset:0 });
+    this.server.emit('list_matriculados', res );
   }
 
   @Cron('45 12 * * *')

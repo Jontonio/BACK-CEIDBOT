@@ -9,12 +9,21 @@ export class VerifyDniUsuarioMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: () => void) {
     try {
+      //update usuario
+      if(req.params.DNI){ 
+        const usuario = await this._userService.findOneByDNI(req.params.DNI);
+        if(!usuario){
+          return res.json({msg:`El DNI ${req.params.DNI} no se encuentra registrado`, ok:false, data: null});
+        }
+        console.log("ok")
+        next();
+      }
+      // create usuario
       const { DNI } = req.body;
       const usuario = await this._userService.findOneByDNI(DNI);
-      if(usuario){
-        return res.json({msg:`El DNI ${usuario.DNI} ya se encuentra registrado, registre uno nuevo`, ok:false, data: null});
-      } 
+      if(usuario) return res.json({msg:`El DNI ${DNI} ya se encuentra registrado, registre uno nuevo`, ok:false, data: null});
       next();
+
     } catch (e) {
       console.log(e)
       throw new InternalServerErrorException(e);

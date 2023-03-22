@@ -32,11 +32,31 @@ import { MatriculaModule } from './matricula/matricula.module';
 import { ApoderadoModule } from './apoderado/apoderado.module';
 import { EstudianteModule } from './estudiante/estudiante.module';
 import { InstitucionModule } from './institucion/institucion.module';
+import { Matricula } from './matricula/entities/matricula.entity';
+import { MatriculaService } from './matricula/matricula.service';
+import { Apoderado } from './apoderado/entities/apoderado.entity';
+import { DenominacionServicioService } from './denominacion-servicio/denominacion-servicio.service';
+import { Estudiante } from './estudiante/entities/estudiante.entity';
+import { Institucion } from './institucion/entities/institucion.entity';
+import { EstudianteService } from './estudiante/estudiante.service';
+import { DenominacionServicio } from './denominacion-servicio/entities/denominacion-servicio.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [ 
+    ConfigModule.forRoot({isGlobal:true}),
     ScheduleModule.forRoot(),
-    TypeOrmModule.forFeature([Curso, Docente, Usuario, Grupo, TipoGrupo, Horario]),
+    TypeOrmModule.forFeature([Curso, 
+                              Docente, 
+                              Usuario, 
+                              Grupo, 
+                              TipoGrupo, 
+                              Horario, 
+                              Matricula,
+                              Apoderado,
+                              Estudiante,
+                              Institucion,
+                              DenominacionServicio]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'public'),
       exclude:['/api*']
@@ -50,7 +70,12 @@ import { InstitucionModule } from './institucion/institucion.module';
     CursoModule, 
     HorarioModule, 
     GrupoModule, 
-    UbigeoModule, DenominacionServicioModule, MatriculaModule, ApoderadoModule, EstudianteModule, InstitucionModule
+    UbigeoModule, 
+    MatriculaModule, 
+    ApoderadoModule,
+    EstudianteModule,
+    DenominacionServicioModule,
+    InstitucionModule
   ],
   controllers: [AppController],
   providers: [AppService, 
@@ -59,7 +84,10 @@ import { InstitucionModule } from './institucion/institucion.module';
               DocenteService,
               UsuarioService,
               GrupoService,
-              HorarioService
+              HorarioService,
+              MatriculaService,
+              EstudianteService,
+              DenominacionServicioService
             ]
 })
 export class AppModule {}

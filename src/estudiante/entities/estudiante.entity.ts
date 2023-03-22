@@ -11,9 +11,12 @@ export class Estudiante {
     @PrimaryGeneratedColumn('increment')
     Id:number;
 
-    @Column({type:'varchar', length:8})
+    @Column({type:'varchar', length:5})
+    TipoDocumento:string;
+    
+    @Column({type:'varchar', length:11})
     @Index({unique:true})
-    DNI:string;
+    Documento:string;
 
     @Column({type:'varchar', length:45})
     Nombres:string;
@@ -36,6 +39,12 @@ export class Estudiante {
     @Column({type:'varchar', length:9})
     Celular:string;
 
+    @Column({nullable:true, type:'varchar', length:5})
+    Code:string;
+
+    @Column({nullable:true, type:'varchar', length:10})
+    CodePhone:string;
+    
     @Column({type:'varchar', length:50})
     @Index({unique:true})
     Email:string;

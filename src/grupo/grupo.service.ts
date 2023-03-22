@@ -87,8 +87,16 @@ export class GrupoService {
     }
   }
 
-  update(id: number, updateGrupoDto: UpdateGrupoDto) {
-    return `This action updates a #${id} grupo`;
+  async update(Id: number, updateGrupoDto: UpdateGrupoDto) {
+    try {
+      const { affected } = await this.grupoModel.update(Id, updateGrupoDto);
+      if(affected==0) return new HandleGrupo('Grupo sin afectar ', false, null)
+      const grupo = await this.grupoModel.findOneBy({Id});
+      return new HandleGrupo(`Grupo G-${grupo.Id} actualizado correctamente`, true, null);
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException('ERROR_UPDATE_GRUPO');
+    }
   }
 
   remove(id: number) {
