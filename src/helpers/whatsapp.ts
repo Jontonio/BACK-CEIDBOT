@@ -1,7 +1,6 @@
 import { Buttons, Client, LocalAuth, Location, MessageMedia, List, Chat } from "whatsapp-web.js";
-import { Socket, Server } from 'socket.io';
+import { Server } from 'socket.io';
 import { MessageStatusBot } from "../class/Bot";
-import { sendToDialogFlow } from "./dialogflow";
 import { chatbot } from "./chatbot";
 import { CursoService } from "src/curso/curso.service";
 

@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HandleEstudiante } from 'src/class/global-handles';
 import { Repository } from 'typeorm';
@@ -31,8 +32,13 @@ export class EstudianteService {
     }
   }
 
-  findAll() {
-    return `This action returns all estudiante`;
+  async findAllHermanos(IdApoderado:number) {
+    try {
+      return await this.estudianteModel.find({ where:{ apoderado:{ Id:IdApoderado } } });
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_FIND_HERMANOS');
+    }
   }
 
   findOne(id: number) {
@@ -43,7 +49,16 @@ export class EstudianteService {
     return `This action updates a #${id} estudiante`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} estudiante`;
+  async remove(Id: number) {
+    try {
+      const estudiante = await this.estudianteModel.findOne({where:{Id}});
+      if(!estudiante){
+        throw new NotFoundException(`No se encontro al estudiante con el Id ${Id}`);
+      }
+      return await this.estudianteModel.delete({Id});
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_REMOVE_ESTUDIANTE');
+    }
   }
 }

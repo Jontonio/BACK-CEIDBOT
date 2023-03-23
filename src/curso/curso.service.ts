@@ -41,7 +41,7 @@ export class CursoService {
     try {
       const count = await this.cursoModel.countBy({ Estado:true });
       const cursos = await this.cursoModel.find(
-        { where: { Estado:true }, 
+        { where: { Estado:true, EstadoApertura:true }, 
         skip:offset, 
         take:limit, 
         order: { createdAt:'DESC' } 

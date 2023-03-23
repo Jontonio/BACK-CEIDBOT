@@ -29,6 +29,9 @@ export class Curso {
     @Column({default:true})
     Estado:boolean;
 
+    @Column({default:false})
+    EstadoApertura:boolean;
+    
     @CreateDateColumn()
     createdAt:Date;
 

@@ -1,4 +1,4 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod} from '@nestjs/common';
 import { ApoderadoService } from './apoderado.service';
 import { ApoderadoController } from './apoderado.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,6 +15,7 @@ export class ApoderadoModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware)
+      .exclude({ path:'get-one-apoderado/:DNI', method:RequestMethod.GET })
       .forRoutes(ApoderadoController)
   }
 

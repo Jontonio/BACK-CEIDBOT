@@ -41,6 +41,8 @@ import { Institucion } from './institucion/entities/institucion.entity';
 import { EstudianteService } from './estudiante/estudiante.service';
 import { DenominacionServicio } from './denominacion-servicio/entities/denominacion-servicio.entity';
 import { ConfigModule } from '@nestjs/config';
+import { ApoderadoService } from './apoderado/apoderado.service';
+import { InstitucionService } from './institucion/institucion.service';
 
 @Module({
   imports: [ 
@@ -86,7 +88,9 @@ import { ConfigModule } from '@nestjs/config';
               GrupoService,
               HorarioService,
               MatriculaService,
+              ApoderadoService,
               EstudianteService,
+              InstitucionService,
               DenominacionServicioService
             ]
 })

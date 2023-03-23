@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HandleInstitucion } from 'src/class/global-handles';
 import { Repository } from 'typeorm';
@@ -21,6 +21,15 @@ export class InstitucionService {
     }
   }
 
+  async saveInstitucion(createInstitucionDto: CreateInstitucionDto) {
+    try {
+      return await this.instituModel.save(createInstitucionDto);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_CREATE_INSTITUCION');
+    }
+  }
+
   findAll() {
     return `This action returns all institucion`;
   }
@@ -33,7 +42,16 @@ export class InstitucionService {
     return `This action updates a #${id} institucion`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} institucion`;
+  async remove(Id: number) {
+    try {
+      const institucion = await this.instituModel.findOne({where:{Id}});
+      if(!institucion){
+        throw new NotFoundException(`No se encontro a la institución con el Id ${Id}`);
+      }
+      return await this.instituModel.delete({Id});
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_REMOVE_INSTITUCION');
+    }
   }
 }

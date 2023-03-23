@@ -23,12 +23,7 @@ export class MatriculaController {
     return this.matriculaService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMatriculaDto: UpdateMatriculaDto) {
-    return this.matriculaService.update(+id, updateMatriculaDto);
-  }
-
-  @Delete(':id')
+  @Delete('remove-matriculado/:id')
   remove(@Param('id') id: string) {
     return this.matriculaService.remove(+id);
   }

@@ -12,11 +12,6 @@ export class EstudianteController {
     return this.estudianteService.create(createEstudianteDto);
   }
 
-  @Get()
-  findAll() {
-    return this.estudianteService.findAll();
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.estudianteService.findOne(+id);

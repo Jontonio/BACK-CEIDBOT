@@ -17,9 +17,9 @@ export class ApoderadoController {
     return this.apoderadoService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.apoderadoService.findOne(+id);
+  @Get('get-one-apoderado/:DNI')
+  findOne(@Param('DNI') DNI: string) {
+    return this.apoderadoService.findOne(DNI);
   }
 
   @Patch(':id')

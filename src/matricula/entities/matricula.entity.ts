@@ -10,8 +10,11 @@ export class Matricula {
     @PrimaryGeneratedColumn('increment')
     Id:number;
 
-    @Column({type:'varchar', length:200, default:'matriculado'})
+    @Column({type:'varchar', length:350, default:null})
     MotivoBaja:string;
+
+    @Column({type:'varchar', length:15, default:'prematricula'})
+    EstadoMatricula:string;
 
     @Column({type:'boolean'})
     DeclaraJurada:boolean;

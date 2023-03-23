@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException} from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HandleApoderado } from 'src/class/global-handles';
 import { Repository } from 'typeorm';
@@ -22,19 +23,43 @@ export class ApoderadoService {
     }
   }
 
+  async saveApoderado(createApoderadoDto: CreateApoderadoDto) {
+    try {
+      return await this.apoderadoModel.save(createApoderadoDto);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_CREATE_APODERADO');
+    }
+  }
+
   findAll() {
     return `This action returns all apoderado`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} apoderado`;
+  async findOne(DNI: string) {
+    try {
+      const apoderado = await this.apoderadoModel.findOne({ where:{ DNIApoderado:DNI } });
+      return new HandleApoderado('get apoderado', apoderado?true:false, apoderado);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_GET_APODERADO');
+    }
   }
 
   update(id: number, updateApoderadoDto: UpdateApoderadoDto) {
     return `This action updates a #${id} apoderado`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} apoderado`;
+  async remove(Id: number) {
+    try {
+      const apoderado = await this.apoderadoModel.findOne({where:{Id}});
+      if(!apoderado){
+        throw new NotFoundException(`No se encontro al apoderado con el Id ${Id}`);
+      }
+      return await this.apoderadoModel.delete({Id});
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_REMOVE_APODERADO');
+    }
   }
 }

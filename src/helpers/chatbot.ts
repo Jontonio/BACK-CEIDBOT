@@ -27,60 +27,77 @@ export const chatbot = async (client:Client, message:WAWebJS.Message, _curso:Cur
                 
                 switch (intentUbicacion) {
                     case 'consulta_ubicacion':
-                        const payload1:PayloadBoot = response.payload.fields;
-                        await client.sendMessage(message.from, `${payload1.message.stringValue} ${payload1.link.stringValue}`, {linkPreview:true})
+                        sendUbicacion(client, message, response);
                         break;
-                    case 'consulta_pagos':
-                        const payload2:PayloadBoot = response.payload.fields;
-                        const media = await MessageMedia.fromUrl(payload2.link.stringValue);
-                        media.mimetype = "image/png";
-                        media.filename = "Información de pagos.png";
-                        await client.sendMessage(message.from, media);
+                    case 'consulta_precios':
+                        sendPrecios(client, message, response);
                         break;
                     case 'consulta_cursos':
-                        const cursos = await _curso.CursosMatricula({limit:100, offset:0});
-                        let lista = '';
-                        if(isArray(cursos.data)){
-                            cursos.data.forEach(curso => {
-                                lista += `°📙 ${curso.NombreCurso.toUpperCase()} - nivel ${curso.NivelCurso} \n`;
-                            })
-                        }
-                        await client.sendMessage(message.from, lista);
+                        sendCursos(client, message, response, _curso);
+                        break;
+                    case 'Default_response':
+                        sendDefaultResponse(client, message, response);
+                        break;
                     default:
                         break;
                 }
                     
             }, 1000);
         }
-    
-        // if(res.parameters.fields.dni){
-        //     const dni = res.parameters.fields.dni.numberValue
-        //     onMessagePeople(client, message, dni);
-        // }
-
-        // if(res.intent.displayName=='respuesta_usuario'){
-
-        //     if(res.parameters.fields.email){
-        //         const email = res.parameters.fields.email.stringValue;
-        //         if(email){
-        //             const user = await User.findOne({where:{email:email}});
-        //             if(user){
-        //                 setTimeout(async () => {
-        //                     await client.sendMessage(message.from,`Este usuario le corresponde a:\n *Nombres:* ${user.dataValues.name}\n *Apellidos:* ${user.dataValues.lastName}\n *Fecha de creación:* ${user.dataValues.createdAt}`);
-        //                 }, 8000);
-        //             }else{
-
-        //                 setTimeout(async () => {
-        //                     await client.sendMessage(message.from,`😔 No se encontraron datos para el usuario ${email}`);
-        //                 }, 8000);
-        //             }
-        //         }else{
-        //             await client.sendMessage(message.from,"🤕 Por favor digite un email válido....");
-        //         }
-        //     }
-        // }
-
-        
     }
     
+}
+
+const prepareMedia = async (payload:PayloadBoot) => {
+    const media = await MessageMedia.fromUrl(payload.media.stringValue);
+    media.mimetype = payload.type_media.stringValue;
+    media.filename = payload.name_media.stringValue;
+    return media;
+}
+
+const sendCursos = async (client:Client, message:WAWebJS.Message, response:any, _curso:CursoService) => {
+
+    const cursos = await _curso.CursosMatricula({limit:100, offset:0});
+    const payload:PayloadBoot = response.payload.fields;
+
+    let lista = 'Estos son los cursos aperturados:\n';
+    if(isArray(cursos.data)){
+        if(cursos.data.length==0){
+            await client.sendMessage(message.from,`😬 Disculpa, Por el momento no tenemos cursos aperturados`);   
+            return;
+        }
+        cursos.data.forEach(curso => {
+            lista += `°📙 *${curso.NombreCurso.toUpperCase()}* - nivel ${curso.NivelCurso} \n`;
+        })
+    }
+    await client.sendMessage(message.from, lista);
+    if(payload.media.stringValue){
+        const media = await prepareMedia(payload);
+        await client.sendMessage(message.from, media);
+    }
+} 
+
+const sendDefaultResponse = async (client:Client, message:WAWebJS.Message, response:any) => {
+    const payload:PayloadBoot = response.payload.fields;
+    await client.sendMessage(message.from, `${payload.message.stringValue}`)
+    if(payload.media.stringValue){
+        const media = await prepareMedia(payload);
+        await client.sendMessage(message.from, media);
+    }
+} 
+const sendUbicacion = async (client:Client, message:WAWebJS.Message, response:any) => {
+    const payload:PayloadBoot = response.payload.fields;
+    await client.sendMessage(message.from, `${payload.message.stringValue} ${payload.link.stringValue}`, {linkPreview:true})
+    if(payload.media.stringValue){
+        const media = await prepareMedia(payload);
+        await client.sendMessage(message.from, media);
+    }
+}
+const sendPrecios = async (client:Client, message:WAWebJS.Message, response:any) => {
+    const payload:PayloadBoot = response.payload.fields;
+    await client.sendMessage(message.from, `${payload.message.stringValue} ${payload.link.stringValue}`, {linkPreview:true})
+    if(payload.media.stringValue){
+        const media = await prepareMedia(payload);
+        await client.sendMessage(message.from, media);
+    }
 }

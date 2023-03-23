@@ -54,11 +54,14 @@ export class Estudiante {
 
     @Column({default:true})
     Estado:boolean;
+
     
     /** tablas relacionadas  */
     @ManyToOne( () => Apoderado, (apoderado:Apoderado) => apoderado.estudiantes )
     apoderado:Apoderado;
-
+    
+    apoderadoId:number;
+    
     @OneToMany(() => Matricula, (matricula:Matricula) => matricula.estudiante, {
         cascade:true
     })
