@@ -1,6 +1,0 @@
-2023/03/27-09:25:40.244 32a0 Reusing MANIFEST C:\Users\H-P\Documents\Nestjs\Backend-CEIDBOT\auth-whatsapp\session\Default\Local Storage\leveldb/MANIFEST-000001
-2023/03/27-09:25:40.244 32a0 Recovering log #8
-2023/03/27-09:25:40.245 32a0 Reusing old log C:\Users\H-P\Documents\Nestjs\Backend-CEIDBOT\auth-whatsapp\session\Default\Local Storage\leveldb/000008.log 
-2023/03/27-09:35:57.894 3188 Level-0 table #11: started
-2023/03/27-09:35:57.900 3188 Level-0 table #11: 11440 bytes OK
-2023/03/27-09:35:57.903 3188 Delete type=0 #8
