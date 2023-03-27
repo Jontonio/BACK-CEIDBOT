@@ -41,8 +41,13 @@ export class EstudianteService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} estudiante`;
+  async findOne(Id: number) {
+    try {
+      return await this.estudianteModel.findOneBy({Id});
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTE');
+    }
   }
 
   update(id: number, updateEstudianteDto: UpdateEstudianteDto) {

@@ -11,7 +11,11 @@ import { Apoderado } from "src/apoderado/entities/apoderado.entity";
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
 import { Institucion } from "src/institucion/entities/institucion.entity";
+import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
 
+class HandleEstudianteEnGrupo{
+  constructor(public msg:string, public ok:boolean,public data:EstudianteEnGrupo | EstudianteEnGrupo[], public count?:number){}
+}
 class HandleInstitucion{
   constructor(public msg:string, public ok:boolean,public data:Institucion | Institucion[], public count?:number){}
 }
@@ -72,6 +76,7 @@ export {
     HandleMatricula,
     HandleEstudiante,
     HandleApoderado,
-    HandleInstitucion
+    HandleInstitucion,
+    HandleEstudianteEnGrupo
 }
 

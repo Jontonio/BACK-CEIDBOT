@@ -1,4 +1,5 @@
 import { Apoderado } from "src/apoderado/entities/apoderado.entity";
+import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
 import { Departamento } from "src/ubigeo/entities/departamento.entity";
 import { Distrito } from "src/ubigeo/entities/distrito.entity";
@@ -66,6 +67,11 @@ export class Estudiante {
         cascade:true
     })
     matriculas:Matricula[];
+
+    @OneToMany(() => EstudianteEnGrupo, (EstuEnGrupo:EstudianteEnGrupo) => EstuEnGrupo.estudiante, {
+        cascade:true
+    })
+    estudianteEnGrupo:EstudianteEnGrupo[];
 
     @ManyToOne( () => Departamento, (departamento:Departamento) => departamento.estudiantes )
     departamento:Departamento;

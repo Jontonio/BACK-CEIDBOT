@@ -43,6 +43,7 @@ import { DenominacionServicio } from './denominacion-servicio/entities/denominac
 import { ConfigModule } from '@nestjs/config';
 import { ApoderadoService } from './apoderado/apoderado.service';
 import { InstitucionService } from './institucion/institucion.service';
+import { EstudianteEnGrupoModule } from './estudiante-en-grupo/estudiante-en-grupo.module';
 
 @Module({
   imports: [ 
@@ -77,7 +78,8 @@ import { InstitucionService } from './institucion/institucion.service';
     ApoderadoModule,
     EstudianteModule,
     DenominacionServicioModule,
-    InstitucionModule
+    InstitucionModule,
+    EstudianteEnGrupoModule
   ],
   controllers: [AppController],
   providers: [AppService, 

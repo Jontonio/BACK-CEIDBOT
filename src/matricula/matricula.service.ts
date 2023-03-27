@@ -11,6 +11,7 @@ import { InstitucionService } from 'src/institucion/institucion.service';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { Repository } from 'typeorm';
 import { CreateMatriculaDto } from './dto/create-matricula.dto';
+import { UpdateMatriculaDto } from './dto/update-matricula.dto';
 import { Matricula } from './entities/matricula.entity';
 
 @Injectable()
@@ -50,7 +51,6 @@ export class MatriculaService {
         const res = await this.apoderadoService.saveApoderado(createMatDto.estudiante.apoderado)
         apoderado = res;
       }
-
       //? TODO: Insertar estudiante
       createMatDto.estudiante.apoderado = apoderado;
       const estudiante = await this.estudianteService.saveEstudiante(createMatDto.estudiante as Estudiante);
@@ -70,9 +70,9 @@ export class MatriculaService {
 
   async findAll({limit, offset}:PaginationQueryDto) {
     try {
-      const count = await this.matModel.countBy({ Estado:true });
+      const count = await this.matModel.countBy({ Estado:true, EstadoMatricula:'prematricula' });
       const data = await this.matModel.find({ 
-        where:{ Estado:true }, 
+        where:{ Estado:true, EstadoMatricula:'prematricula'}, 
         skip:offset, take:limit,
         order: { createdAt:'DESC' },
         relations:['estudiante', 'estudiante.apoderado','denomiServicio','curso','institucion'] });
@@ -88,7 +88,6 @@ export class MatriculaService {
 
   async remove(Id: number) {
     try {
-
       //? TODO: verificar si existe persona
       const inscrito = await this.matModel.findOne({where:{ Id }, relations:['estudiante', 'estudiante.apoderado','institucion']})
       if(!inscrito){
@@ -118,6 +117,15 @@ export class MatriculaService {
       return new HandleMatricula(`Estudiante ${estudiante.Nombres} eliminado satisfactoriamente`, true, null);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_REMOVE_PERSONA');
+    }
+  }
+
+  async update(Id: number, matriculaDto:UpdateMatriculaDto){
+    try {
+      await this.matModel.update(Id, matriculaDto);
+      return new HandleMatricula('Matricula actualizado correctamente', true, null);
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR_UPDATE_MATRICULA');
     }
   }
 }

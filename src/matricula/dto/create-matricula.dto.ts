@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional } from "class-validator";
 import { Curso } from "src/curso/entities/curso.entity";
 import { DenominacionServicio } from "src/denominacion-servicio/entities/denominacion-servicio.entity";
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
@@ -16,8 +16,11 @@ export class CreateMatriculaDto {
 
     @IsNotEmpty({message:'CarCompromiso es requerido'})
     @IsBoolean({message:'CarCompromiso tiene que ser de tipo BOOLEAN'})
-    CarCompromiso:boolean;
+    CarCompromiso:boolean;  
 
+    @IsOptional()
+    EstadoMatricula:string;
+    
     /** Ids de tablas relacionadas */
     @IsNotEmpty({message:'Es necesario el Id del Estudiante dentro del objeto estudiante'})
     estudiante:Estudiante;

@@ -87,6 +87,14 @@ export class GrupoService {
     }
   }
 
+  async findOne(Id: number) {
+    try {
+      return await this.grupoModel.findOne({ where:{ Id }, relations:['tipoGrupo','curso']});
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');
+    }
+  }
+
   async update(Id: number, updateGrupoDto: UpdateGrupoDto) {
     try {
       const { affected } = await this.grupoModel.update(Id, updateGrupoDto);

@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsNumber, MaxLength } from "class-validator";
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, MaxLength } from "class-validator";
 import { Curso } from "src/curso/entities/curso.entity";
 import { Docente } from "src/docente/entities/docente.entity";
 import { Horario } from "src/horario/entities/horario.entity";
@@ -25,6 +25,10 @@ export class CreateGrupoDto {
     @IsNotEmpty({message:'Modalidad es requerido'})
     @MaxLength(15, {message:'Modalidad tiene permitido como máximo 15 carácteres'})
     Modalidad:string;
+
+    @IsOptional()
+    @IsNumber()
+    NumeroEstudiantes:number;
 
     /** Ids de tablas relacionadas */
     @IsNotEmpty({message:'Es necesario el Id del docente dentro del objeto docente'})

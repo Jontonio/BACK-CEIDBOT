@@ -1,8 +1,9 @@
 import { Curso } from "src/curso/entities/curso.entity";
 import { DenominacionServicio } from "src/denominacion-servicio/entities/denominacion-servicio.entity";
+import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
 import { Institucion } from "src/institucion/entities/institucion.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Matricula {
@@ -46,5 +47,10 @@ export class Matricula {
 
     @ManyToOne( () => Institucion, (institucion:Institucion) => institucion.matriculas )
     institucion:Institucion;
+
+    @OneToMany(() => EstudianteEnGrupo, (EstuEnGrupo:EstudianteEnGrupo) => EstuEnGrupo.matricula, {
+        cascade:true
+    })
+    estudianteEnGrupo:EstudianteEnGrupo[];
 }
 
