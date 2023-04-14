@@ -2,6 +2,7 @@ import { Curso } from "src/curso/entities/curso.entity";
 import { DenominacionServicio } from "src/denominacion-servicio/entities/denominacion-servicio.entity";
 import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
+import { Horario } from "src/horario/entities/horario.entity";
 import { Institucion } from "src/institucion/entities/institucion.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -25,6 +26,9 @@ export class Matricula {
 
     @Column({type:'boolean'})
     CarCompromiso:boolean;
+    
+    @Column({type:'varchar'})
+    FileMatriculaURL:string;
 
     @Column({default:true})
     Estado:boolean;
@@ -38,15 +42,18 @@ export class Matricula {
     /** Tablas relacionadas */
     @ManyToOne( () => Estudiante, (estudiante:Estudiante) => estudiante.matriculas )
     estudiante:Estudiante;
-    
+
     @ManyToOne( () => DenominacionServicio, (denominServivio:DenominacionServicio) => denominServivio )
     denomiServicio:DenominacionServicio;
+
+    @ManyToOne( () => Institucion, (institucion:Institucion) => institucion.matriculas )
+    institucion:Institucion;
 
     @ManyToOne( () => Curso, (curso:Curso) => curso.matriculas )
     curso:Curso;
 
-    @ManyToOne( () => Institucion, (institucion:Institucion) => institucion.matriculas )
-    institucion:Institucion;
+    @ManyToOne( () => Horario, (horario:Horario) => horario.matriculas )
+    horario:Horario;
 
     @OneToMany(() => EstudianteEnGrupo, (EstuEnGrupo:EstudianteEnGrupo) => EstuEnGrupo.matricula, {
         cascade:true

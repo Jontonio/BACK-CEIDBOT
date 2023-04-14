@@ -30,4 +30,14 @@ interface Name_media {
   kind: string;
 }
 
-export { PayloadBoot }
+interface PayloadCurso {
+  nivel_curso: Nivelcurso;
+  curso_especifico: Nivelcurso;
+}
+
+interface Nivelcurso {
+  stringValue: string;
+  kind: string;
+}
+
+export { PayloadBoot, PayloadCurso }

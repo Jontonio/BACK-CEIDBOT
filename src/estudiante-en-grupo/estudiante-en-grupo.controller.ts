@@ -8,9 +8,14 @@ import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 export class EstudianteEnGrupoController {
   constructor(private readonly estudianteEnGrupoService: EstudianteEnGrupoService) {}
 
-  @Post('add-estudiante-en-grupo')
+  @Post('register-estudiante-prematricula')
   create(@Body() createEstudianteEnGrupoDto: CreateEstudianteEnGrupoDto) {
     return this.estudianteEnGrupoService.create(createEstudianteEnGrupoDto);
+  }
+
+  @Post('register-estudiante-from-matricula')
+  registerFromMatricula(@Body() createEstudianteEnGrupoDto: CreateEstudianteEnGrupoDto) {
+    return this.estudianteEnGrupoService.registerFromMatricula(createEstudianteEnGrupoDto);
   }
 
   @Get('get-estudiantes-en-grupo')

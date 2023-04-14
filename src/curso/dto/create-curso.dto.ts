@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator"
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator"
+import { Nivel } from "src/nivel/entities/nivel.entity";
 
 export class CreateCursoDto {
 
@@ -21,13 +22,14 @@ export class CreateCursoDto {
     @MaxLength(45,{message:'NombreCurso tiene permitido como máximo 45 carácteres'})
     NombreCurso:string
 
-    @IsNotEmpty({message:'NivelCurso es requerido'})
-    @IsString({message:'NivelCurso tiene que ser de tipo STRING'})
-    @MaxLength(20,{message:'NivelCurso tiene permitido como máximo 20 carácteres'})
-    NivelCurso:string
+    @IsNotEmpty({message:'Es necesario el Id del Nivel dentro del objeto nivel'})
+    nivel:Nivel;
 
     @IsNotEmpty({message:'DescripcionCurso es requerido'})
     @IsString({message:'DescripcionCurso tiene que ser de tipo STRING'})
     @MaxLength(350,{message:'DescripcionCurso tiene permitido como máximo 350 carácteres'})
     DescripcionCurso:string
+
+    @IsOptional()
+    LinkRequistos:string
 }

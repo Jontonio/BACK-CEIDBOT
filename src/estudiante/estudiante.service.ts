@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { HandleEstudiante } from 'src/class/global-handles';
 import { Repository } from 'typeorm';
 import { CreateEstudianteDto } from './dto/create-estudiante.dto';
+import { EmailDocEstudianteDto } from './dto/emailDocestudiante.dto';
 import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
 import { Estudiante } from './entities/estudiante.entity';
 
@@ -20,6 +21,25 @@ export class EstudianteService {
     } catch (e) {
       console.log(e)
       throw new InternalServerErrorException('ERROR_CREATE_ESTUDIANTE');
+    }
+  }
+
+  async verifyEmailDocumento(emailDocEstudianteDto:EmailDocEstudianteDto){
+    try {
+      const estudiante = await this.estudianteModel.findOne({
+        where:{ Email:emailDocEstudianteDto.Email }
+      });
+
+      if(estudiante){
+        if(estudiante.Documento!=emailDocEstudianteDto.Documento){
+          return new HandleEstudiante(`El email ${estudiante.Email} del estudiante ya se encuentra registrado`, false, null);
+        }
+      }
+      return new HandleEstudiante(`El email del estudiante es válido`, true, null);
+
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_VERIFY_EMAIL_DOCUMENTO_ESTUDIANTE');
     }
   }
 
@@ -50,8 +70,60 @@ export class EstudianteService {
     }
   }
 
+  async findOneByDocumento(Documento: string) {
+    try {
+      const estudiante = await this.estudianteModel.findOne({
+        where:{ Documento },
+        relations:['departamento','provincia','distrito','apoderado']
+      });
+      if(!estudiante){
+        return new HandleEstudiante(`Estudiante con ${Documento} no encontrado`, false, null);
+      }
+      return new HandleEstudiante(`Se encontraron registros de ${estudiante.Nombres}, actualice los datos si fuese necesario para continuar`, true, estudiante);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTE');
+    }
+  }
+
+  async findOneByDocumentoInternal(Documento: string) {
+    try {
+      return await this.estudianteModel.findOne({
+        where:{ Documento },
+        relations:['departamento','provincia','distrito','apoderado']
+      });
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTE');
+    }
+  }
+
+  async findOneByEmail(Email: string) {
+    try {
+      return await this.estudianteModel.findOne({
+        where:{ Email },
+        relations:['departamento','provincia','distrito','apoderado']
+      });
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTE');
+    }
+  }
+
   update(id: number, updateEstudianteDto: UpdateEstudianteDto) {
     return `This action updates a #${id} estudiante`;
+  }
+  
+  async updateByDocumento(Documento: string, updateEstudianteDto: UpdateEstudianteDto) {
+    try {
+      const { affected } = await this.estudianteModel.update({Documento}, updateEstudianteDto);
+      if(affected==0) return new HandleEstudiante('Grupo sin afectar ', false, null)
+      const estudiante = await this.estudianteModel.findOneBy({Documento});
+      return new HandleEstudiante(`Estudiante ${estudiante.Nombres} actualizado correctamente`, true, estudiante);
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException('ERROR_UPDATE_ESTUDIANTE');
+    }
   }
 
   async remove(Id: number) {

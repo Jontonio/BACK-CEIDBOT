@@ -13,6 +13,7 @@ export class CreateEstudianteDto {
 
     @IsNotEmpty({message:'Documento es requerido'})
     @MaxLength(11, {message:'Documento tiene permitido como máximo 11 carácteres'})
+    @MinLength(8, { message:'Documento tiene permitido como mínimo 8 carácteres'})
     Documento:string;
 
     @IsNotEmpty({message:'Nombres es requerido'})
@@ -69,12 +70,12 @@ export class CreateEstudianteDto {
     @IsOptional()
     apoderado:Apoderado;
 
-    @IsNotEmpty({message:'Id departamento es requerido de tipo objeto Departamento'})
+    @IsOptional()
     departamento:Departamento;
 
-    @IsNotEmpty({message:'Id provincia es requerido de tipo objeto Provincia'})
+    @IsOptional()
     provincia:Provincia;
 
-    @IsNotEmpty({message:'Id distrito es requerido de tipo objeto Distrito'})
+    @IsOptional()
     distrito:Distrito;
 }

@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query} from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, Body, Param, Delete, Query, UseInterceptors, UploadedFile} from '@nestjs/common';
 import { MatriculaService } from './matricula.service';
 import { CreateMatriculaDto } from './dto/create-matricula.dto';
-import { UpdateMatriculaDto } from './dto/update-matricula.dto';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import { Request } from 'express';
 
 @Controller('matricula')
 export class MatriculaController {
@@ -10,10 +12,10 @@ export class MatriculaController {
 
   @Post('matricular-estudiante')
   create(@Body() createMatriculaDto: CreateMatriculaDto) {
-    return this.matriculaService.create(createMatriculaDto);
+    return this.matriculaService.registerPrematricula(createMatriculaDto);
   }
 
-  @Get('get-matriculas-estudiantes')
+  @Get('get-prematriculas-estudiantes')
   findAll(@Query() pagination:PaginationQueryDto ) {
     return this.matriculaService.findAll(pagination);
   }
@@ -21,6 +23,12 @@ export class MatriculaController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.matriculaService.findOne(+id);
+  }
+
+  @Post('file-matricula')
+  @UseInterceptors(FileInterceptor('file', { dest: './uploads' }))
+  async handleFileMatricula(@UploadedFile() file:Express.Multer.File, @Req() req:Request){
+    return this.matriculaService.uploadFileMatricula(file, req);
   }
 
   @Delete('remove-matriculado/:id')

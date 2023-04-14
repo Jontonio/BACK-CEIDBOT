@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { compareToken } from 'src/helpers/token';
 
@@ -11,7 +11,8 @@ export class VerifyTokenMiddleware implements NestMiddleware {
       const token = authHeader && authHeader.split(' ')[1];
       compareToken(token);
     } catch(e) {
-      return res.json({msg:"Acceso denegado - necesita un token de autorización", ok:false, e});
+      console.log(e)
+      throw new UnauthorizedException(e.message);
     }
     next();
   }

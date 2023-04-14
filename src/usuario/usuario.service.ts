@@ -148,14 +148,15 @@ export class UsuarioService {
     try {
       const response = await axios.post(`${urlBase}${dniDto.DNI}`);
       if(response.data.error){
-          return { msg:response.data.error, ok:false, data:null };
+          return new HandleUsuario(response.data.error, false, null);
       }
       const data = new Person(dniDto.DNI as string, 
                               response.data.nombreSoli, 
                               response.data.apePatSoli, 
                               response.data.apeMatSoli);
       return new HandleUsuario(`Datos encontrados para el DNI ${dniDto.DNI}`, true, data);
-    } catch (error) {
+    } catch (e) {
+      console.log(e)
       throw new InternalServerErrorException('ERROR_QUERY_RENIEC');
     }
   }

@@ -38,7 +38,7 @@ export class ApoderadoService {
 
   async findOne(DNI: string) {
     try {
-      const apoderado = await this.apoderadoModel.findOne({ where:{ DNIApoderado:DNI } });
+      const apoderado = await this.apoderadoModel.findOne({ where:{ Documento:DNI } });
       return new HandleApoderado('get apoderado', apoderado?true:false, apoderado);
     } catch (e) {
       console.log(e)

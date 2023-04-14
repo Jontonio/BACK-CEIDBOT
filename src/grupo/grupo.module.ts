@@ -18,7 +18,9 @@ export class GrupoModule {
 
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(VerifyTokenMiddleware).forRoutes(GrupoController)
+      .apply(VerifyTokenMiddleware)
+      .exclude({path:'grupo/get-grupos-matricula', method:RequestMethod.GET})
+      .forRoutes(GrupoController)
       .apply(VerifyIdGrupoMiddleware)
       .forRoutes({path:'grupo/get-one-grupo/:id', method: RequestMethod.GET})
   }

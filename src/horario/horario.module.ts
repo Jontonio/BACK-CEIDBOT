@@ -14,6 +14,6 @@ export class HorarioModule {
 
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(VerifyTokenMiddleware).exclude({ path:'/horario/get-horarios-matricula', method:RequestMethod.GET }).forRoutes(HorarioController)
+      .apply(VerifyTokenMiddleware).forRoutes(HorarioController)
   }
 }

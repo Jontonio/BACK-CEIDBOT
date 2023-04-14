@@ -18,12 +18,10 @@ export class AuthController {
   @Post('logout')
   logout(@Body() logoutDto: LogoutAuthDto){
     return this.authService.logout(logoutDto);
-
   }
 
   @Get('user-authenticated')
   authenticated(@Req() req:Request){
-
     if(req){
       const authHeader = req.headers.authorization;
       const token = authHeader && authHeader.split(' ')[1];

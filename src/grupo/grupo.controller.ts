@@ -30,6 +30,11 @@ export class GrupoController {
     return this.grupoService.findAllGrupos(pagination);
   }
 
+  @Get('get-grupos-matricula')
+  findAllGruposMatricula(@Query() pagination: PaginationQueryDto) {
+    return this.grupoService.findAllMatricula(pagination);
+  }
+
   @Get('get-one-grupo/:id')
   findOneGrupo(@Param('id') id: string) {
     return this.grupoService.findOneGrupo(+id);

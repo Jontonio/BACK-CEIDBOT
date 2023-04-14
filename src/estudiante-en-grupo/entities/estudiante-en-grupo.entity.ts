@@ -1,7 +1,8 @@
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
 import { Grupo } from "src/grupo/entities/grupo.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Mensualidad } from "src/mensualidad/entities/mensualidad.entity";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class EstudianteEnGrupo {
@@ -25,6 +26,13 @@ export class EstudianteEnGrupo {
 
     @CreateDateColumn()
     createdAt:Date;
+
     @UpdateDateColumn()
     updateddAt:Date;
+
+    /** Tablas relacionadas */
+    @OneToMany(() => Mensualidad, (mensualidad:Mensualidad) => mensualidad.estudianteEnGrupo, {
+        cascade:true
+    })
+    mensualidades:Mensualidad[];
 }

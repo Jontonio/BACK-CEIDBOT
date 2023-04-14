@@ -44,10 +44,19 @@ import { ConfigModule } from '@nestjs/config';
 import { ApoderadoService } from './apoderado/apoderado.service';
 import { InstitucionService } from './institucion/institucion.service';
 import { EstudianteEnGrupoModule } from './estudiante-en-grupo/estudiante-en-grupo.module';
+import { NivelModule } from './nivel/nivel.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { MensualidadModule } from './mensualidad/mensualidad.module';
 
 @Module({
   imports: [ 
     ConfigModule.forRoot({isGlobal:true}),
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './uploads',
+      }),
+    }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([Curso, 
                               Docente, 
@@ -79,7 +88,9 @@ import { EstudianteEnGrupoModule } from './estudiante-en-grupo/estudiante-en-gru
     EstudianteModule,
     DenominacionServicioModule,
     InstitucionModule,
-    EstudianteEnGrupoModule
+    EstudianteEnGrupoModule,
+    NivelModule,
+    MensualidadModule
   ],
   controllers: [AppController],
   providers: [AppService, 

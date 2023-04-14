@@ -10,8 +10,7 @@ export class CursoController {
 
   @Post('add-curso')
   async create(@Body() createCursoDto: CreateCursoDto) {
-    const resul = await this.cursoService.create(createCursoDto);
-    return resul;
+    return this.cursoService.create(createCursoDto);
   }
 
   @Get('get-cursos')

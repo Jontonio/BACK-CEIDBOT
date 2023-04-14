@@ -1,6 +1,7 @@
 import { Grupo } from "src/grupo/entities/grupo.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Nivel } from "src/nivel/entities/nivel.entity";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 
 @Entity()
 export class Curso {
@@ -10,9 +11,6 @@ export class Curso {
 
     @Column({type:'varchar', length:40})
     NombrePais:string;
-
-    @Column({type:'varchar', length:20})
-    NivelCurso:string;
 
     @Column({type:'int'})
     NumModulos:number;
@@ -25,6 +23,9 @@ export class Curso {
 
     @Column({type:'varchar', length:50})
     UrlBandera:string;
+
+    @Column({type:'varchar'})
+    LinkRequistos:string;
 
     @Column({default:true})
     Estado:boolean;
@@ -42,8 +43,9 @@ export class Curso {
     @OneToMany(() => Grupo, (grupo:Grupo) => grupo.Id)
     grupos: Grupo[];
 
-    
     @OneToMany(() => Matricula, (matricula:Matricula) => matricula.curso)
     matriculas:Matricula[];
 
+    @ManyToOne(() => Nivel, (niveles:Nivel) => niveles.cursos)
+    nivel: Nivel;
 }

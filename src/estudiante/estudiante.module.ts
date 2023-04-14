@@ -1,4 +1,4 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { EstudianteService } from './estudiante.service';
 import { EstudianteController } from './estudiante.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,7 +14,9 @@ export class EstudianteModule {
 
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(VerifyTokenMiddleware).forRoutes(EstudianteController)
+      .apply(VerifyTokenMiddleware).
+      exclude({ path:'estudiante/verify-documento-email', method:RequestMethod.POST })
+      .forRoutes(EstudianteController)
   }
 
 }

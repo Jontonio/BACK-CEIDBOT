@@ -7,9 +7,12 @@ export class Apoderado {
     @PrimaryGeneratedColumn('increment')
     Id:number;
 
-    @Column({type:'varchar', length:8})
+    @Column({type:'varchar', length:5})
+    TipoDocumento:string;
+    
+    @Column({type:'varchar', length:11})
     @Index({unique:true})
-    DNIApoderado:string;
+    Documento:string;
 
     @Column({type:'varchar', length:45})
     NomApoderado:string;
@@ -22,6 +25,12 @@ export class Apoderado {
 
     @Column({type:'varchar', length:9})
     CelApoderado:string;
+
+    @Column({nullable:true, type:'varchar', length:5})
+    Code:string;
+
+    @Column({nullable:true, type:'varchar', length:10})
+    CodePhone:string;
 
     @Column({default:true})
     Estado:boolean;

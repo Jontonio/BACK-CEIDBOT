@@ -2,6 +2,7 @@ import { IsBoolean, IsNotEmpty, IsOptional } from "class-validator";
 import { Curso } from "src/curso/entities/curso.entity";
 import { DenominacionServicio } from "src/denominacion-servicio/entities/denominacion-servicio.entity";
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
+import { Horario } from "src/horario/entities/horario.entity";
 import { Institucion } from "src/institucion/entities/institucion.entity";
 
 export class CreateMatriculaDto {
@@ -18,6 +19,9 @@ export class CreateMatriculaDto {
     @IsBoolean({message:'CarCompromiso tiene que ser de tipo BOOLEAN'})
     CarCompromiso:boolean;  
 
+    @IsNotEmpty({message:'FileMatriculaURL es requerido'})
+    FileMatriculaURL:string;
+
     @IsOptional()
     EstadoMatricula:string;
     
@@ -28,10 +32,13 @@ export class CreateMatriculaDto {
     @IsNotEmpty({message:'Es necesario el Id de DenominacionServicio dentro del objeto denomiServicio'})
     denomiServicio:DenominacionServicio;
 
-    @IsNotEmpty({message:'Es necesario el Id del Curso dentro del objeto curso'})
-    curso:Curso;
-
     @IsNotEmpty({message:'Es necesario el Id de la institucion dentro del objeto Institucion'})
     institucion:Institucion;
+
+    @IsOptional()
+    curso:Curso;
+
+    @IsOptional()
+    horario:Horario;
 
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, RequestMethod } from '@nestjs/common';
 import { EstudianteEnGrupoService } from './estudiante-en-grupo.service';
 import { EstudianteEnGrupoController } from './estudiante-en-grupo.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,6 +16,8 @@ import { Apoderado } from 'src/apoderado/entities/apoderado.entity';
 import { Institucion } from 'src/institucion/entities/institucion.entity';
 import { ApoderadoService } from 'src/apoderado/apoderado.service';
 import { InstitucionService } from 'src/institucion/institucion.service';
+import { MensualidadService } from 'src/mensualidad/mensualidad.service';
+import { Mensualidad } from 'src/mensualidad/entities/mensualidad.entity';
 
 @Module({
   imports:[TypeOrmModule.forFeature([EstudianteEnGrupo, 
@@ -23,7 +25,8 @@ import { InstitucionService } from 'src/institucion/institucion.service';
                                      Estudiante, 
                                      TipoGrupo, 
                                      Matricula, 
-                                     Apoderado, 
+                                     Apoderado,
+                                     Mensualidad, 
                                      Institucion, 
                                      Estudiante])],
   controllers: [EstudianteEnGrupoController],
@@ -32,13 +35,16 @@ import { InstitucionService } from 'src/institucion/institucion.service';
               GrupoService, 
               MatriculaService, 
               ApoderadoService,
+              MensualidadService,
               InstitucionService]
 })
 export class EstudianteEnGrupoModule {
 
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(VerifyTokenMiddleware).forRoutes(EstudianteEnGrupoController)
+      .apply(VerifyTokenMiddleware).
+      exclude({ path:'estudiante-en-grupo/register-estudiante-from-matricula', method:RequestMethod.POST })
+      .forRoutes(EstudianteEnGrupoController)
   }
 
 }

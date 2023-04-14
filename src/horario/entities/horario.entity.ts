@@ -1,4 +1,5 @@
 import { Grupo } from "src/grupo/entities/grupo.entity";
+import { Matricula } from "src/matricula/entities/matricula.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -23,4 +24,7 @@ export class Horario {
     
     @OneToMany(() => Grupo, (grupo:Grupo) => grupo.Id)
     grupos: Grupo[];
+
+    @OneToMany(() => Matricula, (matricula:Matricula) => matricula.curso)
+    matriculas:Matricula[];
 }

@@ -12,10 +12,21 @@ import { Estudiante } from "src/estudiante/entities/estudiante.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
 import { Institucion } from "src/institucion/entities/institucion.entity";
 import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
+import { Nivel } from "src/nivel/entities/nivel.entity";
+import { Mensualidad } from "src/mensualidad/entities/mensualidad.entity";
+
+class HandleMensualidad{
+  constructor(public msg:string, public ok:boolean,public data:Mensualidad | Mensualidad[], public count?:number){}
+}
 
 class HandleEstudianteEnGrupo{
   constructor(public msg:string, public ok:boolean,public data:EstudianteEnGrupo | EstudianteEnGrupo[], public count?:number){}
 }
+
+class HandleNivel{
+  constructor(public msg:string, public ok:boolean, public data:Nivel | Nivel[], public count?:number){}
+}
+
 class HandleInstitucion{
   constructor(public msg:string, public ok:boolean,public data:Institucion | Institucion[], public count?:number){}
 }
@@ -77,6 +88,8 @@ export {
     HandleEstudiante,
     HandleApoderado,
     HandleInstitucion,
-    HandleEstudianteEnGrupo
+    HandleEstudianteEnGrupo,
+    HandleNivel,
+    HandleMensualidad
 }
 

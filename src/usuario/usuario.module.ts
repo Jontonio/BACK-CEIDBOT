@@ -18,7 +18,9 @@ export class UsuarioModule {
 
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(VerifyTokenMiddleware).forRoutes(UserController)
+      .apply(VerifyTokenMiddleware)
+      .exclude({ path:'usuario/usuario-reniec', method:RequestMethod.POST })
+      .forRoutes(UserController)
       .apply(VerifyEmailUsuarioMiddleware, VerifyDniUsuarioMiddleware)
       .forRoutes({ path:'usuario/add-usuario', method: RequestMethod.POST})
       .apply(VerifyIdUsuarioMiddleware)

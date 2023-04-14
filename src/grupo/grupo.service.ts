@@ -70,17 +70,32 @@ export class GrupoService {
         where:{ Estado:true }, 
         skip:offset, take:limit,
         order: { createdAt:'DESC' },
-        relations:['docente','horario','tipoGrupo','curso']});
+        relations:['docente','horario','tipoGrupo','curso','curso.nivel']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_GRUPOS');
     }
   }
+
+  async findAllMatricula({limit, offset}: PaginationQueryDto) {
+    try {
+      const count = await this.grupoModel.countBy({ Estado:true });
+      const grupos = await this.grupoModel.find({
+        where:{ Estado:true }, 
+        skip:offset, take:limit,
+        order: { curso:{ NombreCurso:'ASC' } },
+        relations:['horario','tipoGrupo','curso','curso.nivel']});
+      return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR_GET_GRUPOS_MATRICULA');
+    }
+  }
   
   async findOneGrupo(Id: number) {
     try {
-      const data = await this.grupoModel.findOne({ where:{ Id }, 
-                                                relations:['docente','horario','tipoGrupo','curso']});
+      const data = await this.grupoModel.findOne({ 
+        where:{ Id }, 
+        relations:['docente','horario','tipoGrupo','curso','curso.nivel']});
       return new HandleGrupo('Un grupo encontrado', true, data);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');

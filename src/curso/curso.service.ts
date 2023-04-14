@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HandleCurso } from 'src/class/global-handles';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Like, Repository } from 'typeorm';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { Curso } from './entities/curso.entity';
@@ -16,7 +16,7 @@ export class CursoService {
   async create(createCursoDto: CreateCursoDto) {
     try {
       const curso = await this.cursoModel.save(createCursoDto);
-      return new HandleCurso(`Curso ${curso.NombreCurso } de nivel ${curso.NivelCurso} registrado correctamente`, true, curso);
+      return new HandleCurso(`Curso ${curso.NombreCurso } de nivel ${curso.nivel.Nivel } registrado correctamente`, true, curso);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_UPDATE_CURSO');
     }
@@ -29,7 +29,8 @@ export class CursoService {
         where: { Estado:true }, 
         skip:offset, 
         take:limit, 
-        order: { createdAt:'DESC' } 
+        order: { createdAt:'DESC' },
+        relations:['nivel'] 
       });
       return new HandleCurso(`Lista de cursos`, true, cursos, count);
     } catch (e) {
@@ -44,7 +45,8 @@ export class CursoService {
         { where: { Estado:true, EstadoApertura:true }, 
         skip:offset, 
         take:limit, 
-        order: { createdAt:'DESC' } 
+        order: { createdAt:'DESC' },
+        relations:['nivel'] 
       });
       return new HandleCurso(`Lista de cursos`, true, cursos, count);
     } catch (e) {
@@ -55,12 +57,28 @@ export class CursoService {
   async findOne(Id: number) {
     try {
       const curso = await this.cursoModel.findOne({
-        where:{ Id }
+        where:{ Id },
+        relations:['nivel']
       });
       return new HandleCurso(`Curso ${curso.NombreCurso}`, true, curso);
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('ERROR_FIND_ONE_CURSO');
+    }
+  }
+
+  async findByName(NombreCurso: string, Nivel = '') {
+    try {
+      const query1:FindOptionsWhere<Curso> = { EstadoApertura:true, NombreCurso, nivel:{ Nivel } };
+      const query2:FindOptionsWhere<Curso> = { EstadoApertura:true, NombreCurso };
+
+      return await this.cursoModel.find({
+        where: Nivel?query1:query2,
+        relations:['nivel']
+      });
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException('ERROR_FIND_ONE_CURSO_BY_NAME');
     }
   }
 

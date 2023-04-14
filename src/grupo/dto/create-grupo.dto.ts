@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, MaxLength } from "class-validator";
+import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, MaxLength } from "class-validator";
 import { Curso } from "src/curso/entities/curso.entity";
 import { Docente } from "src/docente/entities/docente.entity";
 import { Horario } from "src/horario/entities/horario.entity";
@@ -25,6 +25,10 @@ export class CreateGrupoDto {
     @IsNotEmpty({message:'Modalidad es requerido'})
     @MaxLength(15, {message:'Modalidad tiene permitido como máximo 15 carácteres'})
     Modalidad:string;
+
+    @IsNotEmpty({message:'RequeridoPPago es requerido'})
+    @IsBoolean({message:'RequeridoPPago tienen que ser de tipo BOOLEAN'})
+    RequeridoPPago:boolean;
 
     @IsOptional()
     @IsNumber()
