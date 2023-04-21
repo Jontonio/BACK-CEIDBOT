@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException} from '@nestjs/common';
-import { InternalServerErrorException } from '@nestjs/common/exceptions';
+import { Injectable, NotFoundException, HttpStatus} from '@nestjs/common';
+import { HttpException, InternalServerErrorException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApoderadoService } from 'src/apoderado/apoderado.service';
 import { Apoderado } from 'src/apoderado/entities/apoderado.entity';
@@ -15,7 +15,6 @@ import { Matricula } from './entities/matricula.entity';
 import { uploadFileDrive } from 'src/helpers/googleDrive';
 import * as fs from "fs-extra";
 import { Request } from 'express';
-import { cloudasset } from 'googleapis/build/src/apis/cloudasset';
 
 @Injectable()
 export class MatriculaService {
@@ -44,7 +43,6 @@ export class MatriculaService {
           createMatDto.estudiante = estudiante;
           createMatDto.institucion = institucion;
           return await this.matModel.save(createMatDto);
-
         }else{
           const estudiante = await this.estudianteService.saveEstudiante(createMatDto.estudiante as Estudiante);
           //? TODO: Insertar institucion
@@ -221,12 +219,27 @@ export class MatriculaService {
 
   async uploadFileMatricula(file:Express.Multer.File, Req:Request){
     try {
+      const allowedMimes = ['image/jpeg','image/jpg', 'image/png', 'application/pdf'];
+
+      if (!allowedMimes.includes(file.mimetype)) {
+        await fs.unlink(file.path)
+        throw new HttpException(`Archivos permitidos (PDF - PNG - JPG)`, HttpStatus.BAD_REQUEST);
+      }
+
+      const in_mb = file.size / 1000000;
+
+      if (in_mb > 4) {
+        await fs.unlink(file.path)
+        throw new HttpException(`Tamaño de archivo permitido mínimo 4 MB`, HttpStatus.BAD_REQUEST);
+      }
+      
       const { tipo, id_grupo } = Req.body;
       const { data } = await uploadFileDrive(file, id_grupo, tipo);
       await fs.unlink(file.path)
       return data;
     } catch (e) {
-      console.log("Error:",e)
+      const error = (e.code && e.code=='ETIMEDOUT')?'Revise su conexión a internet':'';
+      throw new InternalServerErrorException(`Error al subir el archivo | ${(e.response?e.response:error)}`);
     }
   }
 

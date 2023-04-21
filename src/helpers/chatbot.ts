@@ -113,7 +113,7 @@ const sendCursoEspecifico = async (client:Client, message:WAWebJS.Message, respo
     }
 
     cursos.forEach(curso => {
-        lista += `📘 *Curso:* ${curso.NombreCurso.toUpperCase()} \n 🎯 *Nivel del curso:* ${curso.nivel.Nivel} \n #️ *Módulos:* ${curso.NumModulos} módulos \n 📝 *Descripción:* \n ${curso.DescripcionCurso} \n *👉 Link de los requisitos:* ${curso.LinkRequistos}`;
+        lista += `📘 *Curso:* ${curso.NombreCurso.toUpperCase()} \n 🎯 *Nivel del curso:* ${curso.nivel.Nivel} \n #️ *Módulos:* ${curso.NumModulos} módulos \n 📝 *Descripción:* \n ${curso.DescripcionCurso} \n *👉 Link de los requisitos:* ${curso.LinkRequisitos}`;
     })
  
     await client.sendMessage(message.from, lista);

@@ -6,10 +6,12 @@ import { GrupoService } from 'src/grupo/grupo.service';
 import { MatriculaService } from 'src/matricula/matricula.service';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { Repository } from 'typeorm';
-import { CreateEstudianteEnGrupoDto } from './dto/create-estudiante-en-grupo.dto';
+import { EstudianteEnGrupoWithPagoDto } from './dto/create-estudiante-en-grupo-with-pago.dto';
 import { UpdateEstudianteEnGrupoDto } from './dto/update-estudiante-en-grupo.dto';
 import { EstudianteEnGrupo } from './entities/estudiante-en-grupo.entity';
-import { MensualidadService } from 'src/mensualidad/mensualidad.service';
+import { PagoService } from 'src/pago/pago.service';
+import { EstudianteDataDto } from './dto/estudiante-data.dto';
+import { EstudianteEnGrupoWithOutPagoDto } from './dto/create-estudiante-en-grupo-without-pago.dto';
 
 @Injectable()
 export class EstudianteEnGrupoService {
@@ -18,10 +20,10 @@ export class EstudianteEnGrupoService {
   private estudEnGrupoModel:Repository<EstudianteEnGrupo>,
   private grupoService:GrupoService,
   private matriculaService:MatriculaService,
-  private mensualidadService:MensualidadService,
+  private pagoService:PagoService,
   private estudianteService:EstudianteService){}
 
-  async create(createEstudEnGrupoDto: CreateEstudianteEnGrupoDto) {
+  async create(createEstudEnGrupoDto: EstudianteEnGrupoWithOutPagoDto) {
     try {
       const { curso, NumeroEstudiantes, MaximoEstudiantes } = await this.grupoService.findOne(createEstudEnGrupoDto.grupo.Id);
       if(NumeroEstudiantes < MaximoEstudiantes){
@@ -30,7 +32,7 @@ export class EstudianteEnGrupoService {
         // update matricula
         await this.matriculaService.update(createEstudEnGrupoDto.matricula.Id, { EstadoMatricula:'matriculado' })
         // update grupo
-        await this.grupoService.update(createEstudEnGrupoDto.grupo.Id,{NumeroEstudiantes:NumeroEstudiantes+1})
+        await this.grupoService.update(createEstudEnGrupoDto.grupo.Id,{ NumeroEstudiantes:NumeroEstudiantes+1 })
         return new HandleEstudianteEnGrupo(`Estudiante ${Nombres} asignado al grupo del curso de ${curso.NombreCurso} correctamente`, true, estudEngrupo);
       }
       return new HandleEstudianteEnGrupo(`El grupo del curso ${curso.NombreCurso} supera la cantidad de estudiantes permitidos`, false, null);
@@ -40,26 +42,37 @@ export class EstudianteEnGrupoService {
     }
   }
 
-  async registerFromMatricula(createEstudEnGrupoDto: CreateEstudianteEnGrupoDto) {
+  async registerFromMatricula(createEstudEnGrupoDto: EstudianteEnGrupoWithPagoDto) {
     try {
+      // Veriifcar la cantidad de estudiantes en el grupo
       const { curso, NumeroEstudiantes, MaximoEstudiantes } = await this.grupoService.findOne(createEstudEnGrupoDto.grupo.Id);
       if(NumeroEstudiantes < MaximoEstudiantes){
-        //? TODO: matricular al estudiante 
-        const matricula = await this.matriculaService.create(createEstudEnGrupoDto.matricula);
-        createEstudEnGrupoDto.estudiante = matricula.estudiante;
-        createEstudEnGrupoDto.matricula = matricula;
-        const enGrupo = await this.estudEnGrupoModel.save(createEstudEnGrupoDto);
-        //? TODO: actualizar contador de maximo de grupos
-        await this.matriculaService.update(createEstudEnGrupoDto.matricula.Id, { EstadoMatricula:'matriculado' })
-        await this.grupoService.update(createEstudEnGrupoDto.grupo.Id, { NumeroEstudiantes:NumeroEstudiantes+1 })
-        createEstudEnGrupoDto.mensualidad.estudianteEnGrupo = { Id:enGrupo.Id } as any;
-        await this.mensualidadService.firstCreate(createEstudEnGrupoDto.mensualidad);
-        return new HandleEstudianteEnGrupo(`${matricula.estudiante.Nombres.toUpperCase()} has registrado tu matricula satisfactoriamente`, true, enGrupo);
+
+        //matricular al estudiante 
+        const { Id, estudiante}  = await this.matriculaService.create(createEstudEnGrupoDto.matricula);
+
+        // add estudiante en grupo
+        const newEstudianteGrupo = { estudiante:{ Id: estudiante.Id }, matricula:{ Id }, grupo:{ Id: createEstudEnGrupoDto.grupo.Id }}
+        const enGrupo = await this.estudEnGrupoModel.save(newEstudianteGrupo);
+
+        //actualizar contador de maximo de grupos
+        await this.matriculaService.update(createEstudEnGrupoDto.matricula.Id, { EstadoMatricula:'matriculado' });
+        await this.grupoService.update(createEstudEnGrupoDto.grupo.Id, { NumeroEstudiantes:NumeroEstudiantes + 1 });
+
+        //registro de mensualidad
+        createEstudEnGrupoDto.pagos = createEstudEnGrupoDto.pagos.map( pago => { 
+          pago.estudianteEnGrupo = { Id: enGrupo.Id } as EstudianteEnGrupo;
+          return pago;
+        }) 
+       
+        await this.pagoService.autoRegistrerMensualidad(createEstudEnGrupoDto.pagos);
+
+        return new HandleEstudianteEnGrupo(`${estudiante.Nombres.toUpperCase()} has registrado tu matricula satisfactoriamente`, true, enGrupo);
       }
         return new HandleEstudianteEnGrupo(`El grupo del curso ${curso.NombreCurso} - ${curso.nivel.Nivel} supera la cantidad de estudiantes permitidos`, false, null);
     } catch (e) {
       console.log(e)
-      throw new InternalServerErrorException('ERROR_REGISTER_FROM_MATRICULA_ESTUDIANTE_EN_GRUPO');
+      throw new InternalServerErrorException('ERROR REGISTER DE MATRICULA ESTUDIANTE EN GRUPO');
     }
   }
 
@@ -77,6 +90,30 @@ export class EstudianteEnGrupoService {
     }
   }
 
+  async findEstudianteEnGrupo(estudianteDataDto:EstudianteDataDto){
+    try {
+      const { Documento, TipoDocumento } = estudianteDataDto;
+      const estudiante = await this.estudianteService.findOneByDocumentoInternal(Documento, TipoDocumento);
+      const data = await this.estudEnGrupoModel.find({ 
+        where:{ Estado:true, estudiante:{ Documento, TipoDocumento } }, 
+        relations:['estudiante',
+                  'estudiante.apoderado',
+                  'matricula',
+                  'matricula.denomiServicio',
+                  'matricula',
+                  'grupo',
+                  'grupo.curso',
+                  'grupo.curso.nivel',
+                  'pagos'] });
+        const isEmpty = data.length==0?true:false;
+        const msg = isEmpty?`El ${TipoDocumento} ${Documento} aún no este asignado a ningún grupo del CEID`
+                                  :`Hola 👋 ${estudiante.Nombres} ${estudiante.ApellidoPaterno} se encuentra en la sesión de sus cursos`;
+      return new HandleEstudianteEnGrupo(msg, !isEmpty, data);
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO');
+    }
+  }
+
   async findByIdGrupo(Id: number, {limit, offset}:PaginationQueryDto) {
     try {
       const count = await this.estudEnGrupoModel.count({
@@ -85,7 +122,17 @@ export class EstudianteEnGrupoService {
       const data = await this.estudEnGrupoModel.find({ 
         where:{ Estado:true, grupo:{ Id } }, 
         skip:offset, take:limit,
-        relations:['matricula','matricula.denomiServicio','grupo','grupo.tipoGrupo','grupo.docente','grupo.curso','grupo.curso.nivel', 'estudiante','estudiante.apoderado','mensualidades'] });
+        relations:['matricula',
+                   'matricula.denomiServicio',
+                   'grupo',
+                   'grupo.tipoGrupo',
+                   'grupo.docente',
+                   'grupo.curso',
+                   'grupo.curso.nivel', 
+                   'estudiante',
+                   'estudiante.apoderado',
+                   'pagos',
+                   'pagos.categoriaPago'] });
       return new HandleEstudianteEnGrupo('Lista estudiantes asignados al grupo', true, data, count);
     } catch (e) {
       console.log(e)

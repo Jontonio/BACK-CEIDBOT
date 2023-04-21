@@ -41,13 +41,13 @@ export class AppGateway implements OnGatewayInit,
   afterInit(server: Server) {
 
     this.server = server;
-    this.client = new Client({ puppeteer: { headless: true,args: ['--no-sandbox'] },
-            authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
-    });
+    // this.client = new Client({ puppeteer: { headless: true,args: ['--no-sandbox'] },
+    //         authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
+    // });
 
-    this.whatsapp = new whatsApp(this.client, this.server, this._curso);
+    // this.whatsapp = new whatsApp(this.client, this.server, this._curso);
     
-    this.whatsapp.start();
+    // this.whatsapp.start();
     
   }
 
@@ -59,7 +59,7 @@ export class AppGateway implements OnGatewayInit,
   handleConnection(client: Socket) {
     console.log(`Connected ${client.id}`);
     /** Emit welcome socket */
-    this.whatsapp.statusWhatsapp();
+    // this.whatsapp.statusWhatsapp();
     client.emit('welcome-ceidbot',{ data:'', ok:true, msg:'Bienvenido al sistema CEIDBOT' } );
   }
 

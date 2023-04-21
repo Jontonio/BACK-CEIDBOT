@@ -30,10 +30,11 @@ export class CursoService {
         skip:offset, 
         take:limit, 
         order: { createdAt:'DESC' },
-        relations:['nivel'] 
+        relations:['nivel','libros'] 
       });
       return new HandleCurso(`Lista de cursos`, true, cursos, count);
     } catch (e) {
+      console.log(e);
       throw new InternalServerErrorException('ERROR_FIND_ALL_CURSOS');
     }
   }
@@ -46,11 +47,11 @@ export class CursoService {
         skip:offset, 
         take:limit, 
         order: { createdAt:'DESC' },
-        relations:['nivel'] 
+        relations:['nivel','libros'] 
       });
       return new HandleCurso(`Lista de cursos`, true, cursos, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_FIND_ALL_CURSOS');
+      throw new InternalServerErrorException('ERROR_FIND_ALL_CURSOS_MATRICULA');
     }
   }
 
@@ -58,7 +59,7 @@ export class CursoService {
     try {
       const curso = await this.cursoModel.findOne({
         where:{ Id },
-        relations:['nivel']
+        relations:['nivel','libros']
       });
       return new HandleCurso(`Curso ${curso.NombreCurso}`, true, curso);
     } catch (e) {

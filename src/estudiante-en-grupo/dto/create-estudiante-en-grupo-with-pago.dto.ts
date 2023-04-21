@@ -1,18 +1,20 @@
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
 import { Grupo } from "src/grupo/entities/grupo.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
-import { Mensualidad } from "src/mensualidad/entities/mensualidad.entity";
+import { Pago } from "src/pago/entities/pago.entity";
 
-export class CreateEstudianteEnGrupoDto {
+export class EstudianteEnGrupoWithPagoDto {
 
     @IsNotEmpty({message:'Id estudiante es requerido de tipo objeto Estudiante (FK)'})
     estudiante:Estudiante;
+    
     @IsNotEmpty({message:'Id grupo es requerido de tipo objeto Grupo (FK)'})
     grupo:Grupo;
+    
     @IsNotEmpty({message:'Id matricula es requerido de tipo objeto Matricula (FK)'})
     matricula:Matricula;
 
-    @IsOptional()
-    mensualidad:Mensualidad;
+    @IsNotEmpty({message:'Id Pago es requerido de tipo objeto pago (FK)'})
+    pagos:Pago[];
 }

@@ -29,10 +29,8 @@ export class Grupo {
     @Column({type:'varchar', length:15})
     Modalidad:string;
 
-
     @Column({type:'boolean'})
     RequeridoPPago:boolean;
-
 
     @ManyToOne( () => Docente, (docente:Docente) => docente.grupos)
     docente:Docente;
@@ -59,6 +57,4 @@ export class Grupo {
 
     @UpdateDateColumn()
     updatedAt:Date;
-
-    
 }

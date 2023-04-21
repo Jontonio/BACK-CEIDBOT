@@ -16,8 +16,9 @@ import { Apoderado } from 'src/apoderado/entities/apoderado.entity';
 import { Institucion } from 'src/institucion/entities/institucion.entity';
 import { ApoderadoService } from 'src/apoderado/apoderado.service';
 import { InstitucionService } from 'src/institucion/institucion.service';
-import { MensualidadService } from 'src/mensualidad/mensualidad.service';
-import { Mensualidad } from 'src/mensualidad/entities/mensualidad.entity';
+import { PagoService } from 'src/pago/pago.service';
+import { Pago } from 'src/pago/entities/pago.entity';
+import { VerifyEstudianteMiddleware } from 'src/middlewares/verify-estudiante.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([EstudianteEnGrupo, 
@@ -26,7 +27,7 @@ import { Mensualidad } from 'src/mensualidad/entities/mensualidad.entity';
                                      TipoGrupo, 
                                      Matricula, 
                                      Apoderado,
-                                     Mensualidad, 
+                                     Pago, 
                                      Institucion, 
                                      Estudiante])],
   controllers: [EstudianteEnGrupoController],
@@ -35,7 +36,7 @@ import { Mensualidad } from 'src/mensualidad/entities/mensualidad.entity';
               GrupoService, 
               MatriculaService, 
               ApoderadoService,
-              MensualidadService,
+              PagoService,
               InstitucionService]
 })
 export class EstudianteEnGrupoModule {
@@ -43,8 +44,11 @@ export class EstudianteEnGrupoModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware).
-      exclude({ path:'estudiante-en-grupo/register-estudiante-from-matricula', method:RequestMethod.POST })
+      exclude({ path:'estudiante-en-grupo/register-estudiante-from-matricula', method:RequestMethod.POST },
+              { path:'estudiante-en-grupo/consulta-estudiante-en-grupo', method:RequestMethod.POST })
       .forRoutes(EstudianteEnGrupoController)
+      .apply( VerifyEstudianteMiddleware)
+      .forRoutes({ path:'estudiante-en-grupo/consulta-estudiante-en-grupo', method:RequestMethod.POST })
   }
 
 }

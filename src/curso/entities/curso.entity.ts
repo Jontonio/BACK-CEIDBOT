@@ -1,4 +1,5 @@
 import { Grupo } from "src/grupo/entities/grupo.entity";
+import { Libro } from "src/libro/entities/libro.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
 import { Nivel } from "src/nivel/entities/nivel.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
@@ -24,8 +25,8 @@ export class Curso {
     @Column({type:'varchar', length:50})
     UrlBandera:string;
 
-    @Column({type:'varchar'})
-    LinkRequistos:string;
+    @Column({nullable:true, type:'varchar'})
+    LinkRequisitos:string;
 
     @Column({default:true})
     Estado:boolean;
@@ -48,4 +49,8 @@ export class Curso {
 
     @ManyToOne(() => Nivel, (niveles:Nivel) => niveles.cursos)
     nivel: Nivel;
+
+    @OneToMany(() => Libro, (libro:Libro) => libro.curso)
+    libros: Libro[];
+
 }

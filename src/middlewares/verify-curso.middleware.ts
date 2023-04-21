@@ -1,6 +1,5 @@
 import { Injectable, NestMiddleware, InternalServerErrorException } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { HandleCurso } from 'src/class/global-handles';
 import { CursoService } from 'src/curso/curso.service';
 
 @Injectable()

@@ -47,7 +47,9 @@ import { EstudianteEnGrupoModule } from './estudiante-en-grupo/estudiante-en-gru
 import { NivelModule } from './nivel/nivel.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { MensualidadModule } from './mensualidad/mensualidad.module';
+import { PagoModule } from './pago/pago.module';
+import { LibroModule } from './libro/libro.module';
+import { CategoriaPagoModule } from './categoria-pago/categoria-pago.module';
 
 @Module({
   imports: [ 
@@ -90,7 +92,9 @@ import { MensualidadModule } from './mensualidad/mensualidad.module';
     InstitucionModule,
     EstudianteEnGrupoModule,
     NivelModule,
-    MensualidadModule
+    PagoModule,
+    LibroModule,
+    CategoriaPagoModule
   ],
   controllers: [AppController],
   providers: [AppService, 

@@ -86,10 +86,10 @@ export class EstudianteService {
     }
   }
 
-  async findOneByDocumentoInternal(Documento: string) {
-    try {
+  async findOneByDocumentoInternal(Documento: string, TipoDocumento = '') {
+    try {const where = TipoDocumento?{ Documento, TipoDocumento }:{ Documento };
       return await this.estudianteModel.findOne({
-        where:{ Documento },
+        where,
         relations:['departamento','provincia','distrito','apoderado']
       });
     } catch (e) {

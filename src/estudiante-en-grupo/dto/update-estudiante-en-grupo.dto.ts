@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateEstudianteEnGrupoDto } from './create-estudiante-en-grupo.dto';
+import { EstudianteEnGrupoWithPagoDto } from './create-estudiante-en-grupo-with-pago.dto';
 
-export class UpdateEstudianteEnGrupoDto extends PartialType(CreateEstudianteEnGrupoDto) {}
+export class UpdateEstudianteEnGrupoDto extends PartialType( EstudianteEnGrupoWithPagoDto ) {}

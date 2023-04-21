@@ -11,6 +11,7 @@ export class DenominacionServicioService {
 
     constructor(@InjectRepository(DenominacionServicio) 
                 private readonly modelDenomin:Repository<DenominacionServicio>){}
+                
     async create(denominDto:CreateDenominServicioDto){
         try {
             const denominServicio = await this.modelDenomin.save(denominDto);

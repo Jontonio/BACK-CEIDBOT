@@ -84,7 +84,7 @@ export class GrupoService {
         where:{ Estado:true }, 
         skip:offset, take:limit,
         order: { curso:{ NombreCurso:'ASC' } },
-        relations:['horario','tipoGrupo','curso','curso.nivel']});
+        relations:['horario','tipoGrupo','curso','curso.nivel','curso.libros']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_GRUPOS_MATRICULA');

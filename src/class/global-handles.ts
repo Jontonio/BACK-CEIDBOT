@@ -13,10 +13,19 @@ import { Matricula } from "src/matricula/entities/matricula.entity";
 import { Institucion } from "src/institucion/entities/institucion.entity";
 import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
 import { Nivel } from "src/nivel/entities/nivel.entity";
-import { Mensualidad } from "src/mensualidad/entities/mensualidad.entity";
+import { Pago } from "src/pago/entities/pago.entity";
+import { Libro } from "src/libro/entities/libro.entity";
+import { CategoriaPago } from "src/categoria-pago/entities/categoria-pago.entity";
 
-class HandleMensualidad{
-  constructor(public msg:string, public ok:boolean,public data:Mensualidad | Mensualidad[], public count?:number){}
+class HandleLibro{
+  constructor(public msg:string, public ok:boolean,public data:Libro | Libro[], public count?:number){}
+}
+
+class HandleCategoriaPago{
+  constructor(public msg:string, public ok:boolean,public data:CategoriaPago | CategoriaPago[], public count?:number){}
+}
+class HandlePago{
+  constructor(public msg:string, public ok:boolean,public data:Pago | Pago[], public count?:number){}
 }
 
 class HandleEstudianteEnGrupo{
@@ -90,6 +99,8 @@ export {
     HandleInstitucion,
     HandleEstudianteEnGrupo,
     HandleNivel,
-    HandleMensualidad
+    HandlePago,
+    HandleLibro,
+    HandleCategoriaPago
 }
 

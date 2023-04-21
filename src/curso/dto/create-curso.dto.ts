@@ -31,5 +31,5 @@ export class CreateCursoDto {
     DescripcionCurso:string
 
     @IsOptional()
-    LinkRequistos:string
+    LinkRequisitos:string
 }

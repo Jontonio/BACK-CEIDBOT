@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProvinviaDto } from './dto/create-distrito.dto';
@@ -21,15 +21,27 @@ export class UbigeoService {
   }
 
   async findDepartamentos(){
-    return this.deparModel.find();
+    try {
+      return this.deparModel.find();
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR GET DEPARTAMENTOS');
+    }
   }
 
   async findProvincia(IdPadreUbigeo:number){
-    return this.provinModel.findBy({ IdPadreUbigeo });
+    try {
+      return this.provinModel.findBy({ IdPadreUbigeo });
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR GET PROVINCIAS BY UBIGEO');
+    }
   }
 
   async findDistrito(IdPadreUbigeo:number){
-    return this.distModel.find({ where:{ IdPadreUbigeo }, order:{ NombreDistrito:'ASC'} });
+    try {
+      return this.distModel.find({ where:{ IdPadreUbigeo }, order:{ NombreDistrito:'ASC'} });
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR GET DISTRITO BY UBIGEO');
+    }
   }
   
 }

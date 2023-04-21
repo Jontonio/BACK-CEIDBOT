@@ -1,13 +1,30 @@
-import { Controller, Get, Post, Req, Res, Body, Param, Delete, Query, UseInterceptors, UploadedFile} from '@nestjs/common';
+import { Controller, 
+         Get, 
+         Post, 
+         Req, 
+         Body, 
+         Param, 
+         Delete, 
+         Query, 
+         UseInterceptors, 
+         UploadedFile,
+         HttpException, 
+         FileTypeValidator,
+         ParseFilePipe ,
+         HttpStatus} from '@nestjs/common';
 import { MatriculaService } from './matricula.service';
 import { CreateMatriculaDto } from './dto/create-matricula.dto';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { Request } from 'express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { MaxFileSize } from 'src/helpers/files/MaxFileSixe';
 
 @Controller('matricula')
 export class MatriculaController {
+  
   constructor(private readonly matriculaService: MatriculaService) {}
 
   @Post('matricular-estudiante')
@@ -25,8 +42,8 @@ export class MatriculaController {
     return this.matriculaService.findOne(+id);
   }
 
-  @Post('file-matricula')
-  @UseInterceptors(FileInterceptor('file', { dest: './uploads' }))
+  @Post('upload-file')
+  @UseInterceptors(FileInterceptor('file',{ dest:'./uploads' }))
   async handleFileMatricula(@UploadedFile() file:Express.Multer.File, @Req() req:Request){
     return this.matriculaService.uploadFileMatricula(file, req);
   }

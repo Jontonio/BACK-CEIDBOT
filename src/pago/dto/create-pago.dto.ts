@@ -1,7 +1,8 @@
-import { IsDate, IsNotEmpty, IsString } from "class-validator";
+import { IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { CategoriaPago } from "src/categoria-pago/entities/categoria-pago.entity";
 import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
 
-export class CreateMensualidadDto {
+export class CreatePagoDto {
 
     // @MaxLength(5, {message:'TipoDocumento tiene permitido como máximo 5 carácteres'})
     @IsNotEmpty({message:'VoucherUrl es requerido'})
@@ -16,6 +17,13 @@ export class CreateMensualidadDto {
     @IsString({message:'CodigoVocuher tienen que ser de tipo STRING'})
     CodigoVocuher:string;
 
-    @IsNotEmpty({message:'Es necesario el Id de la estudianteEnGrupo dentro del objeto EstudianteEnGrupo'})
+    @IsNotEmpty({message:'MontoPago es requerido'})
+    @IsNumber()
+    MontoPago:number;
+
+    @IsNotEmpty({message:'Es necesario el Id de estudianteEnGrupo dentro del objeto EstudianteEnGrupo'})
     estudianteEnGrupo:EstudianteEnGrupo;
+    
+    @IsNotEmpty({message:'Es necesario el Id de CategoriaPago dentro del objeto categoriaPago'})
+    categoriaPago:CategoriaPago;
 }

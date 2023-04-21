@@ -15,8 +15,8 @@ import { Grupo } from 'src/grupo/entities/grupo.entity';
 import { TipoGrupo } from 'src/grupo/entities/tipo-grupo.entity';
 import { EstudianteEnGrupoService } from 'src/estudiante-en-grupo/estudiante-en-grupo.service';
 import { EstudianteEnGrupo } from 'src/estudiante-en-grupo/entities/estudiante-en-grupo.entity';
-import { MensualidadService } from 'src/mensualidad/mensualidad.service';
-import { Mensualidad } from 'src/mensualidad/entities/mensualidad.entity';
+import { PagoService } from 'src/pago/pago.service';
+import { Pago } from '../pago/entities/pago.entity';
 
 @Module({
   imports:[
@@ -25,7 +25,7 @@ import { Mensualidad } from 'src/mensualidad/entities/mensualidad.entity';
                                      Estudiante, 
                                      Grupo,
                                      TipoGrupo,
-                                     Mensualidad,
+                                     Pago,
                                      EstudianteEnGrupo,
                                      Institucion])],
   controllers: [MatriculaController],
@@ -33,7 +33,7 @@ import { Mensualidad } from 'src/mensualidad/entities/mensualidad.entity';
               ApoderadoService, 
               GrupoService,
               EstudianteEnGrupoService,
-              MensualidadService,
+              PagoService,
               EstudianteService,
               InstitucionService]
 })
@@ -43,7 +43,7 @@ export class MatriculaModule {
     consumer
       .apply(VerifyTokenMiddleware)
       .exclude({ path:'matricula/matricular-estudiante', method:RequestMethod.POST},
-               { path:'matricula/file-matricula', method:RequestMethod.POST })
+               { path:'matricula/upload-file', method:RequestMethod.POST })
       .forRoutes(MatriculaController)
   }
 

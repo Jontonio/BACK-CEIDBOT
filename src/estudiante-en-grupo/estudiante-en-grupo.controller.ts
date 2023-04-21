@@ -1,20 +1,27 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { EstudianteEnGrupoService } from './estudiante-en-grupo.service';
-import { CreateEstudianteEnGrupoDto } from './dto/create-estudiante-en-grupo.dto';
+import { EstudianteEnGrupoWithPagoDto } from './dto/create-estudiante-en-grupo-with-pago.dto';
+import { EstudianteEnGrupoWithOutPagoDto } from './dto/create-estudiante-en-grupo-without-pago.dto';
 import { UpdateEstudianteEnGrupoDto } from './dto/update-estudiante-en-grupo.dto';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
+import { EstudianteDataDto } from './dto/estudiante-data.dto';
 
 @Controller('estudiante-en-grupo')
 export class EstudianteEnGrupoController {
   constructor(private readonly estudianteEnGrupoService: EstudianteEnGrupoService) {}
 
   @Post('register-estudiante-prematricula')
-  create(@Body() createEstudianteEnGrupoDto: CreateEstudianteEnGrupoDto) {
+  create(@Body() createEstudianteEnGrupoDto: EstudianteEnGrupoWithOutPagoDto) {
     return this.estudianteEnGrupoService.create(createEstudianteEnGrupoDto);
   }
 
+  @Post('consulta-estudiante-en-grupo')
+  findEstudianteEnGrupo(@Body() estudianteDataDto: EstudianteDataDto) {
+    return this.estudianteEnGrupoService.findEstudianteEnGrupo(estudianteDataDto);
+  }
+
   @Post('register-estudiante-from-matricula')
-  registerFromMatricula(@Body() createEstudianteEnGrupoDto: CreateEstudianteEnGrupoDto) {
+  registerFromMatricula(@Body() createEstudianteEnGrupoDto: EstudianteEnGrupoWithPagoDto) {
     return this.estudianteEnGrupoService.registerFromMatricula(createEstudianteEnGrupoDto);
   }
 
