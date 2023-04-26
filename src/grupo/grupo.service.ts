@@ -17,6 +17,7 @@ export class GrupoService {
               @InjectRepository(TipoGrupo) 
               private tipoGrupoModel:Repository<TipoGrupo>){}
 
+  /** Crea el nombre del grupo como por ejemplo grupo A, grupo B, grupo C etc  */
   async createTipoGrupo(createTipo: CreateTipoGrupoDto) {
     try {
       /** verifcar si ya existe un nombre similar del grupo*/
@@ -29,8 +30,23 @@ export class GrupoService {
     }
   }
 
+  /** Crea el grupo  */
   async createGrupo(createGrupo: CreateGrupoDto) {
     try {
+      //TODO verificar si existe un grupo con el mismo nombre y que sea del mismo nivel y que estado se activo */
+      const { NombreGrupo } = createGrupo.tipoGrupo;
+      const { NombreCurso, nivel } = createGrupo.curso;
+      const { Nivel } = nivel;
+      const CodeEstado = 'status_matricula';
+      const existsGrupo = await this.grupoModel.findOne({
+        where:{ tipoGrupo:{ NombreGrupo }, 
+                estadoGrupo:{ CodeEstado }, 
+                curso:{ NombreCurso, nivel:{ Nivel } } 
+        }
+      });
+      if(existsGrupo){
+        return new HandleGrupo(`El grupo a registrar ya existe. Registre un nuevo grupo con un nombre diferente`, false, null);
+      }
       const data = await this.grupoModel.save(createGrupo);
       return new HandleGrupo(`Grupo con código ${data.Id} registrado correctamente`, true, data);
     } catch (e) {
@@ -41,9 +57,10 @@ export class GrupoService {
   async findTipoGrupos() {
     try {
       const count = await this.tipoGrupoModel.countBy({ Estado:true });
-      const data = await this.tipoGrupoModel.find({ 
-                                              where:{ Estado:true }, 
-                                              order: { createdAt:'DESC' } });
+      const data = await this.tipoGrupoModel.find({
+        where:{ Estado:true },
+        order: { createdAt:'DESC' } 
+      });
       return new HandleGrupo('Lista de tipo de grupos registrados', true, data, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_TIPOS_GRUPOS');
@@ -54,9 +71,9 @@ export class GrupoService {
     try {
       const count = await this.tipoGrupoModel.countBy({ Estado:true });
       const data = await this.tipoGrupoModel.find({ 
-                                              where:{ Estado:true }, 
-                                              skip:offset, take:limit,
-                                              order: { createdAt:'DESC' } });
+        where:{ Estado:true }, 
+        skip:offset, take:limit,
+        order: { createdAt:'DESC' } });
       return new HandleGrupo('Lista de tipo de grupos registrados', true, data, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_TIPOS_GRUPOS');
@@ -70,7 +87,7 @@ export class GrupoService {
         where:{ Estado:true }, 
         skip:offset, take:limit,
         order: { createdAt:'DESC' },
-        relations:['docente','horario','tipoGrupo','curso','curso.nivel']});
+        relations:['docente','horario','tipoGrupo','curso','curso.nivel','estadoGrupo']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_GRUPOS');
@@ -81,10 +98,15 @@ export class GrupoService {
     try {
       const count = await this.grupoModel.countBy({ Estado:true });
       const grupos = await this.grupoModel.find({
-        where:{ Estado:true }, 
+        where:{ Estado:true, estadoGrupo:{ CodeEstado:'status_matricula' } }, 
         skip:offset, take:limit,
         order: { curso:{ NombreCurso:'ASC' } },
-        relations:['horario','tipoGrupo','curso','curso.nivel','curso.libros']});
+        relations:['horario',
+                   'tipoGrupo',
+                   'curso',
+                   'curso.nivel',
+                   'curso.libros',
+                   'estadoGrupo']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_GRUPOS_MATRICULA');
@@ -95,7 +117,12 @@ export class GrupoService {
     try {
       const data = await this.grupoModel.findOne({ 
         where:{ Id }, 
-        relations:['docente','horario','tipoGrupo','curso','curso.nivel']});
+        relations:['docente',
+                   'horario',
+                   'tipoGrupo',
+                   'curso',
+                   'curso.nivel',
+                   'estadoGrupo']});
       return new HandleGrupo('Un grupo encontrado', true, data);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');

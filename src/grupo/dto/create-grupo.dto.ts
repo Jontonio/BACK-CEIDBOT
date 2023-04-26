@@ -3,6 +3,7 @@ import { Curso } from "src/curso/entities/curso.entity";
 import { Docente } from "src/docente/entities/docente.entity";
 import { Horario } from "src/horario/entities/horario.entity";
 import { TipoGrupo } from "../entities/tipo-grupo.entity";
+import { EstadoGrupo } from "src/estado-grupo/entities/estado-grupo.entity";
 
 export class CreateGrupoDto {
 
@@ -46,5 +47,9 @@ export class CreateGrupoDto {
 
     @IsNotEmpty({message:'Es necesario el Id del tipoGrupo dentro del objeto tipoGrupo'})
     tipoGrupo:TipoGrupo;
+
+    /** El estado del grupo es opcional pero es necesario para tener el control de los grupos*/
+    @IsOptional()
+    estadoGrupo:EstadoGrupo;
 
 }

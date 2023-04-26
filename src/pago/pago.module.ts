@@ -14,7 +14,7 @@ export class PagoModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware)
-      .exclude({ path:'mensualidad/pago-mensualidad', method:RequestMethod.POST})
+      .exclude({ path:'pago/register-pago', method:RequestMethod.POST})
       .forRoutes(PagoController)
   }
 }

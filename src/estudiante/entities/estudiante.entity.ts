@@ -4,7 +4,7 @@ import { Matricula } from "src/matricula/entities/matricula.entity";
 import { Departamento } from "src/ubigeo/entities/departamento.entity";
 import { Distrito } from "src/ubigeo/entities/distrito.entity";
 import { Provincia } from "src/ubigeo/entities/provincia.entity";
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Estudiante {
@@ -87,5 +87,14 @@ export class Estudiante {
 
     @UpdateDateColumn()
     updatedAt:Date;
+
+    @BeforeInsert()
+    nameToLowerCase(){
+        this.Nombres = this.Nombres.toLowerCase();
+        this.ApellidoPaterno = this.ApellidoPaterno.toLowerCase();
+        this.ApellidoMaterno = this.ApellidoMaterno.toLowerCase();
+        this.Email = this.Email.toLowerCase();
+    }
+
  
 }

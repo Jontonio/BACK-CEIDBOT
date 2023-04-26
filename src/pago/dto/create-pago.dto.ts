@@ -13,9 +13,9 @@ export class CreatePagoDto {
     @IsDate({message:'FechaPago tienen que ser de tipo DATE'})
     FechaPago:Date;
     
-    @IsNotEmpty({message:'CodigoVocuher es requerido'})
-    @IsString({message:'CodigoVocuher tienen que ser de tipo STRING'})
-    CodigoVocuher:string;
+    @IsNotEmpty({message:'CodigoVoucher es requerido'})
+    @IsString({message:'CodigoVoucher tienen que ser de tipo STRING'})
+    CodigoVoucher:string;
 
     @IsNotEmpty({message:'MontoPago es requerido'})
     @IsNumber()

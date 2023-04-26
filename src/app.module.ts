@@ -50,6 +50,7 @@ import { diskStorage } from 'multer';
 import { PagoModule } from './pago/pago.module';
 import { LibroModule } from './libro/libro.module';
 import { CategoriaPagoModule } from './categoria-pago/categoria-pago.module';
+import { EstadoGrupoModule } from './estado-grupo/estado-grupo.module';
 
 @Module({
   imports: [ 
@@ -94,7 +95,8 @@ import { CategoriaPagoModule } from './categoria-pago/categoria-pago.module';
     NivelModule,
     PagoModule,
     LibroModule,
-    CategoriaPagoModule
+    CategoriaPagoModule,
+    EstadoGrupoModule
   ],
   controllers: [AppController],
   providers: [AppService, 

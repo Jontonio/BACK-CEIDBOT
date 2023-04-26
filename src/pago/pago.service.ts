@@ -13,8 +13,14 @@ export class PagoService {
   constructor(@InjectRepository(Pago) 
                private pagoModel:Repository<Pago>){}
 
-  create(createPagoDto: CreatePagoDto) {
-    return 'This action adds a new mensualidad';
+  async create(createPagoDto: CreatePagoDto) {
+    try {
+      const mensualidad =  await this.pagoModel.save(createPagoDto);
+      return new HandlePago(`Se ha registrado su pago de ${createPagoDto.categoriaPago.TipoCategoriaPago } correctamente 🎉`, true, mensualidad);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR AL REGISTRAR DATOS DE PAGO');
+    }
   }
 
   async autoRegistrerMensualidad(firstPagoDto: FirstPagoDto[]){
@@ -23,16 +29,6 @@ export class PagoService {
     } catch (e) {
       console.log(e)
       throw new InternalServerErrorException('ERROR_REGISTER_AUTO_MENSUALIDAD');
-    }
-  }
-
-  async registrerMensualidad(firstPagoDto: FirstPagoDto){
-    try {
-      const mensualidad =  await this.pagoModel.save(firstPagoDto);
-      return new HandlePago(`Se Han registrado sus datos correctamente 🎉`, true, mensualidad);
-    } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException('ERROR_REGISTER_MENSUALIDAD');
     }
   }
 

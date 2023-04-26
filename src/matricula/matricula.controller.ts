@@ -7,20 +7,13 @@ import { Controller,
          Delete, 
          Query, 
          UseInterceptors, 
-         UploadedFile,
-         HttpException, 
-         FileTypeValidator,
-         ParseFilePipe ,
-         HttpStatus} from '@nestjs/common';
+         UploadedFile } from '@nestjs/common';
 import { MatriculaService } from './matricula.service';
 import { CreateMatriculaDto } from './dto/create-matricula.dto';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { Request } from 'express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { MaxFileSize } from 'src/helpers/files/MaxFileSixe';
 
 @Controller('matricula')
 export class MatriculaController {

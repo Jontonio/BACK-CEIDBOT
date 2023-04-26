@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HandleCurso } from 'src/class/global-handles';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
-import { FindOptionsWhere, Like, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { Curso } from './entities/curso.entity';
@@ -26,7 +26,7 @@ export class CursoService {
     try {
       const count = await this.cursoModel.countBy({ Estado:true });
       const cursos = await this.cursoModel.find({ 
-        where: { Estado:true }, 
+        where: { Estado:true, EstadoApertura:true }, 
         skip:offset, 
         take:limit, 
         order: { createdAt:'DESC' },
@@ -85,8 +85,9 @@ export class CursoService {
 
   async update(Id: number, updateCursoDto: UpdateCursoDto) {
     try {
+      console.log(updateCursoDto)
       const { affected } = await this.cursoModel.update(Id, updateCursoDto);
-      if(affected==0) return new HandleCurso(`Usuario sin afectar`, false, null);
+      if(affected==0) return new HandleCurso(`curso sin afectar`, false, null);
       const { NombreCurso } = await this.cursoModel.findOneBy({Id});
       return new HandleCurso(`Curso ${NombreCurso.toUpperCase()} actualizado correctamente`, true, null);
     } catch (e) {
@@ -102,7 +103,7 @@ export class CursoService {
       const { NombreCurso } = await this.cursoModel.findOneBy({Id});
       return new HandleCurso(`Curso ${NombreCurso.toUpperCase()} eliminado correctamente`, true, null);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_REMOVE_USUARIO');
+      throw new InternalServerErrorException('ERROR_REMOVE_CURSO');
     }
   }
 

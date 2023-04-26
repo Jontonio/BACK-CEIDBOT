@@ -238,7 +238,7 @@ export class MatriculaService {
       await fs.unlink(file.path)
       return data;
     } catch (e) {
-      const error = (e.code && e.code=='ETIMEDOUT')?'Revise su conexión a internet':'';
+      const error = (e.code && e.code=='ETIMEDOUT')?'Revise su conexión a internet o la estabilidad del internet':'';
       throw new InternalServerErrorException(`Error al subir el archivo | ${(e.response?e.response:error)}`);
     }
   }

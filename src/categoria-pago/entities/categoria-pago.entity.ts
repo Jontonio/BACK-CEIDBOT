@@ -10,6 +10,9 @@ export class CategoriaPago {
     @Column({type:'varchar', length:40})
     TipoCategoriaPago:string;
 
+    @Column({type:'varchar', length:40})
+    CodeCategoriaPago:string;
+
     @Column({default:true})
     Estado:boolean;
 

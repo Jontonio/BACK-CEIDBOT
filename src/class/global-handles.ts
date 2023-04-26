@@ -16,9 +16,14 @@ import { Nivel } from "src/nivel/entities/nivel.entity";
 import { Pago } from "src/pago/entities/pago.entity";
 import { Libro } from "src/libro/entities/libro.entity";
 import { CategoriaPago } from "src/categoria-pago/entities/categoria-pago.entity";
+import { EstadoGrupo } from "src/estado-grupo/entities/estado-grupo.entity";
 
 class HandleLibro{
   constructor(public msg:string, public ok:boolean,public data:Libro | Libro[], public count?:number){}
+}
+
+class HandleEstadoGrupo{
+  constructor(public msg:string, public ok:boolean,public data:EstadoGrupo | EstadoGrupo[], public count?:number){}
 }
 
 class HandleCategoriaPago{
@@ -101,6 +106,7 @@ export {
     HandleNivel,
     HandlePago,
     HandleLibro,
-    HandleCategoriaPago
+    HandleCategoriaPago,
+    HandleEstadoGrupo
 }
 
