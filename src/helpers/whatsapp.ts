@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 import { MessageStatusBot } from "../class/Bot";
 import { chatbot } from "./chatbot";
 import { CursoService } from "src/curso/curso.service";
+import { GPT } from "./ChatGPT";
 
 class whatsApp {
 
@@ -79,7 +80,10 @@ class whatsApp {
         this.client.on('message', async (message) => {
             const chat:Chat = await message.getChat()
             if(!chat.isGroup && message.type=='chat'){
-                chatbot(this.client, message, this._curso);                
+                const res = await GPT( message.body );
+                console.log(res)
+                this.client.sendMessage(message.from, res )
+                // chatbot(this.client, message, this._curso);                
             }
         })
 

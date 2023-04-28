@@ -18,6 +18,10 @@ import { Libro } from "src/libro/entities/libro.entity";
 import { CategoriaPago } from "src/categoria-pago/entities/categoria-pago.entity";
 import { EstadoGrupo } from "src/estado-grupo/entities/estado-grupo.entity";
 
+class HandleResetPassword{
+  constructor(public msg:string, public ok:boolean,public data:any){}
+}
+
 class HandleLibro{
   constructor(public msg:string, public ok:boolean,public data:Libro | Libro[], public count?:number){}
 }
@@ -107,6 +111,7 @@ export {
     HandlePago,
     HandleLibro,
     HandleCategoriaPago,
-    HandleEstadoGrupo
+    HandleEstadoGrupo,
+    HandleResetPassword
 }
 

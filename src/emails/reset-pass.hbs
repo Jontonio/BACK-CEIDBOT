@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Recuperación de contraseña</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
+	<style>
+		body {
+			background-color: #f2f2f2;
+			font-family: 'Roboto', sans-serif;
+		}
+
+		.container {
+			background-color: #fff;
+			max-width: 500px;
+			margin: 0 auto;
+			padding: 20px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			box-shadow: 0 0 5px #ddd;
+		}
+		
+		h1 {
+			font-size: 24px;
+			margin-bottom: 20px;
+		}
+		
+		p {
+			font-size: 16px;
+			margin-bottom: 20px;
+		}
+		
+		a.button {
+			display: block;
+			background-color: #F9A826;
+			color: #fff;
+			padding: 10px;
+			border: none;
+			border-radius: 5px;
+			font-size: 16px;
+			text-align: center;
+			text-decoration: none;
+			cursor: pointer;
+		}
+		
+		a.button:hover {
+			background-color: #b97a13;
+		}
+
+        .content-header{
+            width: 500px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .img-logo{
+            width: 55px;
+			height: 55px;
+        }
+
+        .footer-p{
+            margin: 0 auto;
+            font-size: 15px;
+            color: #a2a2a2;
+        }
+
+		.title-main{
+			padding: 3px;
+		}
+		
+		.name-user{
+			text-transform: uppercase;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+        <div class="content-header">
+            <img class="img-logo" src="https://res.cloudinary.com/dodd3ff0n/image/upload/v1682649164/logo_vgfalx.png" alt="CEID logo"> 
+            <p class="title-main"><b>Centro de idiomas UNAJMA</b></p>
+        </div>
+		<h2>Recuperación de contraseña</h2>
+		<p>Hola <span class="name-user">{{data.Nombres}}</span>,</p>
+		<p>Recibimos una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+		<p><a href="{{data.UrlReset}}/{{data.UUI}}" class="button">Restablecer contraseña</a></p>
+		<p>Si no solicitaste un restablecimiento de contraseña, no realices ninguna acción.</p>
+		<p>Atentamente,</p>
+		<p>El equipo del <b>CEIDBOT</b></p>
+        <footer>
+            <p class="footer-p">© Todos los derechos reservados CEIDBOT</p>
+        </footer>
+	</div>
+</body>
+</html>

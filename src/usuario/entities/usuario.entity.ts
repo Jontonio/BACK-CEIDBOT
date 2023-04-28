@@ -51,6 +51,9 @@ export class Usuario {
     @Column({nullable:true, type:'varchar', length:10})
     CodePhone:string;
 
+    @Column({nullable:true, type:'varchar', length:40})
+    ResetPasswordToken:string;
+
     @CreateDateColumn()
     createdAt:Date;
 

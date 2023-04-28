@@ -76,6 +76,15 @@ export class UsuarioService {
     }
   }
 
+  async updateByEmailResetToken(Email: string, ResetPasswordToken: string) {
+    try {
+      return await this.userModel.update({ Email }, { ResetPasswordToken });
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException('ERROR UPDATE TOKEN RESET USUARIO');
+    }
+  }
+
   async remove(Id: number) {
     try {
       const { affected } = await this.userModel.update(Id,{ Estado:false });
@@ -109,7 +118,6 @@ export class UsuarioService {
     } catch (e) {
       throw new InternalServerErrorException('ERROR_FIND_BY_EMAIL_USUARIO');
     }
-    
   }
 
   async findOneByDNI(DNI:string){
@@ -122,6 +130,7 @@ export class UsuarioService {
       throw new InternalServerErrorException('ERROR_FIND_BY_DNI_USUARIO');
     }
   }
+
   async findOneByID(Id: number) {
     try {
       return await this.userModel.findOne({

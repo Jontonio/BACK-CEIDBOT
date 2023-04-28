@@ -22,6 +22,14 @@ export class AuthModule {
       {
         path:'auth/logout', 
         method:RequestMethod.POST 
+      },
+      {
+        path:'auth/reset-password', 
+        method:RequestMethod.PATCH 
+      },
+      {
+        path:'auth/change-password', 
+        method:RequestMethod.PATCH 
       })
       .forRoutes(AuthController)
   }

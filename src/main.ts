@@ -5,17 +5,7 @@ import { ValidationPipe } from "@nestjs/common";
 async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
-
-  // condition of enviroment variables
-  // const nodeEnv = process.env.NODE_ENV || 'development';
-
-  // if (nodeEnv === 'production') {
-  //   dotenv.config({ path: '.env.production' });
-  //   console.log("producion")
-  // } else {
-  //   console.log("dev")
-  //   dotenv.config({ path: '.env' });
-  // }
+  const PORT = process.env.SERVER_PORT || 8000
 
   app.enableCors({origin:'*'})
 
@@ -23,7 +13,7 @@ async function bootstrap() {
     transformOptions:{ enableImplicitConversion:true }
   }))
 
-  await app.listen(3000,'0.0.0.0');
+  await app.listen(PORT,'0.0.0.0');
 }
 
 bootstrap();

@@ -51,10 +51,34 @@ import { PagoModule } from './pago/pago.module';
 import { LibroModule } from './libro/libro.module';
 import { CategoriaPagoModule } from './categoria-pago/categoria-pago.module';
 import { EstadoGrupoModule } from './estado-grupo/estado-grupo.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { config } from 'dotenv';
 
 @Module({
   imports: [ 
-    ConfigModule.forRoot({isGlobal:true}),
+    ConfigModule.forRoot({
+      envFilePath:(process.env.NODE_ENV === 'production')?'.production.env':'.env',
+      load:[config],
+      isGlobal:true
+    }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.SMTP_HOST,
+        port: 587,
+        auth: {
+          user: process.env.SMTP_USERNAME,
+          pass: process.env.SMTP_PASSWORD,
+        },
+      },
+      template: {
+        dir: join(__dirname, 'emails'),
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads',
@@ -98,7 +122,7 @@ import { EstadoGrupoModule } from './estado-grupo/estado-grupo.module';
     CategoriaPagoModule,
     EstadoGrupoModule
   ],
-  controllers: [AppController],
+  controllers: [ AppController ],
   providers: [AppService, 
               AppGateway, 
               CursoService,
