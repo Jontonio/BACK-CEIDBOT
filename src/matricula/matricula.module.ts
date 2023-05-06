@@ -42,7 +42,7 @@ export class MatriculaModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware)
-      .exclude({ path:'matricula/matricular-estudiante', method:RequestMethod.POST},
+      .exclude({ path:'matricula/prematricula-estudiante', method:RequestMethod.POST},
                { path:'matricula/upload-file', method:RequestMethod.POST })
       .forRoutes(MatriculaController)
   }

@@ -8,6 +8,7 @@ import { UpdateGrupoDto } from './dto/update-grupo.dto';
 import { Grupo } from './entities/grupo.entity';
 import { TipoGrupo } from './entities/tipo-grupo.entity';
 import { HandleGrupo } from 'src/class/global-handles';
+import * as moment from 'moment';
 
 @Injectable()
 export class GrupoService {
@@ -115,15 +116,41 @@ export class GrupoService {
   
   async findOneGrupo(Id: number) {
     try {
-      const data = await this.grupoModel.findOne({ 
+      const grupo = await this.grupoModel.findOne({ 
         where:{ Id }, 
         relations:['docente',
                    'horario',
                    'tipoGrupo',
                    'curso',
                    'curso.nivel',
-                   'estadoGrupo']});
-      return new HandleGrupo('Un grupo encontrado', true, data);
+                   'curso.libros',
+                   'estadoGrupo',
+                   'estudianteEnGrupo']});
+      // console.log(grupo);
+      // const fecha1 = moment(grupo.FechaInicioGrupo); //fecha de inicio
+      // const fecha2 = moment(grupo.FechaFinalGrupo); // fecha final
+      // const fecha3 = moment().format('YYYY-MM-DD'); // fecha actual
+      // const fecha4 = moment(fecha3);
+
+      // const diasEnClases = fecha2.diff(fecha1, 'days');
+      // const diasTransPassdos = fecha4.diff(fecha1, 'days');
+      // console.log("Fecha inicio: ",fecha1);
+      // console.log("Fecha final: ",fecha2);
+      // console.log('Dias entre la fecha inicio y la fecha final: ',diasEnClases);
+      // console.log('Dias pasados hasta ahora: ', diasTransPassdos);
+      // // Calcula la cantidad de días que tiene cada módulo en el curso:
+      // const numModulos = grupo.curso.NumModulos;
+      // const cantidadDiasModulo = Math.floor(diasEnClases / numModulos);
+      // console.log('Días por módulo: ', cantidadDiasModulo)
+      // //calcula los modulos completados
+      // const modulosCumplidos = Math.floor(diasTransPassdos / cantidadDiasModulo);
+      // console.log('Modulos cumplidos: ',modulosCumplidos);
+      // console.log('Modulo actual: ',modulosCumplidos<numModulos?modulosCumplidos:modulosCumplidos+1);
+      // for (let index = 1; index <= numModulos; index++) {
+      //   console.log(`Fecha pago ${index}: `, fecha1.add(cantidadDiasModulo,'days').format('YYYY-MM-DD'))
+      // }
+
+      return new HandleGrupo('Un grupo encontrado', true, grupo);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');
     }
@@ -131,7 +158,10 @@ export class GrupoService {
 
   async findOne(Id: number) {
     try {
-      return await this.grupoModel.findOne({ where:{ Id }, relations:['tipoGrupo','curso']});
+      return await this.grupoModel.findOne({ 
+        where:{ Id }, 
+        relations:['tipoGrupo','curso','curso.nivel','docente']
+      });
     } catch (e) {
       throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');
     }

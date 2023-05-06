@@ -12,10 +12,10 @@ export class Grupo {
     @PrimaryGeneratedColumn('increment')
     Id:number;
 
-    @Column({type:'datetime'})
+    @Column({type:'date'})
     FechaFinalGrupo:Date;
 
-    @Column({type:'datetime'})
+    @Column({type:'date'})
     FechaInicioGrupo:Date;
     
     @Column({nullable:true, type:'varchar', length:350})

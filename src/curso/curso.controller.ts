@@ -17,9 +17,10 @@ export class CursoController {
   findAll(@Query() pagination: PaginationQueryDto) {
     return this.cursoService.findAll(pagination);
   }
-  @Get('get-cursos-matriculas')
-  findCursosMatriculas(@Query() pagination: PaginationQueryDto) {
-    return this.cursoService.CursosMatricula(pagination);
+
+  @Get('get-cursos-inscripcion')
+  findCursosInscripcion() {
+    return this.cursoService.cursosInscripcion();
   }
 
   @Get('get-one-curso/:id')

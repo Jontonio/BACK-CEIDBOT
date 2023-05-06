@@ -61,7 +61,6 @@ export class Usuario {
     updatedAt:Date;
 
     /** tablas relacionadas  */
-    
     @ManyToOne( () => Rol, (rol:Rol) => rol.usuarios )
     rol:Rol;
 

@@ -18,9 +18,9 @@ export class RolService {
 
   async findAll() {
     
-    const data = await this.rolModel.find();
     const count = await this.rolModel.count();
-
+    const data = await this.rolModel.find();
+    
     return { count, data, ok:true, msg:'Lista de roles'};
   }
 

@@ -26,7 +26,7 @@ export class CursoService {
     try {
       const count = await this.cursoModel.countBy({ Estado:true });
       const cursos = await this.cursoModel.find({ 
-        where: { Estado:true, EstadoApertura:true }, 
+        where: { Estado:true }, 
         skip:offset, 
         take:limit, 
         order: { createdAt:'DESC' },
@@ -39,13 +39,11 @@ export class CursoService {
     }
   }
 
-  async CursosMatricula({limit, offset}:PaginationQueryDto) {
+  async cursosInscripcion() {
     try {
-      const count = await this.cursoModel.countBy({ Estado:true });
+      const count = await this.cursoModel.countBy({ Estado:true, EstadoApertura:true });
       const cursos = await this.cursoModel.find(
         { where: { Estado:true, EstadoApertura:true }, 
-        skip:offset, 
-        take:limit, 
         order: { createdAt:'DESC' },
         relations:['nivel','libros'] 
       });
@@ -85,7 +83,6 @@ export class CursoService {
 
   async update(Id: number, updateCursoDto: UpdateCursoDto) {
     try {
-      console.log(updateCursoDto)
       const { affected } = await this.cursoModel.update(Id, updateCursoDto);
       if(affected==0) return new HandleCurso(`curso sin afectar`, false, null);
       const { NombreCurso } = await this.cursoModel.findOneBy({Id});

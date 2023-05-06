@@ -15,7 +15,8 @@ export class EstudianteModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware).
-      exclude({ path:'estudiante/verify-documento-email', method:RequestMethod.POST })
+      exclude({ path:'estudiante/verify-documento-email', method:RequestMethod.POST },
+              { path:'estudiante/get-estudiante-by-documento', method:RequestMethod.POST })
       .forRoutes(EstudianteController)
   }
 

@@ -54,6 +54,15 @@ import { EstadoGrupoModule } from './estado-grupo/estado-grupo.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { config } from 'dotenv';
+import { WhatsappGateway } from './socket/whatsapp.gateway';
+import { WhatsAppService } from './whats-app/whats-app.service';
+import { WhatsAppController } from './whats-app/whats-app.controller';
+import { EstudianteEnGrupoService } from './estudiante-en-grupo/estudiante-en-grupo.service';
+import { EstudianteEnGrupo } from './estudiante-en-grupo/entities/estudiante-en-grupo.entity';
+import { PagoService } from './pago/pago.service';
+import { Pago } from './pago/entities/pago.entity';
+import { TipoTramiteModule } from './tipo-tramite/tipo-tramite.module';
+import { TramiteModule } from './tramite/tramite.module';
 
 @Module({
   imports: [ 
@@ -94,6 +103,8 @@ import { config } from 'dotenv';
                               Matricula,
                               Apoderado,
                               Estudiante,
+                              EstudianteEnGrupo,
+                              Pago,
                               Institucion,
                               DenominacionServicio]),
     ServeStaticModule.forRoot({
@@ -120,9 +131,11 @@ import { config } from 'dotenv';
     PagoModule,
     LibroModule,
     CategoriaPagoModule,
-    EstadoGrupoModule
+    EstadoGrupoModule,
+    TipoTramiteModule,
+    TramiteModule
   ],
-  controllers: [ AppController ],
+  controllers: [ AppController, WhatsAppController ],
   providers: [AppService, 
               AppGateway, 
               CursoService,
@@ -133,8 +146,12 @@ import { config } from 'dotenv';
               MatriculaService,
               ApoderadoService,
               EstudianteService,
+              EstudianteEnGrupoService,
               InstitucionService,
-              DenominacionServicioService
+              PagoService,
+              DenominacionServicioService,
+              WhatsappGateway,
+              WhatsAppService
             ]
 })
 export class AppModule {}

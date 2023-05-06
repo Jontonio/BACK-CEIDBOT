@@ -1,23 +1,18 @@
 import { SubscribeMessage, 
          WebSocketGateway,
          WebSocketServer, 
-         OnGatewayInit } from '@nestjs/websockets';
+         OnGatewayInit, 
+         MessageBody} from '@nestjs/websockets';
 import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets/interfaces';
-
 import { Socket, Server } from 'socket.io';
-import { sendPaymentGirlFriend } from 'src/helpers/messageGirlFiend';
-import { onMessageObjects, onMessagePeople } from 'src/helpers/messagePeople';
-import { Buttons, Client, LocalAuth, Location, MessageMedia, List, Chat } from "whatsapp-web.js";
-
-import { Cron } from '@nestjs/schedule';
-import * as moment from 'moment';
 import { CursoService } from 'src/curso/curso.service';
 import { DocenteService } from 'src/docente/docente.service';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { GrupoService } from 'src/grupo/grupo.service';
 import { HorarioService } from 'src/horario/horario.service';
 import { MatriculaService } from 'src/matricula/matricula.service';
-import { whatsApp } from 'src/helpers/whatsapp';
+import { EstudianteEnGrupoService } from 'src/estudiante-en-grupo/estudiante-en-grupo.service';
+import * as moment from 'moment';
 
 moment.locale('es');
 
@@ -27,13 +22,14 @@ moment.locale('es');
 export class AppGateway implements OnGatewayInit, 
                                    OnGatewayConnection,
                                    OnGatewayDisconnect{
-  client: Client;
+  
   @WebSocketServer() server:Server;
-  whatsapp:whatsApp;
+  
   
   constructor(private readonly _curso:CursoService,
               private readonly _docente:DocenteService,
               private readonly _grupo:GrupoService,
+              private readonly _estudianteEngrupo:EstudianteEnGrupoService,
               private readonly _horario:HorarioService,
               private readonly _matri:MatriculaService,
               private readonly _usuario:UsuarioService){}
@@ -42,14 +38,6 @@ export class AppGateway implements OnGatewayInit,
 
     this.server = server;
 
-    this.client = new Client({ puppeteer: { headless: true,args: ['--no-sandbox'] },
-            authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
-    });
-
-    this.whatsapp = new whatsApp(this.client, this.server, this._curso);
-    
-    this.whatsapp.start();
-    
   }
 
   handleDisconnect(client: Socket) {
@@ -59,8 +47,6 @@ export class AppGateway implements OnGatewayInit,
   
   handleConnection(client: Socket) {
     console.log(`Connected ${client.id}`);
-    /** Emit welcome socket */
-    this.whatsapp.statusWhatsapp();
     client.emit('welcome-ceidbot',{ data:'', ok:true, msg:'Bienvenido al sistema CEIDBOT' } );
   }
 
@@ -70,9 +56,17 @@ export class AppGateway implements OnGatewayInit,
   }
 
   @SubscribeMessage('updated_list_curso')
-  async handleCursos(){
-    const res = await this._curso.findAll({limit:5, offset:0})
+  async handleCursos(@MessageBody() data: any){
+    const query = data? { limit: data.limit, offset: data.offset }:{ limit: 5, offset: 0 }
+    const res = await this._curso.findAll( query )
     this.server.emit('list_cursos', res );
+  }
+
+  @SubscribeMessage('updated_list_estudiante_grupo')
+  async handleEstudianteGrupo(@MessageBody() data: any){
+    const query = data? { limit: data.limit, offset: data.offset }:{ limit: 5, offset: 0 };
+    const res = await this._estudianteEngrupo.findByIdGrupo(data.Id, query);
+    this.server.emit('list_estudian_en_grupo', res );
   }
 
   @SubscribeMessage('updated_list_usuario')
@@ -109,13 +103,6 @@ export class AppGateway implements OnGatewayInit,
   async handleListMatriculados(){
     const res =  await this._matri.findAll({ limit:5, offset:0 });
     this.server.emit('list_matriculados', res );
-  }
-
-  @Cron('45 12 * * *')
-  sendAutoMessage(){
-    sendPaymentGirlFriend(this.client);
-  }
-
-  
+  }  
 
 }

@@ -32,4 +32,7 @@ export class CreateCursoDto {
 
     @IsOptional()
     LinkRequisitos:string
+
+    @IsOptional()
+    PrecioExamSuficiencia:number;
 }

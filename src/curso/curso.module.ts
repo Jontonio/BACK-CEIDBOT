@@ -19,6 +19,7 @@ export class CursoModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifyTokenMiddleware)
+      .exclude({ path:'curso/get-cursos-inscripcion', method:RequestMethod.GET })
       .forRoutes(CursoController)
       .apply(VerifyIdCursoMiddleware)
       .forRoutes({ path:'curso/delete-curso/:id', method: RequestMethod.DELETE },

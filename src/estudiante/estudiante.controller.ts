@@ -3,6 +3,7 @@ import { EstudianteService } from './estudiante.service';
 import { CreateEstudianteDto } from './dto/create-estudiante.dto';
 import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
 import { EmailDocEstudianteDto } from './dto/emailDocestudiante.dto';
+import { RequestEstudianteDto } from './dto/request-estudiante.dto';
 
 @Controller('estudiante')
 export class EstudianteController {
@@ -23,9 +24,9 @@ export class EstudianteController {
     return this.estudianteService.findOne(+id);
   }
 
-  @Get('get-estudiante-by-documento/:documento')
-  findOneByDocumento(@Param('documento') documento: string) {
-    return this.estudianteService.findOneByDocumento(documento);
+  @Post('get-estudiante-by-documento')
+  findOneByDocumento(@Body() requestEstudianteDto:RequestEstudianteDto) {
+    return this.estudianteService.findOneByDocumento(requestEstudianteDto);
   }
 
   @Patch(':id')

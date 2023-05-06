@@ -20,7 +20,7 @@ export class MatriculaController {
   
   constructor(private readonly matriculaService: MatriculaService) {}
 
-  @Post('matricular-estudiante')
+  @Post('prematricula-estudiante')
   create(@Body() createMatriculaDto: CreateMatriculaDto) {
     return this.matriculaService.registerPrematricula(createMatriculaDto);
   }

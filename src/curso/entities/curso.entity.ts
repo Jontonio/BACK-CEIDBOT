@@ -34,6 +34,9 @@ export class Curso {
     @Column({default:false})
     EstadoApertura:boolean;
     
+    @Column({type:'float', default: 0.0 })
+    PrecioExamSuficiencia:number;
+
     @CreateDateColumn()
     createdAt:Date;
 

@@ -17,9 +17,18 @@ import { Pago } from "src/pago/entities/pago.entity";
 import { Libro } from "src/libro/entities/libro.entity";
 import { CategoriaPago } from "src/categoria-pago/entities/categoria-pago.entity";
 import { EstadoGrupo } from "src/estado-grupo/entities/estado-grupo.entity";
+import { TipoTramite } from "src/tipo-tramite/entities/tipo-tramite.entity";
+
+class HandleMessageWhatsapp{
+  constructor(public msg:string, public ok:boolean, public data:any){}
+}
 
 class HandleResetPassword{
   constructor(public msg:string, public ok:boolean,public data:any){}
+}
+
+class HandleTipoTramite{
+  constructor(public msg:string, public ok:boolean,public data:TipoTramite | TipoTramite[], public count?:number){}
 }
 
 class HandleLibro{
@@ -39,6 +48,10 @@ class HandlePago{
 
 class HandleEstudianteEnGrupo{
   constructor(public msg:string, public ok:boolean,public data:EstudianteEnGrupo | EstudianteEnGrupo[], public count?:number){}
+}
+
+class HandleEstudianteEnGrupoPago{
+  constructor(public msg:string, public ok:boolean,public data:any, public count?:number){}
 }
 
 class HandleNivel{
@@ -112,6 +125,9 @@ export {
     HandleLibro,
     HandleCategoriaPago,
     HandleEstadoGrupo,
-    HandleResetPassword
+    HandleResetPassword,
+    HandleMessageWhatsapp,
+    HandleEstudianteEnGrupoPago,
+    HandleTipoTramite
 }
 

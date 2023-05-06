@@ -110,15 +110,11 @@ export const uploadFileDrive = async (file:any, codeGrupo:string, folderDestinat
   let yearFolderID:string;
   let grupoFolderID:string;
   let DireccionFolderID:string;
-  // let matriculaFolderID:string;
-  // let requisitosFolderID:string;
-  // let mensualidadFolderID:string;
-  // let pagoLibroFolderID:string;
 
   const fileName = `archivo-${Date.now()}`;
   const year = new Date().getFullYear();
   
-  //TODO: verifify if exists folder year
+  //verifify if exists folder year
   const folderYearExists = await checkIfFolderExists(String(year), parentFolderId);
 
   if(!folderYearExists){
@@ -152,67 +148,39 @@ export const uploadFileDrive = async (file:any, codeGrupo:string, folderDestinat
     console.log(`Folder ${folderDestination} existe`)
     return createFile(fileName, file, DireccionFolderID);
   }
+  
+}
 
-  // if(folderDestination==='requisitos'){
-  //   console.log('requisitos');
-  //   const folderRequisitosExists = await checkIfFolderExists('requisitos', grupoFolderID);
-  //   if(!folderRequisitosExists){
-  //     const folderRequisitos = await createFolder('requisitos', grupoFolderID);
-  //     requisitosFolderID = folderRequisitos.data.id;
-  //     console.log(`Folder requisitos creado`)
-  //   }else{
-  //     requisitosFolderID = folderRequisitosExists.id;
-  //     console.log(`Folder requisitos existe`)
-  //   }
-  //   return createFile(fileName, file, requisitosFolderID);
-  // }
+export const uploadOthersFilesDrive = async (file:any, folderDestination:string) => {
 
-  // if(folderDestination==='matricula'){
-  //   console.log('matricula');
-  //   const folderMatriculaExists = await checkIfFolderExists('matricula', grupoFolderID);
-  //   if(!folderMatriculaExists){
-  //     const folderMatricula = await createFolder('matricula', grupoFolderID);
-  //     matriculaFolderID = folderMatricula.data.id;
-  //     console.log(`Folder matricula creado`)
+  let yearFolderID:string;
+  let DireccionFolderID:string;
 
-  //   }else{
-  //     matriculaFolderID = folderMatriculaExists.id;
-  //     console.log(`Folder matricula existe`)
+  const fileName = `archivo-${Date.now()}`;
+  const year = new Date().getFullYear();
+  
+  //verifify if exists folder year
+  const folderYearExists = await checkIfFolderExists(String(year), parentFolderId);
 
-  //   }
-  //   return createFile(fileName, file, matriculaFolderID);
-  // }
+  if(!folderYearExists){
+    const folderYear = await createFolder(String(year), parentFolderId);
+    yearFolderID = folderYear.data.id;
+    console.log(`Folder ${String(year)} creado`)
+  }else{
+    yearFolderID = folderYearExists.id;
+    console.log(`Folder ${String(year)} existe`)
+  }
 
-  // if(folderDestination==='libro'){
-  //   console.log('libro');
-  //   const folderPagoLibroExists = await checkIfFolderExists('libro', grupoFolderID);
-  //   if(!folderPagoLibroExists){
-  //     const folderPagoLibro = await createFolder('libro', grupoFolderID);
-  //     pagoLibroFolderID = folderPagoLibro.data.id;
-  //     console.log(`Folder libro creado`)
+  const folderDireccionExists = await checkIfFolderExists(folderDestination, yearFolderID);
+  if(!folderDireccionExists){
+    const folderDireccion = await createFolder(folderDestination, yearFolderID);
+    DireccionFolderID = folderDireccion.data.id;
+    console.log(`Folder ${folderDestination} creado`)
+    return createFile(fileName, file, DireccionFolderID);
+  }else{
+    DireccionFolderID = folderDireccionExists.id;
+    console.log(`Folder ${folderDestination} existe`)
+    return createFile(fileName, file, DireccionFolderID);
+  }
 
-  //   }else{
-  //     pagoLibroFolderID = folderPagoLibroExists.id;
-  //     console.log(`Folder libro existe`)
-
-  //   }
-  //   return createFile(fileName, file, pagoLibroFolderID);
-  // }
-
-  // if(folderDestination==='mensualidad'){
-  //   console.log('mensualidad');
-  //   const folderMensualidadExists = await checkIfFolderExists('mensualidad', grupoFolderID);
-  //   if(!folderMensualidadExists){
-  //     const folderMensualidad = await createFolder('mensualidad', grupoFolderID);
-  //     mensualidadFolderID = folderMensualidad.data.id;
-  //     console.log(`Folder mensualidad creado`)
-      
-  //   }else{
-  //     mensualidadFolderID = folderMensualidadExists.id;
-  //     console.log(`Folder mensualidad existe`)
-  //   }
-  //   return createFile(fileName, file, mensualidadFolderID);
-  // }
-
-  return null;    
 }

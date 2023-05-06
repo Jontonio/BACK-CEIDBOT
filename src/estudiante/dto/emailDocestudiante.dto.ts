@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, MaxLength, MinLength } from "class-validator";
 export class EmailDocEstudianteDto {
 
     @IsNotEmpty({message:'Documento es requerido'})
-    @MaxLength(11, {message:'Documento tiene permitido como máximo 11 carácteres'})
+    @MaxLength(12, {message:'Documento tiene permitido como máximo 11 carácteres'})
     @MinLength(8, { message:'Documento tiene permitido como mínimo 8 carácteres'})
     Documento:string;
 

@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { HandleEstudianteEnGrupo } from 'src/class/global-handles';
+import { HandleEstudianteEnGrupo, HandleEstudianteEnGrupoPago } from 'src/class/global-handles';
 import { EstudianteService } from 'src/estudiante/estudiante.service';
 import { GrupoService } from 'src/grupo/grupo.service';
 import { MatriculaService } from 'src/matricula/matricula.service';
@@ -12,6 +12,8 @@ import { EstudianteEnGrupo } from './entities/estudiante-en-grupo.entity';
 import { PagoService } from 'src/pago/pago.service';
 import { EstudianteDataDto } from './dto/estudiante-data.dto';
 import { EstudianteEnGrupoWithOutPagoDto } from './dto/create-estudiante-en-grupo-without-pago.dto';
+import * as moment from 'moment';
+moment.locale('es');
 
 @Injectable()
 export class EstudianteEnGrupoService {
@@ -46,8 +48,16 @@ export class EstudianteEnGrupoService {
     try {
       // Veriifcar la cantidad de estudiantes en el grupo
       const { curso, NumeroEstudiantes, MaximoEstudiantes } = await this.grupoService.findOne(createEstudEnGrupoDto.grupo.Id);
+      const resEstudiante = await this.estudEnGrupoModel.findOneBy({ 
+        estudiante:{ Documento: createEstudEnGrupoDto.estudiante.Documento },
+        grupo:{ Id: createEstudEnGrupoDto.grupo.Id }
+      }); 
+      console.log(createEstudEnGrupoDto)
+      if(resEstudiante){
+        return new HandleEstudianteEnGrupo(`El estudiante ya se encuentra registrado en el grupo. Elija un curso con un grupo diferente`, false, null);
+      }
       if(NumeroEstudiantes < MaximoEstudiantes){
-
+        
         //matricular al estudiante 
         const { Id, estudiante}  = await this.matriculaService.create(createEstudEnGrupoDto.matricula);
 
@@ -69,7 +79,7 @@ export class EstudianteEnGrupoService {
 
         return new HandleEstudianteEnGrupo(`${estudiante.Nombres.toUpperCase()} has registrado tu matricula satisfactoriamente`, true, enGrupo);
       }
-        return new HandleEstudianteEnGrupo(`El grupo del curso ${curso.NombreCurso} - ${curso.nivel.Nivel} supera la cantidad de estudiantes permitidos`, false, null);
+      return new HandleEstudianteEnGrupo(`El grupo del curso ${curso.NombreCurso} - ${curso.nivel.Nivel} supera la cantidad de estudiantes permitidos`, false, null);
     } catch (e) {
       console.log(e)
       throw new InternalServerErrorException('ERROR REGISTER DE MATRICULA ESTUDIANTE EN GRUPO');
@@ -118,13 +128,19 @@ export class EstudianteEnGrupoService {
     try {
       const count = await this.estudEnGrupoModel.count({
         where:{ Estado:true, grupo:{ Id } }, 
-        relations:['matricula','matricula.denomiServicio','grupo','grupo.curso', 'estudiante','estudiante.apoderado' ] });
-      const data = await this.estudEnGrupoModel.find({ 
+        relations:['matricula',
+                   'matricula.denomiServicio',
+                   'grupo',
+                   'grupo.curso',
+                   'estudiante',
+                   'estudiante.apoderado'
+                  ]});
+      const grupo = await this.grupoService.findOne( Id );
+      const estudiantesEnGrupo = await this.estudEnGrupoModel.find({ 
         where:{ Estado:true, grupo:{ Id } }, 
         skip:offset, take:limit,
         relations:['matricula',
                    'matricula.denomiServicio',
-                   'grupo',
                    'grupo.tipoGrupo',
                    'grupo.docente',
                    'grupo.curso',
@@ -132,8 +148,36 @@ export class EstudianteEnGrupoService {
                    'estudiante',
                    'estudiante.apoderado',
                    'pagos',
-                   'pagos.categoriaPago'] });
-      return new HandleEstudianteEnGrupo('Lista estudiantes asignados al grupo', true, data, count);
+                   'pagos.categoriaPago']});
+
+        const fecha1 = moment(grupo.FechaInicioGrupo); // fecha de inicio del grupo
+        const fecha2 = moment(grupo.FechaFinalGrupo);  // fecha final del grupo
+        const fecha3 = moment().format('YYYY-MM-DD');  // fecha actual
+        const fecha4 = moment(fecha3);                 // fecha auxiliar
+        const numModulos = grupo.curso.NumModulos;     // numero de modulos del curso
+        
+        const diasEnClases = fecha2.diff(fecha1, 'days');     // Cantidad de dias desde el inicio hasta el final
+        const diasTransPassdos = fecha4.diff(fecha1, 'days'); // Numero de dias pasados desde el inicio de las clases
+        const cantidadDiasModulo = Math.floor(diasEnClases / numModulos); // Numero de dias por modulo del curso
+        const modulosCumplidos = Math.floor(diasTransPassdos / cantidadDiasModulo); // numero de modulos completados
+        const listFechas:string[] = [];
+        for (let index = 1; index <= numModulos; index++) { // Fechas de pago
+          listFechas.push(fecha1.add(cantidadDiasModulo,'days').format('YYYY-MM-DD'));
+        }
+
+        const estadoDataPago:any = {
+          FechaInicioGrupo:grupo.FechaInicioGrupo, //Fecha de inicio del grupo
+          FechaFinalGrupo:grupo.FechaFinalGrupo, // Fecha final del grupo
+          FechaActual: fecha3, // la fecha actual
+          NumDiasCurso:diasEnClases, // Cantidad de dias desde el inicio hasta el final
+          DiasPasados:diasTransPassdos, // Numero de dias pasados desde el inicio de las clases
+          DiasPorModulo:cantidadDiasModulo, // Numero de dias por modulo del curso
+          ModulosCumplidos:modulosCumplidos,
+          ModuloActual:modulosCumplidos<numModulos?modulosCumplidos:modulosCumplidos+1,
+          FechasDePago:listFechas
+        }
+      const data = { grupo, estudiantesEnGrupo, estadoDataPago } 
+      return new HandleEstudianteEnGrupoPago('Lista estudiantes asignados al grupo', true, data, count);
     } catch (e) {
       console.log(e)
       throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO_ESPECIFICO');

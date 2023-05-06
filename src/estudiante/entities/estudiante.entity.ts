@@ -15,7 +15,7 @@ export class Estudiante {
     @Column({type:'varchar', length:5})
     TipoDocumento:string;
     
-    @Column({type:'varchar', length:11})
+    @Column({type:'varchar', length:12})
     @Index({unique:true})
     Documento:string;
 

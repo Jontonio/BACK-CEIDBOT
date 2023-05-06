@@ -70,7 +70,7 @@ const prepareMedia = async (payload:PayloadBoot) => {
 
 const sendCursos = async (client:Client, message:WAWebJS.Message, response:any, _curso:CursoService) => {
 
-    const cursos = await _curso.CursosMatricula({limit:100, offset:0});
+    const cursos = await _curso.cursosInscripcion();
     const payload:PayloadBoot = response.payload.fields;
 
     let lista = 'Estos son los cursos aperturados:\n';

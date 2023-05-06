@@ -7,6 +7,7 @@ import { CreateEstudianteDto } from './dto/create-estudiante.dto';
 import { EmailDocEstudianteDto } from './dto/emailDocestudiante.dto';
 import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
 import { Estudiante } from './entities/estudiante.entity';
+import { RequestEstudianteDto } from './dto/request-estudiante.dto';
 
 @Injectable()
 export class EstudianteService {
@@ -70,10 +71,12 @@ export class EstudianteService {
     }
   }
 
-  async findOneByDocumento(Documento: string) {
+  async findOneByDocumento(requestEstudianteDto:RequestEstudianteDto) {
     try {
+      const { Documento, TipoDocumento } = requestEstudianteDto;
+      const query = TipoDocumento?{ Documento, TipoDocumento }:{ Documento };
       const estudiante = await this.estudianteModel.findOne({
-        where:{ Documento },
+        where: query,
         relations:['departamento','provincia','distrito','apoderado']
       });
       if(!estudiante){
@@ -87,7 +90,8 @@ export class EstudianteService {
   }
 
   async findOneByDocumentoInternal(Documento: string, TipoDocumento = '') {
-    try {const where = TipoDocumento?{ Documento, TipoDocumento }:{ Documento };
+    try {
+      const where = TipoDocumento?{ Documento, TipoDocumento }:{ Documento };
       return await this.estudianteModel.findOne({
         where,
         relations:['departamento','provincia','distrito','apoderado']

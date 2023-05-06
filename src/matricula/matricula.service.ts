@@ -12,7 +12,7 @@ import { Repository } from 'typeorm';
 import { CreateMatriculaDto } from './dto/create-matricula.dto';
 import { UpdateMatriculaDto } from './dto/update-matricula.dto';
 import { Matricula } from './entities/matricula.entity';
-import { uploadFileDrive } from 'src/helpers/googleDrive';
+import { uploadFileDrive, uploadOthersFilesDrive } from 'src/helpers/googleDrive';
 import * as fs from "fs-extra";
 import { Request } from 'express';
 
@@ -234,7 +234,7 @@ export class MatriculaService {
       }
       
       const { tipo, id_grupo } = Req.body;
-      const { data } = await uploadFileDrive(file, id_grupo, tipo);
+      const { data } = (id_grupo)? await uploadFileDrive(file, id_grupo, tipo): await uploadOthersFilesDrive(file, tipo);
       await fs.unlink(file.path)
       return data;
     } catch (e) {
