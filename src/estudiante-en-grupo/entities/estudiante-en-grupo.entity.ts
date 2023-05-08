@@ -10,27 +10,29 @@ export class EstudianteEnGrupo {
     @PrimaryGeneratedColumn('increment')
     Id:number;
 
-    @ManyToOne( () => Estudiante, (estudiante:Estudiante) => estudiante.estudianteEnGrupo )
-    estudiante:Estudiante;
-
-    @ManyToOne( () => Grupo, (grupo:Grupo) => grupo )
-    grupo:Grupo;
-
+    
     grupoId:number;
     
     @Column({default:true})
     Estado:boolean;
     
+    
+    @CreateDateColumn()
+    createdAt:Date;
+    
+    @UpdateDateColumn()
+    updateddAt:Date;
+    
+    /** Tablas relacionadas */
+    @ManyToOne( () => Estudiante, (estudiante:Estudiante) => estudiante.estudianteEnGrupo )
+    estudiante:Estudiante;
+
+    @ManyToOne( () => Grupo, (grupo:Grupo) => grupo )
+    grupo:Grupo;
+    
     @ManyToOne( () => Matricula, (matricula:Matricula) => matricula )
     matricula:Matricula;
 
-    @CreateDateColumn()
-    createdAt:Date;
-
-    @UpdateDateColumn()
-    updateddAt:Date;
-
-    /** Tablas relacionadas */
     @OneToMany(() => Pago, (pago:Pago) => pago.estudianteEnGrupo, {
         cascade:true
     })

@@ -1,28 +1,46 @@
 import { Injectable, InternalServerErrorException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { HandleCurso } from 'src/class/global-handles';
+import { HandleCurso, HandleModulo } from 'src/class/global-handles';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { Curso } from './entities/curso.entity';
+import { Modulo } from './entities/modulo.entity';
+import { CreateModuloDto } from './dto/create-modulo.dto';
 
 @Injectable()
 export class CursoService {
 
   constructor(@InjectRepository(Curso) 
-              private cursoModel:Repository<Curso>){}
+              private cursoModel:Repository<Curso>,
+              @InjectRepository(Modulo) 
+              private moduloModel:Repository<Modulo>){}
 
-  async create(createCursoDto: CreateCursoDto) {
+  async createCurso(createCursoDto: CreateCursoDto) {
     try {
       const curso = await this.cursoModel.save(createCursoDto);
       return new HandleCurso(`Curso ${curso.NombreCurso } de nivel ${curso.nivel.Nivel } registrado correctamente`, true, curso);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_UPDATE_CURSO');
+      throw new InternalServerErrorException('ERROR_CREATE_CURSO');
+    }
+  }
+  
+  async createModulo(createModuloDto: CreateModuloDto) {
+    try {
+      const modulo = await this.moduloModel.findOneBy({ Modulo: createModuloDto.Modulo });
+      if(modulo){
+        return new HandleModulo(`El módulo ${createModuloDto.Modulo } ya se encuentra registrado`, false, null);
+      }
+      const resModulo = await this.moduloModel.save(createModuloDto);
+      return new HandleModulo(`Módulo ${resModulo.Modulo } registrado correctamente`, true, resModulo);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR_CREATE_MODULO');
     }
   }
 
-  async findAll({limit, offset}:PaginationQueryDto) {
+  async findAllCursos({limit, offset}:PaginationQueryDto) {
     try {
       const count = await this.cursoModel.countBy({ Estado:true });
       const cursos = await this.cursoModel.find({ 
@@ -30,12 +48,27 @@ export class CursoService {
         skip:offset, 
         take:limit, 
         order: { createdAt:'DESC' },
-        relations:['nivel','libros'] 
+        relations:['nivel','libros','modulo'] 
       });
       return new HandleCurso(`Lista de cursos`, true, cursos, count);
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('ERROR_FIND_ALL_CURSOS');
+    }
+  }
+
+  async findAllModulos({limit, offset}:PaginationQueryDto) {
+    try {
+      const count = await this.moduloModel.count();
+      const modulos = await this.moduloModel.find({ 
+        skip:offset, 
+        take:limit, 
+        order: { Modulo:'ASC' }
+      });
+      return new HandleModulo(`Lista de modulos`, true, modulos, count);
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException('ERROR_FIND_ALL_MODULOS');
     }
   }
 
@@ -57,7 +90,7 @@ export class CursoService {
     try {
       const curso = await this.cursoModel.findOne({
         where:{ Id },
-        relations:['nivel','libros']
+        relations:['nivel','libros','modulo']
       });
       return new HandleCurso(`Curso ${curso.NombreCurso}`, true, curso);
     } catch (e) {
@@ -73,7 +106,7 @@ export class CursoService {
 
       return await this.cursoModel.find({
         where: Nivel?query1:query2,
-        relations:['nivel']
+        relations:['nivel','modulo']
       });
     } catch (e) {
       console.log(e);
@@ -114,5 +147,6 @@ export class CursoService {
       throw new InternalServerErrorException('ERROR_FIND_ONE_CURSO');
     }
   }
+
 
 }

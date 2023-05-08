@@ -1,4 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
+import { Estudiante } from "src/estudiante/entities/estudiante.entity";
+import { Pago } from "src/pago/entities/pago.entity";
+import { TipoTramite } from "src/tipo-tramite/entities/tipo-tramite.entity";
 
 export class CreateTramiteDto {
 
@@ -8,6 +11,14 @@ export class CreateTramiteDto {
     UrlRequisito:string;
     
     @IsOptional()
-    @IsUrl()
     UrlRequisitoExtra:string;
+
+    @IsNotEmpty({message:'UrlRequisito es requerido'})
+    estudiante:Estudiante;
+
+    @IsNotEmpty({message:'tipoTramite es requerido'})
+    tipoTramite:TipoTramite;
+
+    @IsNotEmpty({message:'pago es requerido'})
+    pago:Pago;
 }

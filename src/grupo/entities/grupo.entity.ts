@@ -5,6 +5,7 @@ import { Horario } from "src/horario/entities/horario.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { TipoGrupo } from "./tipo-grupo.entity";
 import { EstadoGrupo } from "src/estado-grupo/entities/estado-grupo.entity";
+import { GrupoModulo } from "./grupoModulo.entity";
 
 @Entity()
 export class Grupo {
@@ -52,6 +53,11 @@ export class Grupo {
         cascade:true
     })
     estudianteEnGrupo:EstudianteEnGrupo[];
+
+    @OneToMany(() => GrupoModulo, (grupoModulo:GrupoModulo) => grupoModulo.grupo, {
+        cascade:true
+    })
+    grupoModulo:GrupoModulo[];
 
     @Column({default:true})
     Estado:boolean;

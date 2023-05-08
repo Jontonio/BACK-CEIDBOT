@@ -64,7 +64,7 @@ export class DocenteService {
       const { affected } = await this.docenteModel.update(Id,{ Estado:false });
       if(affected==0) return new HandleDocente(`Usuario sin afectar`, false, null);
       const usuario = await this.docenteModel.findOneBy({Id});
-      return new HandleDocente(`Usuario ${usuario.Nombres} eliminado correctamente`, true, null);
+      return new HandleDocente(`Usuario ${usuario.Nombres} eliminado correctamente`, true, usuario);
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('ERROR_DELETE_USUARIO');

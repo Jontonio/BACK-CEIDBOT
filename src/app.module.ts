@@ -63,6 +63,11 @@ import { PagoService } from './pago/pago.service';
 import { Pago } from './pago/entities/pago.entity';
 import { TipoTramiteModule } from './tipo-tramite/tipo-tramite.module';
 import { TramiteModule } from './tramite/tramite.module';
+import { MedioDePagoModule } from './medio-de-pago/medio-de-pago.module';
+import { TramiteService } from './tramite/tramite.service';
+import { Tramite } from './tramite/entities/tramite.entity';
+import { Modulo } from './curso/entities/modulo.entity';
+import { GrupoModulo } from './grupo/entities/grupoModulo.entity';
 
 @Module({
   imports: [ 
@@ -95,16 +100,19 @@ import { TramiteModule } from './tramite/tramite.module';
     }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([Curso, 
+                              Modulo,
                               Docente, 
                               Usuario, 
                               Grupo, 
                               TipoGrupo, 
+                              GrupoModulo,
                               Horario, 
                               Matricula,
                               Apoderado,
                               Estudiante,
                               EstudianteEnGrupo,
                               Pago,
+                              Tramite,
                               Institucion,
                               DenominacionServicio]),
     ServeStaticModule.forRoot({
@@ -133,7 +141,8 @@ import { TramiteModule } from './tramite/tramite.module';
     CategoriaPagoModule,
     EstadoGrupoModule,
     TipoTramiteModule,
-    TramiteModule
+    TramiteModule,
+    MedioDePagoModule
   ],
   controllers: [ AppController, WhatsAppController ],
   providers: [AppService, 
@@ -151,7 +160,8 @@ import { TramiteModule } from './tramite/tramite.module';
               PagoService,
               DenominacionServicioService,
               WhatsappGateway,
-              WhatsAppService
+              WhatsAppService,
+              TramiteService
             ]
 })
 export class AppModule {}

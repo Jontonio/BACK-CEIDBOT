@@ -7,8 +7,12 @@ import { CreateGrupoDto } from './dto/create-grupo.dto';
 import { UpdateGrupoDto } from './dto/update-grupo.dto';
 import { Grupo } from './entities/grupo.entity';
 import { TipoGrupo } from './entities/tipo-grupo.entity';
-import { HandleGrupo } from 'src/class/global-handles';
+import { HandleGrupo, HandleGrupoModulo } from 'src/class/global-handles';
 import * as moment from 'moment';
+import { GrupoModulo } from './entities/grupoModulo.entity';
+import { CreateGrupoModuloDto } from './dto/create-grupo-modulo.dto copy';
+import { Modulo } from 'src/curso/entities/modulo.entity';
+import { UpdateGrupoModuloDto } from './dto/update-grupo-modulo.dto';
 
 @Injectable()
 export class GrupoService {
@@ -16,7 +20,9 @@ export class GrupoService {
   constructor(@InjectRepository(Grupo) 
                private grupoModel:Repository<Grupo>,
               @InjectRepository(TipoGrupo) 
-              private tipoGrupoModel:Repository<TipoGrupo>){}
+              private tipoGrupoModel:Repository<TipoGrupo>,
+              @InjectRepository(GrupoModulo) 
+              private grupoModuloModel:Repository<GrupoModulo>){}
 
   /** Crea el nombre del grupo como por ejemplo grupo A, grupo B, grupo C etc  */
   async createTipoGrupo(createTipo: CreateTipoGrupoDto) {
@@ -34,22 +40,40 @@ export class GrupoService {
   /** Crea el grupo  */
   async createGrupo(createGrupo: CreateGrupoDto) {
     try {
-      //TODO verificar si existe un grupo con el mismo nombre y que sea del mismo nivel y que estado se activo */
+      // verificar si existe un grupo con el mismo nombre y que sea del mismo nivel y que estado se activo */
       const { NombreGrupo } = createGrupo.tipoGrupo;
       const { NombreCurso, nivel } = createGrupo.curso;
       const { Nivel } = nivel;
       const CodeEstado = 'status_matricula';
       const existsGrupo = await this.grupoModel.findOne({
-        where:{ tipoGrupo:{ NombreGrupo }, 
-                estadoGrupo:{ CodeEstado }, 
-                curso:{ NombreCurso, nivel:{ Nivel } } 
+        where:{ 
+          tipoGrupo:{ NombreGrupo }, 
+          estadoGrupo:{ CodeEstado }, 
+          curso:{ NombreCurso, nivel:{ Nivel } } 
         }
       });
+
       if(existsGrupo){
         return new HandleGrupo(`El grupo a registrar ya existe. Registre un nuevo grupo con un nombre diferente`, false, null);
       }
-      const data = await this.grupoModel.save(createGrupo);
-      return new HandleGrupo(`Grupo con código ${data.Id} registrado correctamente`, true, data);
+      /** registrar grupo */
+      const grupo = await this.grupoModel.save(createGrupo);
+      /** obtener sus posibles fechas de pago en dias calendarios */
+      const fecha1 = moment(grupo.FechaInicioGrupo); // fecha de inicio del grupo
+      const fecha2 = moment(grupo.FechaFinalGrupo);  // fecha final del grupo
+      const numModulos = grupo.curso.NumModulos;     // numero de modulos del curso
+      const diasEnClases = fecha2.diff(fecha1, 'days');     // Cantidad de dias desde el inicio hasta el final
+      const cantidadDiasModulo = Math.floor(diasEnClases / numModulos); // Numero de dias por modulo del curso
+      const listFechas:CreateGrupoModuloDto[] = [];
+      /** preparar fechas */
+      listFechas.push({FechaPago:fecha1.toDate(), CurrentModulo:true, grupo:{Id:grupo.Id} as Grupo, modulo: {Id:null} as Modulo});
+      for (let index = 1; index <= numModulos; index++) { // Fechas de pago
+        listFechas.push({FechaPago:fecha1.add(cantidadDiasModulo,'days').toDate(), CurrentModulo:false, grupo:{Id:grupo.Id} as Grupo, modulo: {Id:index} as Modulo});
+      }
+      // insertar datos a grupo módulo
+      await this.grupoModuloModel.save(listFechas);
+
+      return new HandleGrupo(`Grupo con código ${grupo.Id} registrado correctamente`, true, grupo);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_CREATE_GRUPO');
     }
@@ -88,7 +112,14 @@ export class GrupoService {
         where:{ Estado:true }, 
         skip:offset, take:limit,
         order: { createdAt:'DESC' },
-        relations:['docente','horario','tipoGrupo','curso','curso.nivel','estadoGrupo']});
+        relations:['docente',
+                   'horario',
+                   'tipoGrupo',
+                   'curso',
+                   'curso.nivel',
+                   'estadoGrupo',
+                   'grupoModulo',
+                   'grupoModulo.modulo']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_GRUPOS');
@@ -106,6 +137,7 @@ export class GrupoService {
                    'tipoGrupo',
                    'curso',
                    'curso.nivel',
+                   'curso.modulo',
                    'curso.libros',
                    'estadoGrupo']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
@@ -124,32 +156,11 @@ export class GrupoService {
                    'curso',
                    'curso.nivel',
                    'curso.libros',
+                   'curso.modulo',
                    'estadoGrupo',
-                   'estudianteEnGrupo']});
-      // console.log(grupo);
-      // const fecha1 = moment(grupo.FechaInicioGrupo); //fecha de inicio
-      // const fecha2 = moment(grupo.FechaFinalGrupo); // fecha final
-      // const fecha3 = moment().format('YYYY-MM-DD'); // fecha actual
-      // const fecha4 = moment(fecha3);
-
-      // const diasEnClases = fecha2.diff(fecha1, 'days');
-      // const diasTransPassdos = fecha4.diff(fecha1, 'days');
-      // console.log("Fecha inicio: ",fecha1);
-      // console.log("Fecha final: ",fecha2);
-      // console.log('Dias entre la fecha inicio y la fecha final: ',diasEnClases);
-      // console.log('Dias pasados hasta ahora: ', diasTransPassdos);
-      // // Calcula la cantidad de días que tiene cada módulo en el curso:
-      // const numModulos = grupo.curso.NumModulos;
-      // const cantidadDiasModulo = Math.floor(diasEnClases / numModulos);
-      // console.log('Días por módulo: ', cantidadDiasModulo)
-      // //calcula los modulos completados
-      // const modulosCumplidos = Math.floor(diasTransPassdos / cantidadDiasModulo);
-      // console.log('Modulos cumplidos: ',modulosCumplidos);
-      // console.log('Modulo actual: ',modulosCumplidos<numModulos?modulosCumplidos:modulosCumplidos+1);
-      // for (let index = 1; index <= numModulos; index++) {
-      //   console.log(`Fecha pago ${index}: `, fecha1.add(cantidadDiasModulo,'days').format('YYYY-MM-DD'))
-      // }
-
+                   'estudianteEnGrupo',
+                   'grupoModulo',
+                   'grupoModulo.modulo']});
       return new HandleGrupo('Un grupo encontrado', true, grupo);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');
@@ -160,14 +171,20 @@ export class GrupoService {
     try {
       return await this.grupoModel.findOne({ 
         where:{ Id }, 
-        relations:['tipoGrupo','curso','curso.nivel','docente']
+        relations:['tipoGrupo',
+                   'curso',
+                   'curso.nivel',
+                   'docente',
+                   'curso.modulo',
+                   'grupoModulo',
+                   'grupoModulo.modulo']
       });
     } catch (e) {
       throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');
     }
   }
 
-  async update(Id: number, updateGrupoDto: UpdateGrupoDto) {
+  async updateGrupo(Id: number, updateGrupoDto: UpdateGrupoDto) {
     try {
       const { affected } = await this.grupoModel.update(Id, updateGrupoDto);
       if(affected==0) return new HandleGrupo('Grupo sin afectar ', false, null)
@@ -176,6 +193,35 @@ export class GrupoService {
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('ERROR_UPDATE_GRUPO');
+    }
+  }
+
+  async updateGrupoModelo(Id:number, updateGrupoModuloDto:UpdateGrupoModuloDto){
+    try {
+      const { grupo, FechaPago } = updateGrupoModuloDto;
+      // verificar si existe el grupo
+      const existsGrupo = await this.grupoModel.findOneBy({ Id: grupo.Id });
+      if(!existsGrupo){
+        return new HandleGrupoModulo(`El grupo G-${grupo.Id} no encontrado`, false, null);
+      }
+      // verificar si las fechas se encuentran el el rango de fecha inicio y final del grupo
+      const grupoFechInicio = moment(existsGrupo.FechaInicioGrupo);
+      const grupoFechFinal  = moment(existsGrupo.FechaFinalGrupo);
+      const fechaPapo       = moment(FechaPago);
+      const diferenciaInicioDias = grupoFechInicio.diff(fechaPapo, 'days');
+      const diferenciaFinalDias  = fechaPapo.diff(grupoFechFinal, 'days');
+      if(diferenciaInicioDias > 0){
+        return new HandleGrupoModulo(`Las fecha de pago tiene que ser en el rango de la fecha de inicio del grupo`, false, null);
+      }
+      if(diferenciaFinalDias > 0){
+        return new HandleGrupoModulo(`Las fecha de pago tiene que ser en el rango de la fecha de final del grupo`, false, null);
+      }
+      const { affected } = await this.grupoModuloModel.update(Id, updateGrupoModuloDto);
+      if(affected==0) return new HandleGrupo('Grupo módulo sin afectar ', false, null)
+      return new HandleGrupoModulo(`Fecha de cobro del grupo G-${grupo.Id} actualizado correctamente`, true, null);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR UPDATE GRUPO MODULO');
     }
   }
 

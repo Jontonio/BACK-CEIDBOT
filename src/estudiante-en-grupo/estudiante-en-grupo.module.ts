@@ -19,12 +19,14 @@ import { InstitucionService } from 'src/institucion/institucion.service';
 import { PagoService } from 'src/pago/pago.service';
 import { Pago } from 'src/pago/entities/pago.entity';
 import { VerifyEstudianteMiddleware } from 'src/middlewares/verify-estudiante.middleware';
+import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
 
 @Module({
   imports:[TypeOrmModule.forFeature([EstudianteEnGrupo, 
                                      Grupo, 
                                      Estudiante, 
-                                     TipoGrupo, 
+                                     TipoGrupo,
+                                     GrupoModulo, 
                                      Matricula, 
                                      Apoderado,
                                      Pago, 

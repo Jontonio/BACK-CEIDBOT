@@ -8,9 +8,10 @@ import { MiddlewareConsumer } from '@nestjs/common/interfaces';
 import { TipoGrupo } from './entities/tipo-grupo.entity';
 import { RequestMethod } from '@nestjs/common/enums';
 import { VerifyIdGrupoMiddleware } from 'src/middlewares/verify-id-grupo/verify-id-grupo.middleware';
+import { GrupoModulo } from './entities/grupoModulo.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Grupo, TipoGrupo])],
+  imports:[TypeOrmModule.forFeature([Grupo, TipoGrupo, GrupoModulo])],
   controllers: [GrupoController],
   providers: [GrupoService]
 })

@@ -18,6 +18,10 @@ import { Libro } from "src/libro/entities/libro.entity";
 import { CategoriaPago } from "src/categoria-pago/entities/categoria-pago.entity";
 import { EstadoGrupo } from "src/estado-grupo/entities/estado-grupo.entity";
 import { TipoTramite } from "src/tipo-tramite/entities/tipo-tramite.entity";
+import { MedioDePago } from "src/medio-de-pago/entities/medio-de-pago.entity";
+import { Tramite } from "src/tramite/entities/tramite.entity";
+import { Modulo } from "src/curso/entities/modulo.entity";
+import { GrupoModulo } from "src/grupo/entities/grupoModulo.entity";
 
 class HandleMessageWhatsapp{
   constructor(public msg:string, public ok:boolean, public data:any){}
@@ -29,6 +33,14 @@ class HandleResetPassword{
 
 class HandleTipoTramite{
   constructor(public msg:string, public ok:boolean,public data:TipoTramite | TipoTramite[], public count?:number){}
+}
+
+class HandleTramite{
+  constructor(public msg:string, public ok:boolean,public data:Tramite | Tramite[], public count?:number){}
+}
+
+class HandleMedioDePago{
+  constructor(public msg:string, public ok:boolean,public data:MedioDePago | MedioDePago[], public count?:number){}
 }
 
 class HandleLibro{
@@ -82,6 +94,10 @@ class HandleCurso {
   constructor(public msg:string, public ok:boolean,public data:Curso | Curso[], public count?:number){}
 }
 
+class HandleModulo {
+  constructor(public msg:string, public ok:boolean,public data:Modulo | Modulo[], public count?:number){}
+}
+
 class HandleDocente {
   constructor(public msg:string, public ok:boolean,public data:Docente | Docente[], public count?:number){}
 }
@@ -89,6 +105,10 @@ class HandleDocente {
 
 class HandleGrupo {
   constructor(public msg:string, public ok:boolean,public data:Grupo | Grupo[] | TipoGrupo | TipoGrupo[], public count?:number){}
+
+}
+class HandleGrupoModulo {
+  constructor(public msg:string, public ok:boolean,public data:GrupoModulo | GrupoModulo[], public count?:number){}
 }
 
 class HandleHorario {
@@ -111,6 +131,7 @@ export {
     HandleLogin, 
     HandleLogout,
     HandleCurso, 
+    HandleModulo,
     HandleDocente, 
     HandleGrupo, 
     HandleHorario,
@@ -128,6 +149,9 @@ export {
     HandleResetPassword,
     HandleMessageWhatsapp,
     HandleEstudianteEnGrupoPago,
-    HandleTipoTramite
+    HandleTipoTramite,
+    HandleMedioDePago,
+    HandleTramite,
+    HandleGrupoModulo
 }
 

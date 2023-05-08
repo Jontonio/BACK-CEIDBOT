@@ -1,5 +1,6 @@
 import { CategoriaPago } from "src/categoria-pago/entities/categoria-pago.entity";
 import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
+import { MedioDePago } from "src/medio-de-pago/entities/medio-de-pago.entity";
 import { Tramite } from "src/tramite/entities/tramite.entity";
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from "typeorm";
 
@@ -36,6 +37,9 @@ export class Pago {
 
     @ManyToOne( () => CategoriaPago, (categoriaPago:CategoriaPago) => categoriaPago.pagos )
     categoriaPago:CategoriaPago;
+
+    @ManyToOne( () => MedioDePago, (medioDePago:MedioDePago) => medioDePago.pagos )
+    medioDePago:MedioDePago;
 
     @OneToMany(() => Tramite, (tramite:Tramite) => tramite.pago)
     tramites: Tramite[];

@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator"
 import { Nivel } from "src/nivel/entities/nivel.entity";
+import { Modulo } from "../entities/modulo.entity";
 
 export class CreateCursoDto {
 
@@ -12,10 +13,6 @@ export class CreateCursoDto {
     @IsString({message:'UrlBandera tiene que ser de tipo STRING'})
     @MaxLength(50,{message:'UrlBandera tiene permitido como máximo 50 carácteres'})
     UrlBandera:string
-
-    @IsNotEmpty({message:'NumModulos es requerido'})
-    @IsNumber()
-    NumModulos:number;
 
     @IsNotEmpty({message:'NombreCurso es requerido'})
     @IsString({message:'NombreCurso tiene que ser de tipo STRING'})
@@ -35,4 +32,7 @@ export class CreateCursoDto {
 
     @IsOptional()
     PrecioExamSuficiencia:number;
+
+    @IsNotEmpty({message:'modulo es requerido'})
+    modulo:Modulo;
 }

@@ -13,6 +13,7 @@ import { HorarioService } from 'src/horario/horario.service';
 import { MatriculaService } from 'src/matricula/matricula.service';
 import { EstudianteEnGrupoService } from 'src/estudiante-en-grupo/estudiante-en-grupo.service';
 import * as moment from 'moment';
+import { TramiteService } from 'src/tramite/tramite.service';
 
 moment.locale('es');
 
@@ -31,6 +32,7 @@ export class AppGateway implements OnGatewayInit,
               private readonly _grupo:GrupoService,
               private readonly _estudianteEngrupo:EstudianteEnGrupoService,
               private readonly _horario:HorarioService,
+              private readonly _tramite:TramiteService,
               private readonly _matri:MatriculaService,
               private readonly _usuario:UsuarioService){}
 
@@ -58,7 +60,7 @@ export class AppGateway implements OnGatewayInit,
   @SubscribeMessage('updated_list_curso')
   async handleCursos(@MessageBody() data: any){
     const query = data? { limit: data.limit, offset: data.offset }:{ limit: 5, offset: 0 }
-    const res = await this._curso.findAll( query )
+    const res = await this._curso.findAllCursos( query )
     this.server.emit('list_cursos', res );
   }
 
@@ -66,7 +68,15 @@ export class AppGateway implements OnGatewayInit,
   async handleEstudianteGrupo(@MessageBody() data: any){
     const query = data? { limit: data.limit, offset: data.offset }:{ limit: 5, offset: 0 };
     const res = await this._estudianteEngrupo.findByIdGrupo(data.Id, query);
+    console.log(res)
     this.server.emit('list_estudian_en_grupo', res );
+  }
+
+  @SubscribeMessage('updated_list_tramites')
+  async handleTramites(@MessageBody() data: any){
+    const query = data? { limit: data.limit, offset: data.offset }:{ limit: 5, offset: 0 };
+    const res = await this._tramite.findAll(query);
+    this.server.emit('list_tramites', res );
   }
 
   @SubscribeMessage('updated_list_usuario')

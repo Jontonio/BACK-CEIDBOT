@@ -4,6 +4,7 @@ import { CreateTipoGrupoDto } from './dto/create-tipo-grupo.dto';
 import { UpdateGrupoDto } from './dto/update-grupo.dto';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { CreateGrupoDto } from './dto/create-grupo.dto';
+import { UpdateGrupoModuloDto } from './dto/update-grupo-modulo.dto';
 
 @Controller('grupo')
 export class GrupoController {
@@ -41,8 +42,13 @@ export class GrupoController {
   }
 
   @Patch('update-grupo/:id')
-  update(@Param('id') id: string, @Body() updateGrupoDto: UpdateGrupoDto) {
-    return this.grupoService.update(+id, updateGrupoDto);
+  updateGrupo(@Param('id') id: string, @Body() updateGrupoDto: UpdateGrupoDto) {
+    return this.grupoService.updateGrupo(+id, updateGrupoDto);
+  }
+
+  @Patch('update-grupo-modulo/:id')
+  update(@Param('id') id: string, @Body() updateGrupoModuloDto: UpdateGrupoModuloDto) {
+    return this.grupoService.updateGrupoModelo(+id, updateGrupoModuloDto);
   }
 
   @Delete(':id')

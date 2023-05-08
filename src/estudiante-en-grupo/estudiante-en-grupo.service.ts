@@ -34,7 +34,7 @@ export class EstudianteEnGrupoService {
         // update matricula
         await this.matriculaService.update(createEstudEnGrupoDto.matricula.Id, { EstadoMatricula:'matriculado' })
         // update grupo
-        await this.grupoService.update(createEstudEnGrupoDto.grupo.Id,{ NumeroEstudiantes:NumeroEstudiantes+1 })
+        await this.grupoService.updateGrupo(createEstudEnGrupoDto.grupo.Id,{ NumeroEstudiantes:NumeroEstudiantes+1 })
         return new HandleEstudianteEnGrupo(`Estudiante ${Nombres} asignado al grupo del curso de ${curso.NombreCurso} correctamente`, true, estudEngrupo);
       }
       return new HandleEstudianteEnGrupo(`El grupo del curso ${curso.NombreCurso} supera la cantidad de estudiantes permitidos`, false, null);
@@ -67,7 +67,7 @@ export class EstudianteEnGrupoService {
 
         //actualizar contador de maximo de grupos
         await this.matriculaService.update(createEstudEnGrupoDto.matricula.Id, { EstadoMatricula:'matriculado' });
-        await this.grupoService.update(createEstudEnGrupoDto.grupo.Id, { NumeroEstudiantes:NumeroEstudiantes + 1 });
+        await this.grupoService.updateGrupo(createEstudEnGrupoDto.grupo.Id, { NumeroEstudiantes:NumeroEstudiantes + 1 });
 
         //registro de mensualidad
         createEstudEnGrupoDto.pagos = createEstudEnGrupoDto.pagos.map( pago => { 
@@ -148,35 +148,17 @@ export class EstudianteEnGrupoService {
                    'estudiante',
                    'estudiante.apoderado',
                    'pagos',
+                   'pagos.medioDePago',
                    'pagos.categoriaPago']});
 
-        const fecha1 = moment(grupo.FechaInicioGrupo); // fecha de inicio del grupo
-        const fecha2 = moment(grupo.FechaFinalGrupo);  // fecha final del grupo
-        const fecha3 = moment().format('YYYY-MM-DD');  // fecha actual
-        const fecha4 = moment(fecha3);                 // fecha auxiliar
-        const numModulos = grupo.curso.NumModulos;     // numero de modulos del curso
-        
-        const diasEnClases = fecha2.diff(fecha1, 'days');     // Cantidad de dias desde el inicio hasta el final
-        const diasTransPassdos = fecha4.diff(fecha1, 'days'); // Numero de dias pasados desde el inicio de las clases
-        const cantidadDiasModulo = Math.floor(diasEnClases / numModulos); // Numero de dias por modulo del curso
-        const modulosCumplidos = Math.floor(diasTransPassdos / cantidadDiasModulo); // numero de modulos completados
-        const listFechas:string[] = [];
-        for (let index = 1; index <= numModulos; index++) { // Fechas de pago
-          listFechas.push(fecha1.add(cantidadDiasModulo,'days').format('YYYY-MM-DD'));
-        }
+      const fecha1 = moment(grupo.FechaInicioGrupo); // fecha de inicio del grupo
+      const fechaActual = moment().format('YYYY-MM-DD');  // fecha actual
+      const fecha4 = moment(fechaActual);                 // fecha auxiliar
+      const diasTrans = fecha4.diff(fecha1, 'days'); // Numero de dias pasados desde el inicio de las clases
+      const diasTranscurridos = diasTrans>0?`${diasTrans} dias`:`${Math.abs(diasTrans)} dias para el inicio del grupo`;
+      const infoDateGrupo = { diasTranscurridos, fechaActual };
+      const data = { grupo, estudiantesEnGrupo, infoDateGrupo } 
 
-        const estadoDataPago:any = {
-          FechaInicioGrupo:grupo.FechaInicioGrupo, //Fecha de inicio del grupo
-          FechaFinalGrupo:grupo.FechaFinalGrupo, // Fecha final del grupo
-          FechaActual: fecha3, // la fecha actual
-          NumDiasCurso:diasEnClases, // Cantidad de dias desde el inicio hasta el final
-          DiasPasados:diasTransPassdos, // Numero de dias pasados desde el inicio de las clases
-          DiasPorModulo:cantidadDiasModulo, // Numero de dias por modulo del curso
-          ModulosCumplidos:modulosCumplidos,
-          ModuloActual:modulosCumplidos<numModulos?modulosCumplidos:modulosCumplidos+1,
-          FechasDePago:listFechas
-        }
-      const data = { grupo, estudiantesEnGrupo, estadoDataPago } 
       return new HandleEstudianteEnGrupoPago('Lista estudiantes asignados al grupo', true, data, count);
     } catch (e) {
       console.log(e)

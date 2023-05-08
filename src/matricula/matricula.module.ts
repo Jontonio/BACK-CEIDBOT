@@ -17,6 +17,7 @@ import { EstudianteEnGrupoService } from 'src/estudiante-en-grupo/estudiante-en-
 import { EstudianteEnGrupo } from 'src/estudiante-en-grupo/entities/estudiante-en-grupo.entity';
 import { PagoService } from 'src/pago/pago.service';
 import { Pago } from '../pago/entities/pago.entity';
+import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
 
 @Module({
   imports:[
@@ -25,6 +26,7 @@ import { Pago } from '../pago/entities/pago.entity';
                                      Estudiante, 
                                      Grupo,
                                      TipoGrupo,
+                                     GrupoModulo,
                                      Pago,
                                      EstudianteEnGrupo,
                                      Institucion])],

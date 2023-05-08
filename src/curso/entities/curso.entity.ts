@@ -3,6 +3,7 @@ import { Libro } from "src/libro/entities/libro.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
 import { Nivel } from "src/nivel/entities/nivel.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Modulo } from "./modulo.entity";
 
 @Entity()
 export class Curso {
@@ -55,5 +56,8 @@ export class Curso {
 
     @OneToMany(() => Libro, (libro:Libro) => libro.curso)
     libros: Libro[];
+
+    @ManyToOne( () => Modulo, (modulo:Modulo) => modulo.cursos )
+    modulo:Modulo;
 
 }

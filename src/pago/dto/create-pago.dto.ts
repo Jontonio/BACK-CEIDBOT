@@ -1,6 +1,7 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { CategoriaPago } from "src/categoria-pago/entities/categoria-pago.entity";
 import { EstudianteEnGrupo } from "src/estudiante-en-grupo/entities/estudiante-en-grupo.entity";
+import { MedioDePago } from "src/medio-de-pago/entities/medio-de-pago.entity";
 
 export class CreatePagoDto {
 
@@ -21,9 +22,12 @@ export class CreatePagoDto {
     @IsNumber()
     MontoPago:number;
 
-    @IsNotEmpty({message:'Es necesario el Id de estudianteEnGrupo dentro del objeto EstudianteEnGrupo'})
+    @IsOptional()
     estudianteEnGrupo:EstudianteEnGrupo;
     
-    @IsNotEmpty({message:'Es necesario el Id de CategoriaPago dentro del objeto categoriaPago'})
+    @IsOptional()
     categoriaPago:CategoriaPago;
+
+    @IsNotEmpty({message:'medioDePago es requerido'})
+    medioDePago:MedioDePago;
 }
