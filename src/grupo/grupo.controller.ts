@@ -51,7 +51,7 @@ export class GrupoController {
     return this.grupoService.updateGrupoModelo(+id, updateGrupoModuloDto);
   }
 
-  @Delete(':id')
+  @Delete('delete-grupo/:id')
   remove(@Param('id') id: string) {
     return this.grupoService.remove(+id);
   }

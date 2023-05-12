@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Grupo } from "./grupo.entity";
 import { Modulo } from "src/curso/entities/modulo.entity";
+import { Pago } from "src/pago/entities/pago.entity";
 
 @Entity()
 export class GrupoModulo {
@@ -26,4 +27,7 @@ export class GrupoModulo {
 
     @ManyToOne( () => Modulo, (modulo:Modulo) => modulo.grupoModulo )
     modulo:Modulo;
+
+    @OneToMany(() => Pago, (pago:Pago) => pago.grupoModulo )
+    pagos:Pago[];
 }

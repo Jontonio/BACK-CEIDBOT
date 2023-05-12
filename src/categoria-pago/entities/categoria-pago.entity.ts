@@ -25,5 +25,4 @@ export class CategoriaPago {
     /** Tablas relacionadas */
     @OneToMany(() => Pago, (pago:Pago) => pago.categoriaPago)
     pagos:Pago[];
-    
 }

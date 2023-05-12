@@ -16,7 +16,7 @@ export class PagoService {
   async create(createPagoDto: CreatePagoDto) {
     try {
       const mensualidad =  await this.pagoModel.save(createPagoDto);
-      return new HandlePago(`Se ha registrado su pago de ${createPagoDto.categoriaPago.TipoCategoriaPago } correctamente 🎉`, true, mensualidad);
+      return new HandlePago(`Se ha registrado su pago correctamente 🎉`, true, mensualidad);
     } catch (e) {
       console.log(e)
       throw new InternalServerErrorException('ERROR AL REGISTRAR DATOS DE PAGO');

@@ -54,8 +54,11 @@ export class WhatsappGateway {
   }
   
 
-  @Cron('45 12 * * *')
-  sendAutoMessage(){
-    console.log("auto mensaje")
-  }
+  // // @Cron('0 0 24 * * 1-5')
+  // @Cron('0 * * * * *', {
+  //   timeZone:'America/Lima'
+  // })
+  // updateModuloActual(){
+  //   console.log("cada 1 minuto")
+  // }
 }

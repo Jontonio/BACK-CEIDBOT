@@ -14,9 +14,6 @@ export class Curso {
     @Column({type:'varchar', length:40})
     NombrePais:string;
 
-    @Column({type:'int'})
-    NumModulos:number;
-
     @Column({type:'varchar', length:350})
     DescripcionCurso:string;
     

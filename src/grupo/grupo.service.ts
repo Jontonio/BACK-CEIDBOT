@@ -1,7 +1,7 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateTipoGrupoDto } from './dto/create-tipo-grupo.dto';
 import { CreateGrupoDto } from './dto/create-grupo.dto';
 import { UpdateGrupoDto } from './dto/update-grupo.dto';
@@ -13,11 +13,13 @@ import { GrupoModulo } from './entities/grupoModulo.entity';
 import { CreateGrupoModuloDto } from './dto/create-grupo-modulo.dto copy';
 import { Modulo } from 'src/curso/entities/modulo.entity';
 import { UpdateGrupoModuloDto } from './dto/update-grupo-modulo.dto';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class GrupoService {
   
-  constructor(@InjectRepository(Grupo) 
+  constructor(private dataSource: DataSource,
+              @InjectRepository(Grupo) 
                private grupoModel:Repository<Grupo>,
               @InjectRepository(TipoGrupo) 
               private tipoGrupoModel:Repository<TipoGrupo>,
@@ -61,16 +63,18 @@ export class GrupoService {
       /** obtener sus posibles fechas de pago en dias calendarios */
       const fecha1 = moment(grupo.FechaInicioGrupo); // fecha de inicio del grupo
       const fecha2 = moment(grupo.FechaFinalGrupo);  // fecha final del grupo
-      const numModulos = grupo.curso.NumModulos;     // numero de modulos del curso
+      const numModulos = grupo.curso.modulo.Modulo;     // numero de modulos del curso
       const diasEnClases = fecha2.diff(fecha1, 'days');     // Cantidad de dias desde el inicio hasta el final
       const cantidadDiasModulo = Math.floor(diasEnClases / numModulos); // Numero de dias por modulo del curso
       const listFechas:CreateGrupoModuloDto[] = [];
+      let fecha_sum = fecha1.toDate();
       /** preparar fechas */
-      listFechas.push({FechaPago:fecha1.toDate(), CurrentModulo:true, grupo:{Id:grupo.Id} as Grupo, modulo: {Id:null} as Modulo});
-      for (let index = 1; index <= numModulos; index++) { // Fechas de pago
-        listFechas.push({FechaPago:fecha1.add(cantidadDiasModulo,'days').toDate(), CurrentModulo:false, grupo:{Id:grupo.Id} as Grupo, modulo: {Id:index} as Modulo});
+      for (let index = 1; index <= numModulos+1; index++) { // Fechas de pago
+        listFechas.push({FechaPago:fecha_sum, CurrentModulo:false, grupo:{Id:grupo.Id} as Grupo, modulo: {Id:index} as Modulo});
+        fecha_sum = fecha1.add(cantidadDiasModulo,'days').toDate();
       }
-      // insertar datos a grupo módulo
+      // insertar datos a grupo módulo}
+      console.log(listFechas)
       await this.grupoModuloModel.save(listFechas);
 
       return new HandleGrupo(`Grupo con código ${grupo.Id} registrado correctamente`, true, grupo);
@@ -174,8 +178,8 @@ export class GrupoService {
         relations:['tipoGrupo',
                    'curso',
                    'curso.nivel',
-                   'docente',
                    'curso.modulo',
+                   'docente',
                    'grupoModulo',
                    'grupoModulo.modulo']
       });
@@ -225,11 +229,129 @@ export class GrupoService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} grupo`;
+  async getGrupoModulos(){
+    try {
+      return await this.grupoModuloModel.find({
+        where:{ CurrentModulo:true, grupo:{estadoGrupo: { CodeEstado:'status_en_clases' } } },
+        relations:['grupo','modulo']
+      });
+    } catch (e) {
+      throw new InternalServerErrorException("ERROR GET GRUPO MODULO")
+    }
+  }
+
+  async remove(Id: number) {
+    try {
+      const existGrupo = await this.grupoModel.findOneBy({ Id });
+      if(!existGrupo){
+        throw new NotFoundException(`No existe el grupo G-${Id}`);
+      }
+      const { affected } = await this.grupoModel.update(Id, { Estado:false });
+      if(affected==0) return new HandleGrupo('Grupo módulo sin afectar ', false, null)
+      return new HandleGrupoModulo(`Grupo G-${Id} se ha eliminado correctamente`, true, null);
+    } catch (e) {
+      throw new InternalServerErrorException("ERROR REMOVE GRUPO")
+    }
   }
 
   async getOneById(Id:number){
     return await this.grupoModel.findOne({ where:{ Id } });
   }
+
+  /* The above code is defining a function that will run at midnight every day using a cron job. The
+  function updates the state of a group based on its start and end dates. It uses a query runner to
+  connect to a data source and start a transaction. It then updates the state of the group based on
+  the current date and the start and end dates of the group. If the update is successful, it commits
+  the transaction and logs a message. If there is an error, it rolls back the transaction and throws
+  the error. Finally, it releases the query runner. 
+  update estadoGrupoId 2 in process or 3 finalized a las 0 horas y 0 minutos
+  */
+  @Cron('0 0 0 * * *', { timeZone:'America/Lima' })
+  async actualizarEstadoDelGrupo(){
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.query(`
+      UPDATE grupo
+      SET estadoGrupoId = CASE
+          WHEN FechaInicioGrupo = DATE(NOW()) THEN 2
+          WHEN FechaFinalGrupo = DATE(NOW()) THEN 3
+          ELSE estadoGrupoId
+          END
+      WHERE Estado != 0;
+      `);
+      await queryRunner.commitTransaction();
+      console.log("Estados de grupos actualizados")
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /* The above code is a TypeScript function that runs a cron job at 10 minutes past midnight every day
+  in the "America/Lima" timezone. The function updates the "CurrentModulo" field in the
+  "grupo_modulo" table based on whether the "FechaPago" field is equal to the current date or not.
+  If it is equal, the "CurrentModulo" field is set to true, otherwise it is set to false. The
+  function also ignores groups that have already been finalized or deleted. The function uses a
+  query runner to execute the SQL update statement and handles any errors that may 
+  actualizar a los módulos actuales cuya condición sea aquellos grupos con estadoGrupoId diferente de tres y cuyo estado del grupo sea diferente de 0.
+  a las 0 horas y 10 minutos
+  */
+  @Cron('0 10 0 * * *', { timeZone:'America/Lima' })
+  async actualizarCurrentModulo() {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.query(`
+      UPDATE grupo_modulo
+      JOIN grupo on grupo.Id = grupo_modulo.grupoId
+      SET grupo_modulo.CurrentModulo = CASE
+            WHEN FechaPago = DATE(NOW()) THEN true
+            ELSE false
+            END
+      WHERE grupo.estadoGrupoId != 3 || grupo.Estado != 0; 
+      -- Donde !=3 obviar a los grupos ya finalizados y !=0 obviar a los que ya se enceuntran eliminados 
+      `);
+      await queryRunner.commitTransaction();
+      console.log("Modulos actuales actualizado correctamente")
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }   
+
+  // @Cron('* */2 * * * *', { timeZone:'America/Lima' })
+  // async obtenerGruposConModulosActuales(){
+  //   const queryRunner = this.dataSource.createQueryRunner();
+  //   await queryRunner.connect();
+  //   await queryRunner.startTransaction();
+  //   try {
+  //     await queryRunner.query(`
+  //     UPDATE grupo_modulo
+  //     JOIN grupo on grupo.Id = grupo_modulo.grupoId
+  //     SET grupo_modulo.CurrentModulo = CASE
+  //           WHEN FechaPago = DATE(NOW()) THEN true
+  //           ELSE false
+  //           END
+  //     WHERE grupo.estadoGrupoId != 3 || grupo.Estado != 0; 
+  //     -- Donde !=3 obviar a los grupos ya finalizados y !=0 obviar a los que ya se enceuntran eliminados 
+  //     `);
+  //     await queryRunner.commitTransaction();
+  //     console.log("fechas actualizadas")
+  //   } catch (error) {
+  //     await queryRunner.rollbackTransaction();
+  //     throw error;
+  //   } finally {
+  //     await queryRunner.release();
+  //   }
+  // }
+
+
+
 }

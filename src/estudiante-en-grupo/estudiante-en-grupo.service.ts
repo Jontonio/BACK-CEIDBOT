@@ -108,16 +108,15 @@ export class EstudianteEnGrupoService {
         where:{ Estado:true, estudiante:{ Documento, TipoDocumento } }, 
         relations:['estudiante',
                   'estudiante.apoderado',
-                  'matricula',
                   'matricula.denomiServicio',
-                  'matricula',
-                  'grupo',
                   'grupo.curso',
                   'grupo.curso.nivel',
+                  'grupo.grupoModulo',
+                  'grupo.grupoModulo.modulo',
                   'pagos'] });
         const isEmpty = data.length==0?true:false;
         const msg = isEmpty?`El ${TipoDocumento} ${Documento} aún no este asignado a ningún grupo del CEID`
-                                  :`Hola 👋 ${estudiante.Nombres} ${estudiante.ApellidoPaterno} se encuentra en la sesión de sus cursos`;
+                           :`Hola 👋 ${estudiante.Nombres} se encuentra en la sesión de sus cursos`;
       return new HandleEstudianteEnGrupo(msg, !isEmpty, data);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO');
@@ -141,14 +140,18 @@ export class EstudianteEnGrupoService {
         skip:offset, take:limit,
         relations:['matricula',
                    'matricula.denomiServicio',
+                   'grupo',
                    'grupo.tipoGrupo',
                    'grupo.docente',
                    'grupo.curso',
                    'grupo.curso.nivel', 
+                   'grupo.curso.modulo', 
                    'estudiante',
                    'estudiante.apoderado',
                    'pagos',
                    'pagos.medioDePago',
+                   'pagos.grupoModulo',
+                   'pagos.grupoModulo.modulo',
                    'pagos.categoriaPago']});
 
       const fecha1 = moment(grupo.FechaInicioGrupo); // fecha de inicio del grupo

@@ -50,24 +50,24 @@ export class DocenteService {
   async update(Id: number, updateDocenteDto: UpdateDocenteDto) {
     try {
       const { affected } = await this.docenteModel.update(Id, updateDocenteDto);
-      if(affected==0) return new HandleDocente(`Usuario sin afectar`, false, null);
+      if(affected==0) return new HandleDocente(`Docente sin afectar`, false, null);
       const usuario = await this.docenteModel.findOneBy({Id});
-      return new HandleDocente(`Usuario ${usuario.Nombres} actualizado correctamente`, true, null);
+      return new HandleDocente(`Docente ${usuario.Nombres} actualizado correctamente`, true, null);
     } catch (e) {
       console.log(e);
-      throw new InternalServerErrorException('ERROR_UPDATE_USUARIO');
+      throw new InternalServerErrorException('ERROR_UPDATE_DOCENTE');
     }
   }
 
   async remove(Id: number) {
     try {
       const { affected } = await this.docenteModel.update(Id,{ Estado:false });
-      if(affected==0) return new HandleDocente(`Usuario sin afectar`, false, null);
+      if(affected==0) return new HandleDocente(`Docente sin afectar`, false, null);
       const usuario = await this.docenteModel.findOneBy({Id});
-      return new HandleDocente(`Usuario ${usuario.Nombres} eliminado correctamente`, true, usuario);
+      return new HandleDocente(`Docente ${usuario.Nombres} eliminado correctamente`, true, usuario);
     } catch (e) {
       console.log(e);
-      throw new InternalServerErrorException('ERROR_DELETE_USUARIO');
+      throw new InternalServerErrorException('ERROR_DELETE_DOCENTE');
     }
   }
 

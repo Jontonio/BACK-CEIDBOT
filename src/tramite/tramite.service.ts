@@ -45,7 +45,7 @@ export class TramiteService {
       createTramiteDto.pago = resPago;
       // TODO: registro trámite
       const resTramite = await this.tramiteModel.save( createTramiteDto );
-      return new HandleTramite(`${estudiante.Nombres.toLowerCase()} su trámite a fue registrado correctamente`,true, resTramite);
+      return new HandleTramite(`${estudiante.Nombres.toUpperCase()} su trámite a fue registrado correctamente`,true, resTramite);
     } catch (e) {
       console.log(e)
       throw new InternalServerErrorException('ERROR REGISTER NEW TRAMITE');

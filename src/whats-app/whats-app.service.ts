@@ -11,7 +11,7 @@ export class WhatsAppService {
     async senMessageWhatsap(whatsAppDto:WhatsAppDto){
         try {
             const res = await this.whatsapptGateway.sendMessageWhatsapp(whatsAppDto);
-            return new HandleMessageWhatsapp(`Mensaje enviado al número +${whatsAppDto.Numero.split('@')[0]} correctamente`, true, res);
+            return new HandleMessageWhatsapp(`Mensaje enviado al número ${whatsAppDto.Nombres} correctamente`, true, res);
         } catch (e) {
            console.log(e) 
            throw new InternalServerErrorException("ERROR AL ENVIAR MENSAJE DE WHATSAPP")

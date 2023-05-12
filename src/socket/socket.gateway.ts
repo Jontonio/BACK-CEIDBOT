@@ -92,8 +92,9 @@ export class AppGateway implements OnGatewayInit,
   }
 
   @SubscribeMessage('updated_list_grupo')
-  async handleGrupo(){
-    const res =  await this._grupo.findAllGrupos({ limit:5, offset:0 });
+  async handleGrupo(@MessageBody() data: any){
+    const query = data? { limit: data.limit, offset: data.offset }:{ limit: 5, offset: 0 };
+    const res =  await this._grupo.findAllGrupos( query );
     this.server.emit('list_grupos', res );
   }
 
@@ -113,6 +114,6 @@ export class AppGateway implements OnGatewayInit,
   async handleListMatriculados(){
     const res =  await this._matri.findAll({ limit:5, offset:0 });
     this.server.emit('list_matriculados', res );
-  }  
-
+  } 
+  
 }
