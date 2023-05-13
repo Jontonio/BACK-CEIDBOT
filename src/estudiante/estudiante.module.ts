@@ -3,7 +3,7 @@ import { EstudianteService } from './estudiante.service';
 import { EstudianteController } from './estudiante.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Estudiante } from './entities/estudiante.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Estudiante])],

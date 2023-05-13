@@ -49,7 +49,4 @@ export class CursoController {
     return this.cursoService.remove(+id);
   }
 
-  // getClientSomehow(req: Request): Socket{
-  //   return req.socket;
-  // }
 }

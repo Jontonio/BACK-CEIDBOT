@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HandleEstudianteEnGrupo, HandleEstudianteEnGrupoPago } from 'src/class/global-handles';
 import { EstudianteService } from 'src/estudiante/estudiante.service';
@@ -7,7 +7,6 @@ import { MatriculaService } from 'src/matricula/matricula.service';
 import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
 import { Repository } from 'typeorm';
 import { EstudianteEnGrupoWithPagoDto } from './dto/create-estudiante-en-grupo-with-pago.dto';
-import { UpdateEstudianteEnGrupoDto } from './dto/update-estudiante-en-grupo.dto';
 import { EstudianteEnGrupo } from './entities/estudiante-en-grupo.entity';
 import { PagoService } from 'src/pago/pago.service';
 import { EstudianteDataDto } from './dto/estudiante-data.dto';
@@ -93,7 +92,13 @@ export class EstudianteEnGrupoService {
         where:{ Estado:true }, 
         skip:offset, take:limit,
         order: { createdAt:'DESC' },
-        relations:['matricula','matricula.denomiServicio','matricula.curso','grupo', 'estudiante','estudiante.apoderado' ] });
+        relations:['matricula',
+                   'matricula.denomiServicio',
+                   'matricula.curso',
+                   'grupo', 
+                   'estudiante',
+                   'estudiante.apoderado'] 
+                  });
       return new HandleEstudianteEnGrupo('Lista estudiantes asignados al grupo', true, data, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO');
@@ -161,7 +166,6 @@ export class EstudianteEnGrupoService {
       const diasTranscurridos = diasTrans>0?`${diasTrans} dias`:`${Math.abs(diasTrans)} dias para el inicio del grupo`;
       const infoDateGrupo = { diasTranscurridos, fechaActual };
       const data = { grupo, estudiantesEnGrupo, infoDateGrupo } 
-
       return new HandleEstudianteEnGrupoPago('Lista estudiantes asignados al grupo', true, data, count);
     } catch (e) {
       console.log(e)
@@ -169,11 +173,22 @@ export class EstudianteEnGrupoService {
     }
   }
 
-  update(id: number, updateEstudianteEnGrupoDto: UpdateEstudianteEnGrupoDto) {
-    return `This action updates a #${id} estudianteEnGrupo`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} estudianteEnGrupo`;
+  async remove(Id: number) {
+    try{
+      const estudentGrupo = await this.estudEnGrupoModel.update(Id, {Estado: false})
+      if(!estudentGrupo){
+        throw new NotFoundException(`No no se encontro al estudiante con el Id ${Id}`);
+      }
+      const { affected } = await this.estudEnGrupoModel.update(Id, { Estado: false })
+      if(affected==0) return new HandleEstudianteEnGrupoPago(`Estudiante sin afectar`, false, null);
+      const { estudiante } = await this.estudEnGrupoModel.findOne({
+        where:{ Id },
+        relations:['estudiante']
+      });
+      return new HandleEstudianteEnGrupoPago(`Estudiante ${estudiante.Nombres.toUpperCase()} ${estudiante.ApellidoPaterno.toUpperCase()} fue eliminado del grupo correctamente`, true, estudiante);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException('ERROR ELIMINAR ESTUDIANTE EN GRUPO');
+    }
   }
 }

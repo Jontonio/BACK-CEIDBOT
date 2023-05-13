@@ -4,10 +4,10 @@ import { DocenteController } from './docente.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Docente } from './entities/docente.entity';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
-import { VerifyDocenteEmailMiddleware } from 'src/middlewares/verify-docente-email/verify-docente-email.middleware';
-import { VerifyDocenteDocMiddleware } from 'src/middlewares/verify-docente-doc/verify-docente-doc.middleware';
-import { VerifyIdDocenteMiddleware } from 'src/middlewares/verify-id-docente/verify-id-docente.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
+import { VerifyDocenteEmailMiddleware } from 'src/middlewares/verify-docente-email.middleware';
+import { VerifyDocenteDocMiddleware } from 'src/middlewares/verify-docente-doc.middleware';
+import { VerifyIdDocenteMiddleware } from 'src/middlewares/verify-id-docente.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Docente])],

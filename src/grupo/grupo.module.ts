@@ -3,11 +3,11 @@ import { GrupoService } from './grupo.service';
 import { GrupoController } from './grupo.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Grupo } from './entities/grupo.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces';
 import { TipoGrupo } from './entities/tipo-grupo.entity';
 import { RequestMethod } from '@nestjs/common/enums';
-import { VerifyIdGrupoMiddleware } from 'src/middlewares/verify-id-grupo/verify-id-grupo.middleware';
+import { VerifyIdGrupoMiddleware } from 'src/middlewares/verify-id-grupo.middleware';
 import { GrupoModulo } from './entities/grupoModulo.entity';
 
 @Module({

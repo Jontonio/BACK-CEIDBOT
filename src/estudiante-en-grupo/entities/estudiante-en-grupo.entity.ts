@@ -10,7 +10,6 @@ export class EstudianteEnGrupo {
     @PrimaryGeneratedColumn('increment')
     Id:number;
 
-    
     grupoId:number;
     
     @Column({default:true})

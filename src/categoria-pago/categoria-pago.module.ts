@@ -3,7 +3,7 @@ import { CategoriaPagoService } from './categoria-pago.service';
 import { CategoriaPagoController } from './categoria-pago.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoriaPago } from './entities/categoria-pago.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([CategoriaPago])],

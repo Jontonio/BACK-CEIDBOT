@@ -5,8 +5,8 @@ import { Modulo } from './entities/modulo.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Curso } from './entities/curso.entity';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
-import { VerifyIdCursoMiddleware } from 'src/middlewares/verify-id-curso/verify-id-curso.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
+import { VerifyIdCursoMiddleware } from 'src/middlewares/verify-id-curso.middleware';
 import { VerifyCursoMiddleware } from 'src/middlewares/verify-curso.middleware';
 
 @Module({

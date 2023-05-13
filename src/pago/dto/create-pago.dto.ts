@@ -6,7 +6,6 @@ import { MedioDePago } from "src/medio-de-pago/entities/medio-de-pago.entity";
 
 export class CreatePagoDto {
 
-    // @MaxLength(5, {message:'TipoDocumento tiene permitido como máximo 5 carácteres'})
     @IsNotEmpty({message:'VoucherUrl es requerido'})
     @IsString({message:'VoucherUrl tienen que ser de tipo STRING'})
     VoucherUrl:string;
@@ -29,7 +28,6 @@ export class CreatePagoDto {
     @IsOptional() // se va a recibir solo cuando el estudiante este inscrito
     estudianteEnGrupo:EstudianteEnGrupo;
     
-
     @IsOptional()
     categoriaPago:CategoriaPago;
 

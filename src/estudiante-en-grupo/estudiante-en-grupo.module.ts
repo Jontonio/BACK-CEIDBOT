@@ -4,7 +4,7 @@ import { EstudianteEnGrupoController } from './estudiante-en-grupo.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EstudianteEnGrupo } from './entities/estudiante-en-grupo.entity';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 import { Grupo } from 'src/grupo/entities/grupo.entity';
 import { Estudiante } from 'src/estudiante/entities/estudiante.entity';
 import { EstudianteService } from 'src/estudiante/estudiante.service';

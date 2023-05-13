@@ -3,7 +3,7 @@ import { MedioDePagoService } from './medio-de-pago.service';
 import { MedioDePagoController } from './medio-de-pago.controller';
 import { MedioDePago } from './entities/medio-de-pago.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([MedioDePago])],

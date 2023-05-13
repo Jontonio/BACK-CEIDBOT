@@ -35,12 +35,7 @@ export class EstudianteEnGrupoController {
     return this.estudianteEnGrupoService.findByIdGrupo(+id, pagination);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEstudianteEnGrupoDto: UpdateEstudianteEnGrupoDto) {
-    return this.estudianteEnGrupoService.update(+id, updateEstudianteEnGrupoDto);
-  }
-
-  @Delete(':id')
+  @Delete('delete-estudiantes-en-grupo/:id')
   remove(@Param('id') id: string) {
     return this.estudianteEnGrupoService.remove(+id);
   }

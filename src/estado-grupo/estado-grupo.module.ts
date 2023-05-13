@@ -3,7 +3,7 @@ import { EstadoGrupoService } from './estado-grupo.service';
 import { EstadoGrupoController } from './estado-grupo.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EstadoGrupo } from './entities/estado-grupo.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([EstadoGrupo])],

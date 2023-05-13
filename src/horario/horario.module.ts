@@ -1,9 +1,9 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { HorarioService } from './horario.service';
 import { HorarioController } from './horario.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Horario } from './entities/horario.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Horario])],

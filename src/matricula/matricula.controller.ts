@@ -30,11 +30,6 @@ export class MatriculaController {
     return this.matriculaService.findAll(pagination);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.matriculaService.findOne(+id);
-  }
-
   @Post('upload-file')
   @UseInterceptors(FileInterceptor('file',{ dest:'./uploads' }))
   async handleFileMatricula(@UploadedFile() file:Express.Multer.File, @Req() req:Request){

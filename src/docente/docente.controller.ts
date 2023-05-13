@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DocenteService } from './docente.service';
 import { CreateDocenteDto } from './dto/create-docente.dto';
 import { UpdateDocenteDto } from './dto/update-docente.dto';
@@ -33,8 +33,4 @@ export class DocenteController {
     return this.docenteService.remove(+id);
   }
 
-  @Post('/faker-docente')
-  createFake(){
-    return this.docenteService.addFakeData();
-  }
 }

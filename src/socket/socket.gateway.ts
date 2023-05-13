@@ -44,7 +44,6 @@ export class AppGateway implements OnGatewayInit,
 
   handleDisconnect(client: Socket) {
     console.log(`Disconnected: ${client.id}`);
-    //Do stuffs
   }
   
   handleConnection(client: Socket) {

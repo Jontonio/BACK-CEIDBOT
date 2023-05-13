@@ -79,6 +79,7 @@ export class GrupoService {
 
       return new HandleGrupo(`Grupo con código ${grupo.Id} registrado correctamente`, true, grupo);
     } catch (e) {
+      console.log(e)
       throw new InternalServerErrorException('ERROR_CREATE_GRUPO');
     }
   }

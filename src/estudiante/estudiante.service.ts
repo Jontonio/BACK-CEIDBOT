@@ -113,10 +113,6 @@ export class EstudianteService {
       throw new InternalServerErrorException('ERROR_GET_ESTUDIANTE');
     }
   }
-
-  update(id: number, updateEstudianteDto: UpdateEstudianteDto) {
-    return `This action updates a #${id} estudiante`;
-  }
   
   async updateByDocumento(Documento: string, updateEstudianteDto: UpdateEstudianteDto) {
     try {

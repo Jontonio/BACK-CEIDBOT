@@ -16,10 +16,6 @@ export class UbigeoService {
               @InjectRepository(Distrito) 
               private distModel:Repository<Distrito>){}
 
-  create(createUbigeoDto: CreateProvinviaDto) {
-    return 'This action adds a new ubigeo';
-  }
-
   async findDepartamentos(){
     try {
       return this.deparModel.find();

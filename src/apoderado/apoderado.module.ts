@@ -3,7 +3,7 @@ import { ApoderadoService } from './apoderado.service';
 import { ApoderadoController } from './apoderado.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Apoderado } from './entities/apoderado.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Apoderado])],

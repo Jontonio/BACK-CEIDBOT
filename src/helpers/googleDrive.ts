@@ -1,9 +1,7 @@
 import { google } from 'googleapis';
 import * as fs from "fs";
 
-const SCOPES = [
-    'https://www.googleapis.com/auth/drive',
-];
+const SCOPES = [ 'https://www.googleapis.com/auth/drive' ];
 const parentFolderId = '1Qub4HU4zJHFm3OeynEwdGjVZigerGLKz';
 
 const auth = new google.auth.GoogleAuth({

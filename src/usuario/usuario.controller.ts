@@ -50,9 +50,5 @@ export class UserController {
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
-
-  @Post('create-fake-usuario')
-  createFakeUser(){
-    return this.userService.fakeCreateDataUser();
-  }
+  
 }

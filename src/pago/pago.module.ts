@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { PagoService } from './pago.service';
 import { PagoController } from './pago.controller';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pago } from './entities/pago.entity';
 

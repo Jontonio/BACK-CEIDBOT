@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { Usuario } from 'src/usuario/entities/usuario.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Usuario])],

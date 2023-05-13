@@ -3,7 +3,7 @@ import { MatriculaService } from './matricula.service';
 import { MatriculaController } from './matricula.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Matricula } from './entities/matricula.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 import { Apoderado } from 'src/apoderado/entities/apoderado.entity';
 import { Estudiante } from 'src/estudiante/entities/estudiante.entity';
 import { ApoderadoService } from 'src/apoderado/apoderado.service';

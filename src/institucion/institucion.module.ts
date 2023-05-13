@@ -3,7 +3,7 @@ import { InstitucionService } from './institucion.service';
 import { InstitucionController } from './institucion.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Institucion } from './entities/institucion.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Institucion])],

@@ -4,7 +4,7 @@ import { DenominacionServicioController } from './denominacion-servicio.controll
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DenominacionServicio } from './entities/denominacion-servicio.entity';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 import { RequestMethod } from '@nestjs/common/enums';
 
 @Module({

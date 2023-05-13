@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateEstadoGrupoDto } from './dto/create-estado-grupo.dto';
-import { UpdateEstadoGrupoDto } from './dto/update-estado-grupo.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EstadoGrupo } from './entities/estado-grupo.entity';
 import { Repository } from 'typeorm';
@@ -31,17 +30,5 @@ export class EstadoGrupoService {
     } catch (e) {
       throw new InternalServerErrorException('ERROR GET TODOS LOS ESTADOS DE GRUPO');
     }
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} estadoGrupo`;
-  }
-
-  update(id: number, updateEstadoGrupoDto: UpdateEstadoGrupoDto) {
-    return `This action updates a #${id} estadoGrupo`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} estadoGrupo`;
   }
 }

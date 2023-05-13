@@ -11,8 +11,8 @@ export class CreateGrupoModuloDto {
     @IsOptional()
     @IsBoolean({ message:'CurrentModulo tiene que ser de tipo BOOLEAN'})
     CurrentModulo:boolean;
-    /** atributos de tablas relacionadas */
     
+    /** atributos de tablas relacionadas */
     @IsNotEmpty({ message:'grupo es requerido' })
     grupo:Grupo;
     

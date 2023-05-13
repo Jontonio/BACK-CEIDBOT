@@ -68,14 +68,6 @@ export class TramiteService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tramite`;
-  }
-
-  update(id: number, updateTramiteDto: UpdateTramiteDto) {
-    return `This action updates a #${id} tramite`;
-  }
-
   async remove(Id: number) {
     try {
       const tramite = await this.tramiteModel.findOneBy({Id});

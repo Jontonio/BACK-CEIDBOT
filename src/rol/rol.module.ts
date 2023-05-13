@@ -4,7 +4,7 @@ import { RolController } from './rol.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Rol } from './entities/rol.entity';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Rol])],

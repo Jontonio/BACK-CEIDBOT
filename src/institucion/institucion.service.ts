@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { HandleInstitucion } from 'src/class/global-handles';
 import { Repository } from 'typeorm';
 import { CreateInstitucionDto } from './dto/create-institucion.dto';
-import { UpdateInstitucionDto } from './dto/update-institucion.dto';
 import { Institucion } from './entities/institucion.entity';
 
 @Injectable()
@@ -28,18 +27,6 @@ export class InstitucionService {
       console.log(e)
       throw new InternalServerErrorException('ERROR_CREATE_INSTITUCION');
     }
-  }
-
-  findAll() {
-    return `This action returns all institucion`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} institucion`;
-  }
-
-  update(id: number, updateInstitucionDto: UpdateInstitucionDto) {
-    return `This action updates a #${id} institucion`;
   }
 
   async remove(Id: number) {

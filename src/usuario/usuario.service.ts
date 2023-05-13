@@ -11,8 +11,6 @@ import { ReniecUsuarioDto } from './dto/usuario-reniec.dto';
 import { Person } from 'src/interfaces/Person';
 import { EnableUserDto } from './dto/enable-usuario.dto';
 import axios from 'axios';
-
-import { faker } from '@faker-js/faker';
 import { HandleUsuario } from 'src/class/global-handles';
 
 @Injectable()
@@ -192,27 +190,6 @@ export class UsuarioService {
     } catch (e) {
       throw new InternalServerErrorException('ERROR_UPDATE_PASSWORD');
     }
-  }
-
-/* A method that creates fake data for the user. */
-  async fakeCreateDataUser(){
-
-    console.log("Creando datos falsos...");
-    
-    // for (let index = 0; index < 100; index++) {
-      
-    //   await this.create({
-    //       Email: faker.internet.email(),
-    //       LastName: faker.name.lastName(),
-    //       Name:faker.name.firstName(),
-    //       Password: faker.internet.password() 
-    //   });
-      
-    // }
-    
-    console.log("Datos falsos creados...");
-
-    return true;
   }
 
 }

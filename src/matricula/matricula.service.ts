@@ -179,10 +179,6 @@ export class MatriculaService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} matricula`;
-  }
-
   async remove(Id: number) {
     try {
       //? TODO: verificar si existe persona

@@ -1,14 +1,9 @@
-import { SubscribeMessage, 
-         WebSocketGateway, 
-         WebSocketServer,
-         OnGatewayInit, 
-         MessageBody} from '@nestjs/websockets';
-import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets/interfaces';
+import { WebSocketGateway, 
+         WebSocketServer} from '@nestjs/websockets';
 import { InternalServerErrorException } from '@nestjs/common'
 import { whatsApp } from 'src/helpers/whatsapp';
 import { Socket, Server } from 'socket.io';
 import { Client, LocalAuth } from 'whatsapp-web.js';
-import { Cron } from '@nestjs/schedule';
 import { CursoService } from 'src/curso/curso.service';
 import { WhatsAppDto } from 'src/whats-app/dto/whats-app.dto';
 
@@ -33,14 +28,8 @@ export class WhatsappGateway {
     this.whatsapp.start();
   }
 
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
-  }
-
   handleConnection(client: Socket) {
     console.log(`Connected ${client.id}`);
-    /** Emit welcome socket */
     this.whatsapp.statusWhatsapp();
     client.emit('welcome-ceidbot',{ data:'', ok:true, msg:'Bienvenido al sistema CEIDBOT' } );
   }
@@ -53,12 +42,4 @@ export class WhatsappGateway {
     }
   }
   
-
-  // // @Cron('0 0 24 * * 1-5')
-  // @Cron('0 * * * * *', {
-  //   timeZone:'America/Lima'
-  // })
-  // updateModuloActual(){
-  //   console.log("cada 1 minuto")
-  // }
 }

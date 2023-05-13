@@ -3,10 +3,10 @@ import { UsuarioService } from './usuario.service';
 import { UserController } from './usuario.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Usuario } from './entities/usuario.entity';
-import { VerifyEmailUsuarioMiddleware } from 'src/middlewares/verify-email-usuario/verify-email-usuario.middleware';
-import { VerifyIdUsuarioMiddleware } from 'src/middlewares/verify-id-usuario/verify-id-usuario.middleware';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
-import { VerifyDniUsuarioMiddleware } from 'src/middlewares/verify-dni-usuario/verify-dni-usuario.middleware';
+import { VerifyEmailUsuarioMiddleware } from 'src/middlewares/verify-email-usuario.middleware';
+import { VerifyIdUsuarioMiddleware } from 'src/middlewares/verify-id-usuario.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
+import { VerifyDniUsuarioMiddleware } from 'src/middlewares/verify-dni-usuario.middleware';
 import { Rol } from 'src/rol/entities/rol.entity';
 
 @Module({

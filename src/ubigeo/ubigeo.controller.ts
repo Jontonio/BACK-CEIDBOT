@@ -1,16 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { UbigeoService } from './ubigeo.service';
-import { CreateProvinviaDto } from './dto/create-distrito.dto';
-import { UpdateUbigeoDto } from './dto/update-distrito.dto';
 
 @Controller('ubigeo')
 export class UbigeoController {
   constructor(private readonly ubigeoService: UbigeoService) {}
-
-  @Post()
-  create(@Body() createUbigeoDto: CreateProvinviaDto) {
-    return this.ubigeoService.create(createUbigeoDto);
-  }
 
   @Get('departamento')
   findAllDepartamento() {

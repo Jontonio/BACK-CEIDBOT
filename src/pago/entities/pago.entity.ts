@@ -26,6 +26,9 @@ export class Pago {
     @Column({type:'boolean', default:false})
     Verificado:boolean;
 
+    @Column({type:'boolean', default:true})
+    Estado:boolean;
+
     @CreateDateColumn()
     createdAt:Date;
 

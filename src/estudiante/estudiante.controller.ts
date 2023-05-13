@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { EstudianteService } from './estudiante.service';
 import { CreateEstudianteDto } from './dto/create-estudiante.dto';
-import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
 import { EmailDocEstudianteDto } from './dto/emailDocestudiante.dto';
 import { RequestEstudianteDto } from './dto/request-estudiante.dto';
 
@@ -27,11 +26,6 @@ export class EstudianteController {
   @Post('get-estudiante-by-documento')
   findOneByDocumento(@Body() requestEstudianteDto:RequestEstudianteDto) {
     return this.estudianteService.findOneByDocumento(requestEstudianteDto);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEstudianteDto: UpdateEstudianteDto) {
-    return this.estudianteService.update(+id, updateEstudianteDto);
   }
 
   @Delete(':id')

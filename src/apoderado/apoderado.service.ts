@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { HandleApoderado } from 'src/class/global-handles';
 import { Repository } from 'typeorm';
 import { CreateApoderadoDto } from './dto/create-apoderado.dto';
-import { UpdateApoderadoDto } from './dto/update-apoderado.dto';
 import { Apoderado } from './entities/apoderado.entity';
 
 @Injectable()
@@ -32,10 +31,6 @@ export class ApoderadoService {
     }
   }
 
-  findAll() {
-    return `This action returns all apoderado`;
-  }
-
   async findOne(DNI: string) {
     try {
       const apoderado = await this.apoderadoModel.findOne({ where:{ Documento:DNI } });
@@ -44,10 +39,6 @@ export class ApoderadoService {
       console.log(e)
       throw new InternalServerErrorException('ERROR_GET_APODERADO');
     }
-  }
-
-  update(id: number, updateApoderadoDto: UpdateApoderadoDto) {
-    return `This action updates a #${id} apoderado`;
   }
 
   async remove(Id: number) {

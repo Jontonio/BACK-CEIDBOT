@@ -20,11 +20,7 @@ export class LibroService {
       throw new InternalServerErrorException('ERROR_CREATE_LIBRO');
     }
   }
-
-  findAll() {
-    return `This action returns all libro`;
-  }
-
+  
   async findOne(Id: number) {
     try {
       const libro = await this.libroModel.findOneBy({Id, Estado:true});

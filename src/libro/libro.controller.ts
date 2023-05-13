@@ -12,11 +12,6 @@ export class LibroController {
     return this.libroService.create(createLibroDto);
   }
 
-  @Get()
-  findAll() {
-    return this.libroService.findAll();
-  }
-
   @Get('get-one-libro/:id')
   findOne(@Param('id') id: string) {
     return this.libroService.findOne(+id);

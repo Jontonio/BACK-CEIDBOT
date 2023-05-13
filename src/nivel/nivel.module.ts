@@ -3,7 +3,7 @@ import { NivelService } from './nivel.service';
 import { NivelController } from './nivel.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Nivel } from './entities/nivel.entity';
-import { VerifyTokenMiddleware } from 'src/middlewares/verify-token/verify-token.middleware';
+import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Nivel])],

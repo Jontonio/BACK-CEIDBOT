@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateMedioDePagoDto } from './dto/create-medio-de-pago.dto';
-import { UpdateMedioDePagoDto } from './dto/update-medio-de-pago.dto';
 import { MedioDePago } from './entities/medio-de-pago.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -32,16 +31,5 @@ export class MedioDePagoService {
       throw new InternalServerErrorException('ERROR OBTENER MEDIOS DE PAGO')
     }
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} medioDePago`;
-  }
-
-  update(id: number, updateMedioDePagoDto: UpdateMedioDePagoDto) {
-    return `This action updates a #${id} medioDePago`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} medioDePago`;
-  }
+  
 }

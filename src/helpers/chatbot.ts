@@ -3,7 +3,6 @@ import WAWebJS, { Client, MessageMedia } from "whatsapp-web.js"
 import { PayloadBoot, PayloadCurso } from '../class/PayloadBoot';
 import { CursoService } from "src/curso/curso.service";
 import { isArray } from "class-validator";
-import { cloudfunctions } from "googleapis/build/src/apis/cloudfunctions";
 
 export const chatbot = async (client:Client, message:WAWebJS.Message, _curso:CursoService) => {
 

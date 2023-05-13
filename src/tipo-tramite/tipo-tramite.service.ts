@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateTipoTramiteDto } from './dto/create-tipo-tramite.dto';
-import { UpdateTipoTramiteDto } from './dto/update-tipo-tramite.dto';
 import { TipoTramite } from './entities/tipo-tramite.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -33,15 +32,4 @@ export class TipoTramiteService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tipoTramite`;
-  }
-
-  update(id: number, updateTipoTramiteDto: UpdateTipoTramiteDto) {
-    return `This action updates a #${id} tipoTramite`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} tipoTramite`;
-  }
 }

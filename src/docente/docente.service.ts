@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { CreateDocenteDto } from './dto/create-docente.dto';
 import { UpdateDocenteDto } from './dto/update-docente.dto';
 import { Docente } from './entities/docente.entity';
-import { faker } from '@faker-js/faker';
 import { HandleDocente } from 'src/class/global-handles';
 
 @Injectable()
@@ -72,7 +71,6 @@ export class DocenteService {
   }
 
   async getDocenteWithEmail(Email:string){
-    //TODO: falta verificar si el usuario no esta eliminado o desactivado
     try {
       return await this.docenteModel.findOne({
         where:{ Email }
@@ -83,7 +81,6 @@ export class DocenteService {
   }
 
   async getDocenteWithDocument(Documento:string){
-    //TODO: falta verificar si el usuario no esta eliminado o desactivado
     try {
       return await this.docenteModel.findOne({
         where:{ Documento }
@@ -101,27 +98,6 @@ export class DocenteService {
     } catch (error) {
       throw new InternalServerErrorException('ERROR_GET_DOCENTE_BY_ID');
     }
-  }
-
-  async addFakeData(){
-
-    // for (let index = 1; index <= 100; index++) {
-    //   const docente = await this.docenteModel.save({
-    //     Nombres:faker.name.fullName(),
-    //     ApellidoMaterno: faker.name.firstName(),
-    //     ApellidoPaterno: faker.name.lastName(),
-    //     Email: faker.internet.email(),
-    //     Celular: 964145204,
-    //     Direccion: faker.address.direction(),
-    //     Documento: index,
-    //     TipoDocumento:'DNI'
-    //   })
-  
-    //   this.docenteModel.save(docente);
-      
-    // }
-    // return {msg:`Docentes registrados correctamente`, ok:true, data:'docente' };
-
   }
 
 }
