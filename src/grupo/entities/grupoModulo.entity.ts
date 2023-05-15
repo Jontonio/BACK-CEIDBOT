@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGenerate
 import { Grupo } from "./grupo.entity";
 import { Modulo } from "src/curso/entities/modulo.entity";
 import { Pago } from "src/pago/entities/pago.entity";
+import { Mora } from "src/pago/entities/mora.entity";
 
 @Entity()
 export class GrupoModulo {
@@ -30,4 +31,7 @@ export class GrupoModulo {
 
     @OneToMany(() => Pago, (pago:Pago) => pago.grupoModulo )
     pagos:Pago[];
+
+    @OneToMany(() => Mora, (mora:Mora) => mora)
+    moras: Mora[];
 }

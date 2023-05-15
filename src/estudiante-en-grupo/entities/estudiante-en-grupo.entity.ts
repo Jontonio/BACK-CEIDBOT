@@ -1,6 +1,7 @@
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
 import { Grupo } from "src/grupo/entities/grupo.entity";
 import { Matricula } from "src/matricula/entities/matricula.entity";
+import { Mora } from "src/pago/entities/mora.entity";
 import { Pago } from "src/pago/entities/pago.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -36,4 +37,7 @@ export class EstudianteEnGrupo {
         cascade:true
     })
     pagos:Pago[];
+
+    @OneToMany(() => Mora, (mora:Mora) => mora)
+    moras: Mora[];
 }

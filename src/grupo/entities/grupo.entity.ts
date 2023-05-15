@@ -34,6 +34,12 @@ export class Grupo {
     @Column({type:'boolean'})
     RequeridoPPago:boolean;
 
+    @Column({type:'float', default: 5 })
+    MontoMora:number;
+
+    @Column({type:'int', default: 5})
+    NumDiasHolaguraMora:number;
+
     @ManyToOne( () => Docente, (docente:Docente) => docente.grupos)
     docente:Docente;
 

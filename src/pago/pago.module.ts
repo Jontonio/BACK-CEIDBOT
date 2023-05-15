@@ -4,9 +4,10 @@ import { PagoController } from './pago.controller';
 import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pago } from './entities/pago.entity';
+import { Mora } from './entities/mora.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Pago])],
+  imports:[TypeOrmModule.forFeature([Pago, Mora])],
   controllers: [PagoController],
   providers: [PagoService]
 })

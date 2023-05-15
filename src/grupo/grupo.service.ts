@@ -325,34 +325,7 @@ export class GrupoService {
     } finally {
       await queryRunner.release();
     }
+
   }   
-
-  // @Cron('* */2 * * * *', { timeZone:'America/Lima' })
-  // async obtenerGruposConModulosActuales(){
-  //   const queryRunner = this.dataSource.createQueryRunner();
-  //   await queryRunner.connect();
-  //   await queryRunner.startTransaction();
-  //   try {
-  //     await queryRunner.query(`
-  //     UPDATE grupo_modulo
-  //     JOIN grupo on grupo.Id = grupo_modulo.grupoId
-  //     SET grupo_modulo.CurrentModulo = CASE
-  //           WHEN FechaPago = DATE(NOW()) THEN true
-  //           ELSE false
-  //           END
-  //     WHERE grupo.estadoGrupoId != 3 || grupo.Estado != 0; 
-  //     -- Donde !=3 obviar a los grupos ya finalizados y !=0 obviar a los que ya se enceuntran eliminados 
-  //     `);
-  //     await queryRunner.commitTransaction();
-  //     console.log("fechas actualizadas")
-  //   } catch (error) {
-  //     await queryRunner.rollbackTransaction();
-  //     throw error;
-  //   } finally {
-  //     await queryRunner.release();
-  //   }
-  // }
-
-
 
 }

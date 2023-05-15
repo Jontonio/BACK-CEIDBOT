@@ -3,15 +3,19 @@ import { CreatePagoDto } from './dto/create-pago.dto';
 import { UpdatePagoDto } from './dto/update-pago.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pago } from './entities/pago.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { FirstPagoDto } from './dto/first-pago.dto';
 import { HandlePago } from 'src/class/global-handles';
+import { Mora } from './entities/mora.entity';
 
 @Injectable()
 export class PagoService {
 
-  constructor(@InjectRepository(Pago) 
-               private pagoModel:Repository<Pago>){}
+  constructor(private dataSource: DataSource,
+              @InjectRepository(Pago) 
+               private pagoModel:Repository<Pago>,
+               @InjectRepository(Mora) 
+               private moraModel:Repository<Mora>){}
 
   async create(createPagoDto: CreatePagoDto) {
     try {
@@ -57,4 +61,54 @@ export class PagoService {
       throw new InternalServerErrorException('ERROR DELETE MENSUALIDAD');
     }
   }
+  
+  async generarMoras(): Promise<void> {
+    try {
+      const res = await this.dataSource.query(`
+      INSERT INTO mora (estudianteEnGrupoId, grupoModuloId, MontoMora, Verificado, EstadoMora)
+      SELECT estudiante_en_grupo.Id, grupo_modulo.Id, 5, false, true
+      FROM estudiante
+      INNER JOIN estudiante_en_grupo ON estudiante.Id = estudiante_en_grupo.estudianteId
+      INNER JOIN grupo ON estudiante_en_grupo.grupoId = grupo.Id
+      INNER JOIN grupo_modulo ON grupo.Id = grupo_modulo.grupoId
+      WHERE grupo_modulo.CurrentModulo = true and
+          grupo.Estado != false AND
+            grupo.estadoGrupoId != 3 AND 
+            estudiante_en_grupo.Estado != false AND 
+            DATEDIFF(CURDATE(), grupo_modulo.FechaPago) > 5 AND
+            NOT EXISTS (
+              SELECT * FROM mora
+              WHERE mora.grupoModuloId = grupo_modulo.Id AND mora.estudianteEnGrupoId = estudiante_en_grupo.Id
+            ) AND
+            NOT EXISTS (
+              SELECT * FROM pago
+              WHERE pago.grupoModuloId = grupo_modulo.Id AND pago.Verificado IS NOT NULL AND pago.CodigoVoucher IS NOT NULL AND pago.CodigoVoucher <> '' AND (pago.Estado IS NULL OR pago.Estado != 0) AND
+              pago.estudianteEnGrupoId = estudiante_en_grupo.Id AND pago.grupoModuloId = grupo_modulo.Id
+            );
+      `);
+      return res;
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR AL CREAR MORAS');
+    }
+  }
+
+  async listaEstudiantesSinPagar(){
+    return `
+    SELECT * FROM estudiante
+    INNER JOIN estudiante_en_grupo ON estudiante.Id = estudiante_en_grupo.estudianteId
+    INNER JOIN grupo ON estudiante_en_grupo.grupoId = grupo.Id
+    INNER JOIN grupo_modulo ON grupo.Id = grupo_modulo.grupoId
+    WHERE grupo.Estado != false AND
+          grupo.estadoGrupoId != 3 AND 
+          estudiante_en_grupo.Estado != false  AND 
+          grupo_modulo.FechaPago >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) AND
+          grupo_modulo.FechaPago <= DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+    AND NOT EXISTS (
+      SELECT * FROM pago
+      WHERE pago.grupoModuloId = grupo_modulo.Id AND pago.Verificado IS NOT NULL AND pago.CodigoVoucher IS NOT NULL AND pago.CodigoVoucher <> '' AND (pago.Estado IS NULL OR pago.Estado != 0)
+      AND pago.estudianteEnGrupoId = estudiante_en_grupo.Id AND pago.grupoModuloId = grupo_modulo.Id
+    );
+    `;
+  }
+
 }

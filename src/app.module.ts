@@ -55,8 +55,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { config } from 'dotenv';
 import { WhatsappGateway } from './socket/whatsapp.gateway';
-import { WhatsAppService } from './whats-app/whats-app.service';
-import { WhatsAppController } from './whats-app/whats-app.controller';
 import { EstudianteEnGrupoService } from './estudiante-en-grupo/estudiante-en-grupo.service';
 import { EstudianteEnGrupo } from './estudiante-en-grupo/entities/estudiante-en-grupo.entity';
 import { PagoService } from './pago/pago.service';
@@ -68,6 +66,10 @@ import { TramiteService } from './tramite/tramite.service';
 import { Tramite } from './tramite/entities/tramite.entity';
 import { Modulo } from './curso/entities/modulo.entity';
 import { GrupoModulo } from './grupo/entities/grupoModulo.entity';
+import { Mora } from './pago/entities/mora.entity';
+import { BotModule } from './bot/bot.module';
+import { BotService } from './bot/bot.service';
+import { Bot } from './bot/entities/bot.entity';
 
 @Module({
   imports: [ 
@@ -112,8 +114,10 @@ import { GrupoModulo } from './grupo/entities/grupoModulo.entity';
                               Estudiante,
                               EstudianteEnGrupo,
                               Pago,
+                              Mora,
                               Tramite,
                               Institucion,
+                              Bot,
                               DenominacionServicio]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'public'),
@@ -142,9 +146,10 @@ import { GrupoModulo } from './grupo/entities/grupoModulo.entity';
     EstadoGrupoModule,
     TipoTramiteModule,
     TramiteModule,
-    MedioDePagoModule
+    MedioDePagoModule,
+    BotModule
   ],
-  controllers: [ AppController, WhatsAppController ],
+  controllers: [ AppController ],
   providers: [AppService, 
               AppGateway, 
               CursoService,
@@ -160,8 +165,8 @@ import { GrupoModulo } from './grupo/entities/grupoModulo.entity';
               PagoService,
               DenominacionServicioService,
               WhatsappGateway,
-              WhatsAppService,
-              TramiteService
+              TramiteService,
+              BotService
             ]
 })
 export class AppModule {}

@@ -18,6 +18,7 @@ import { EstudianteEnGrupo } from 'src/estudiante-en-grupo/entities/estudiante-e
 import { PagoService } from 'src/pago/pago.service';
 import { Pago } from '../pago/entities/pago.entity';
 import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
+import { Mora } from 'src/pago/entities/mora.entity';
 
 @Module({
   imports:[
@@ -28,6 +29,7 @@ import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
                                      TipoGrupo,
                                      GrupoModulo,
                                      Pago,
+                                     Mora,
                                      EstudianteEnGrupo,
                                      Institucion])],
   controllers: [MatriculaController],

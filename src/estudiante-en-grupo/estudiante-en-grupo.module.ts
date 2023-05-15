@@ -20,6 +20,7 @@ import { PagoService } from 'src/pago/pago.service';
 import { Pago } from 'src/pago/entities/pago.entity';
 import { VerifyEstudianteMiddleware } from 'src/middlewares/verify-estudiante.middleware';
 import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
+import { Mora } from 'src/pago/entities/mora.entity';
 
 @Module({
   imports:[TypeOrmModule.forFeature([EstudianteEnGrupo, 
@@ -29,7 +30,8 @@ import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
                                      GrupoModulo, 
                                      Matricula, 
                                      Apoderado,
-                                     Pago, 
+                                     Pago,
+                                     Mora, 
                                      Institucion, 
                                      Estudiante])],
   controllers: [EstudianteEnGrupoController],
