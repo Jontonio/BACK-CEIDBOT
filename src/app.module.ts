@@ -68,8 +68,7 @@ import { Modulo } from './curso/entities/modulo.entity';
 import { GrupoModulo } from './grupo/entities/grupoModulo.entity';
 import { Mora } from './pago/entities/mora.entity';
 import { BotModule } from './bot/bot.module';
-import { BotService } from './bot/bot.service';
-import { Bot } from './bot/entities/bot.entity';
+import { DialogflowModule } from './dialogflow/dialogflow.module';
 
 @Module({
   imports: [ 
@@ -117,7 +116,6 @@ import { Bot } from './bot/entities/bot.entity';
                               Mora,
                               Tramite,
                               Institucion,
-                              Bot,
                               DenominacionServicio]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'public'),
@@ -147,7 +145,8 @@ import { Bot } from './bot/entities/bot.entity';
     TipoTramiteModule,
     TramiteModule,
     MedioDePagoModule,
-    BotModule
+    BotModule,
+    DialogflowModule
   ],
   controllers: [ AppController ],
   providers: [AppService, 
@@ -165,8 +164,6 @@ import { Bot } from './bot/entities/bot.entity';
               PagoService,
               DenominacionServicioService,
               WhatsappGateway,
-              TramiteService,
-              BotService
-            ]
+              TramiteService ]
 })
 export class AppModule {}

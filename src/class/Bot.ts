@@ -1,6 +1,6 @@
 
 class MessageStatusBot{
-    constructor(public msg:string, public qr:string, public authenticated:boolean){}
+    constructor(public title:string, public description:string, public qr:string, public isAuth:boolean, public showQr?:boolean){}
 }
 
 export { MessageStatusBot };

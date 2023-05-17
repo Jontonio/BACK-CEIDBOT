@@ -23,7 +23,11 @@ import { Tramite } from "src/tramite/entities/tramite.entity";
 import { Modulo } from "src/curso/entities/modulo.entity";
 import { GrupoModulo } from "src/grupo/entities/grupoModulo.entity";
 
-class HandleMessageWhatsapp{
+class HandleWhatsapp{
+  constructor(public msg:string, public ok:boolean, public data:any){}
+}
+
+class HandleDialogFlow{
   constructor(public msg:string, public ok:boolean, public data:any){}
 }
 
@@ -147,11 +151,12 @@ export {
     HandleCategoriaPago,
     HandleEstadoGrupo,
     HandleResetPassword,
-    HandleMessageWhatsapp,
+    HandleWhatsapp,
     HandleEstudianteEnGrupoPago,
     HandleTipoTramite,
     HandleMedioDePago,
     HandleTramite,
-    HandleGrupoModulo
+    HandleGrupoModulo,
+    HandleDialogFlow
 }
 

@@ -1,8 +1,8 @@
 import { IsNotEmpty, Matches } from "class-validator";
 
-export class BotDto {
+export class BotSendDto {
 
-    @IsNotEmpty({ message:'El Nombre del destinatario' })
+    @IsNotEmpty({ message:'El Nombres del destinatario' })
     Nombres:string;
 
     @IsNotEmpty({ message:'El Numero de celular es requerido (formato 00000000000@c.us mas el prefijo)' })
