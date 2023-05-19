@@ -59,9 +59,9 @@ export class WhatsappGateway {
 
     this.inicializarWhatsApp();
 
-    // this.client.on('loading_screen', (percent, message) => {
-    //   console.log('LOADING SCREEN', percent, message);
-    // });
+    this.client.on('loading_screen', (percent, message) => {
+      console.log('LOADING SCREEN', percent, message);
+    });
 
     this.client.on('authenticated', async () => {
       this.isAuth = true;
@@ -69,10 +69,10 @@ export class WhatsappGateway {
       console.log("Session iniciada");
     })
 
-    // this.client.on('auth_failure', msg => {
-    //   // Fired if session restore was unsuccessful
-    //   console.error('AUTHENTICATION FAILURE', msg);
-    // });
+    this.client.on('auth_failure', msg => {
+      // Fired if session restore was unsuccessful
+      console.error('AUTHENTICATION FAILURE', msg);
+    });
 
     this.client.on('qr', (qr:any) => {
       this.isAuth = false;

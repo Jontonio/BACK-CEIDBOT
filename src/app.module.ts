@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
+import { config } from 'dotenv';
 import { AppController } from './app.controller';
+import { join } from 'path';
 import { AppService } from './app.service';
-import { DatabaseModule } from './database/database.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AppGateway } from './socket/socket.gateway';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { ReportsModule } from './reports/reports.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { RolModule } from './rol/rol.module';
 import { DocenteModule } from './docente/docente.module';
 import { CursoModule } from './curso/curso.module';
@@ -36,7 +36,6 @@ import { Matricula } from './matricula/entities/matricula.entity';
 import { MatriculaService } from './matricula/matricula.service';
 import { Apoderado } from './apoderado/entities/apoderado.entity';
 import { DenominacionServicioService } from './denominacion-servicio/denominacion-servicio.service';
-import { Estudiante } from './estudiante/entities/estudiante.entity';
 import { Institucion } from './institucion/entities/institucion.entity';
 import { EstudianteService } from './estudiante/estudiante.service';
 import { DenominacionServicio } from './denominacion-servicio/entities/denominacion-servicio.entity';
@@ -53,7 +52,6 @@ import { CategoriaPagoModule } from './categoria-pago/categoria-pago.module';
 import { EstadoGrupoModule } from './estado-grupo/estado-grupo.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { config } from 'dotenv';
 import { WhatsappGateway } from './socket/whatsapp.gateway';
 import { EstudianteEnGrupoService } from './estudiante-en-grupo/estudiante-en-grupo.service';
 import { EstudianteEnGrupo } from './estudiante-en-grupo/entities/estudiante-en-grupo.entity';
@@ -69,11 +67,15 @@ import { GrupoModulo } from './grupo/entities/grupoModulo.entity';
 import { Mora } from './pago/entities/mora.entity';
 import { BotModule } from './bot/bot.module';
 import { DialogflowModule } from './dialogflow/dialogflow.module';
+import { Estudiante } from './estudiante/entities/estudiante.entity';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [ 
     ConfigModule.forRoot({
-      envFilePath:(process.env.NODE_ENV === 'production')?'.production.env':'.env',
+      envFilePath: process.env.NODE_ENV
+        ? `${process.env.NODE_ENV}`
+        : `.development.env`,
       load:[config],
       isGlobal:true
     }),
@@ -121,7 +123,7 @@ import { DialogflowModule } from './dialogflow/dialogflow.module';
       rootPath: join(__dirname, 'public'),
       exclude:['/api*']
     }),
-    DatabaseModule, 
+    DatabaseModule,
     UsuarioModule,
     AuthModule, 
     ReportsModule, 
