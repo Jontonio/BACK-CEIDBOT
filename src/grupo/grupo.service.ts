@@ -14,6 +14,8 @@ import { CreateGrupoModuloDto } from './dto/create-grupo-modulo.dto copy';
 import { Modulo } from 'src/curso/entities/modulo.entity';
 import { UpdateGrupoModuloDto } from './dto/update-grupo-modulo.dto';
 import { Cron } from '@nestjs/schedule';
+import { EstadoGrupo } from 'src/estado-grupo/entities/estado-grupo.entity';
+import { Data, Series } from 'src/class/Graphics';
 
 @Injectable()
 export class GrupoService {
@@ -252,6 +254,35 @@ export class GrupoService {
       return new HandleGrupoModulo(`Grupo G-${Id} se ha eliminado correctamente`, true, null);
     } catch (e) {
       throw new InternalServerErrorException("ERROR REMOVE GRUPO")
+    }
+  }
+
+  async getDataHorizontalBarGruposActivos(estadoGrupoId:number){
+     const queryRunner = this.dataSource.createQueryRunner();
+     await queryRunner.connect();
+     await queryRunner.startTransaction();
+    try {
+
+      const res = await queryRunner.query(`CALL getDataHorizontalBar(${estadoGrupoId})`);
+      await queryRunner.commitTransaction();
+
+      if(res[0].length > 0 ){
+        const data:any[] = res[0];
+        const newData:Series[] = [];
+        data.forEach(res => {
+          const name = `${res.Id} - ${res.NombreCurso} ${res.Nivel}`;
+          const value = res.cantidadEstudiante;
+          newData.push({name, value})
+        })
+        return newData;
+      }
+      return [];
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      console.log(e)
+      throw new InternalServerErrorException("Error al obtener grupos dashboard");
+    } finally {
+      await queryRunner.release();
     }
   }
 

@@ -51,6 +51,11 @@ export class GrupoController {
     return this.grupoService.updateGrupoModelo(+id, updateGrupoModuloDto);
   }
 
+  @Get('get-data-grupos-horizontal-bar-activos/:id')
+  getDataGruposActivos(@Param('id') id: string){
+    return this.grupoService.getDataHorizontalBarGruposActivos(+id);
+  }
+
   @Delete('delete-grupo/:id')
   remove(@Param('id') id: string) {
     return this.grupoService.remove(+id);

@@ -63,7 +63,7 @@ class HandlePago{
 }
 
 class HandleEstudianteEnGrupo{
-  constructor(public msg:string, public ok:boolean,public data:EstudianteEnGrupo | EstudianteEnGrupo[], public count?:number){}
+  constructor(public msg:string, public ok:boolean,public data:EstudianteEnGrupo | EstudianteEnGrupo[], public count?:number, public others?:any){}
 }
 
 class HandleEstudianteEnGrupoPago{

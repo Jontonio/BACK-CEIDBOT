@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { IntentsClient, SessionsClient, EntityTypesClient } from '@google-cloud/dialogflow';
 import { HandleDialogFlow } from 'src/class/global-handles';
 import { DialogFlowTextDto } from './dto/dialogflow-message.dto';
+import { DialogFlowPayloadDto } from './dto/dialogflow-payload.dto';
 
 @Injectable()
 export class DialogflowService {
@@ -45,7 +46,7 @@ export class DialogflowService {
             return new HandleDialogFlow('get on intent', true, data)
         } catch (e) {
             console.log(e)
-          throw new InternalServerErrorException('Error get list intens')  
+          throw new InternalServerErrorException('Error get one intent')  
         }
     }
 
@@ -56,16 +57,61 @@ export class DialogflowService {
                 keyFilename:this.keyFilename
             });
             const [intent] = await intentsClient.getIntent({ name });
-            intent.messages[0].text.text = dialogFlowTextDto.text;
+            // puede que el mensaje venga en el 0 || 1
+            if (intent.messages.some((message) => message.text)) {
+                // Actualizar el primer mensaje de texto encontrado
+                const textMessage = intent.messages.find((message) => message.text);
+                textMessage.text.text = dialogFlowTextDto.text;
+              } else {
+                // Insertar un nuevo mensaje de texto
+                intent.messages.push({ text: { text: dialogFlowTextDto.text } });
+              }
+
             const result = await intentsClient.updateIntent({
                 intent,
                 languageCode:'es',
                 intentView:'INTENT_VIEW_FULL',
+                updateMask:{
+                    paths: ['messages','messages.text.text']
+                }
             });
             return new HandleDialogFlow('Posibles frases de respuesta del intent actualizado correctamente', true, result)
         } catch (e) {
             console.log(e)
-          throw new InternalServerErrorException('Error get list intens')  
+          throw new InternalServerErrorException('Error update txt intent')  
+        }
+    }
+
+    async updateOnePayloadIntent(uuid:string, dialogFlowPayloadDto:DialogFlowPayloadDto) {
+        try {
+            const name = `projects/ceidbot-bjpe/agent/intents/${uuid}`;
+            const intentsClient  = new IntentsClient({ 
+                keyFilename:this.keyFilename
+            });
+            const [intent] = await intentsClient.getIntent({ name });
+            const newPayload = { fields:dialogFlowPayloadDto }
+            // Verificar si hay un payload existente
+            const existingPayloadIndex = intent.messages.findIndex((message) => message.payload);
+            if (existingPayloadIndex !== -1) {
+                // Actualizar el payload existente
+                intent.messages[existingPayloadIndex].payload = newPayload as any;
+            } else {
+                // Insertar un nuevo payload
+                intent.messages.push({ payload: { fields: dialogFlowPayloadDto as any } });
+            }
+
+            const result = await intentsClient.updateIntent({
+                intent,
+                languageCode:'es',
+                intentView:'INTENT_VIEW_FULL',
+                updateMask:{
+                    paths: ['messages','messages.payload']
+                }
+            });
+            return new HandleDialogFlow('Posibles frases de respuesta del intent actualizado correctamente', true, result)
+        } catch (e) {
+            console.log(e)
+          throw new InternalServerErrorException('Error update payload intent')  
         }
     }
     

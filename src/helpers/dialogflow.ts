@@ -58,6 +58,7 @@ export const sendToDialogFlow = async (msg:string, session:string, params:any = 
         }
       });
     }
+    
     result.fulfillmentMessages = defaultResponses;
 
     // console.log(JSON.stringify(result, null,' '));

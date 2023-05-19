@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Patch, Body } from '@nestjs/common';
 import { DialogflowService } from './dialogflow.service';
 import { DialogFlowTextDto } from './dto/dialogflow-message.dto';
+import { DialogFlowPayloadDto } from './dto/dialogflow-payload.dto';
 
 @Controller('dialogflow')
 export class DialogflowController {
@@ -22,8 +23,13 @@ export class DialogflowController {
   }
 
   @Patch('update-one-txt-intent/:uuid')
-  async updateOneIntent(@Param('uuid') uuid: string, @Body() dialogFlowTextDto:DialogFlowTextDto) {
+  async updateOneTextIntent(@Param('uuid') uuid: string, @Body() dialogFlowTextDto:DialogFlowTextDto) {
     return this.dialogflowService.updateOneTxtIntent(uuid, dialogFlowTextDto);
+  }
+
+  @Patch('update-one-payload-intent/:uuid')
+  async updateOnePayloadIntent(@Param('uuid') uuid: string, @Body() dialogFlowPayloadDto:DialogFlowPayloadDto) {
+    return this.dialogflowService.updateOnePayloadIntent(uuid, dialogFlowPayloadDto);
   }
 
 }

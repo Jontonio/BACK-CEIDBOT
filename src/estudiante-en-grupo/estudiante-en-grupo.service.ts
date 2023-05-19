@@ -12,6 +12,9 @@ import { PagoService } from 'src/pago/pago.service';
 import { EstudianteDataDto } from './dto/estudiante-data.dto';
 import { EstudianteEnGrupoWithOutPagoDto } from './dto/create-estudiante-en-grupo-without-pago.dto';
 import * as moment from 'moment';
+import { Pago } from 'src/pago/entities/pago.entity';
+import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
+import { Data, Series } from 'src/class/Graphics';
 moment.locale('es');
 
 @Injectable()
@@ -128,6 +131,27 @@ export class EstudianteEnGrupoService {
     }
   }
 
+  async findEstudianteEnGrupoById(IdGrupo:number, IdEstudiante:number){
+    try {
+      const res = await this.estudEnGrupoModel.find({ 
+        where:{ Estado:true, estudiante:{ Id:IdEstudiante }, grupo:{ Id:IdGrupo}}, 
+        relations:['estudiante',
+                  'estudiante.apoderado',
+                  'matricula.denomiServicio',
+                  'grupo.curso',
+                  'grupo.curso.nivel',
+                  'grupo.grupoModulo',
+                  'grupo.grupoModulo.modulo',
+                  'pagos',
+                  'pagos.grupoModulo',
+                  'pagos.grupoModulo.modulo'] });
+      const result = (res.length>0)?res[0]:null;
+      return new HandleEstudianteEnGrupo(`Datos encontrados para el estudiante ${IdEstudiante} y el grupo ${IdGrupo}`, true, result, 1, (result)?this.dataHistorial(result.pagos, result.grupo.grupoModulo):null);
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO');
+    }
+  }
+
   async findByIdGrupo(Id: number, {limit, offset}:PaginationQueryDto) {
     try {
       const count = await this.estudEnGrupoModel.count({
@@ -190,5 +214,25 @@ export class EstudianteEnGrupoService {
       console.log(e)
       throw new InternalServerErrorException('ERROR ELIMINAR ESTUDIANTE EN GRUPO');
     }
+  }
+
+  dataHistorial(pagos:Pago[] = [], grupoMdulo:GrupoModulo[] = []){
+    const data:Data[] = [];
+    const gModulo = 'Fechas de pago';
+    const gSeries:Series[] = [];
+    grupoMdulo.forEach( gModulo => {
+      gSeries.push({value: moment(gModulo.FechaPago).valueOf(), name: `${gModulo.modulo.Modulo}`})
+    })
+    data.push({name:gModulo, series: gSeries})
+    const gPago = 'Fecha de pago realizadas';
+    const gPagos:Series[] = [];
+    pagos.forEach( (pago) => {
+      if(pago.grupoModulo){
+        console.log(pago)
+        gPagos.push({value: moment(pago.FechaPago).valueOf(), name: `${pago.grupoModulo.modulo.Modulo}`})
+      }
+    })
+    data.push({name:gPago, series:gPagos})
+    return data;
   }
 }

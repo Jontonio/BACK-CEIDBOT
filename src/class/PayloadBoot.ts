@@ -1,10 +1,8 @@
 interface PayloadBoot {
   message: Message;
   media: Media;
-  link: Message;
-  type_media: Type_media;
+  link: Link;
   description_media:Description_media;
-  name_media:Name_media;
 }
 
 interface Media {
@@ -17,15 +15,12 @@ interface Message {
   kind: string;
 }
 
-interface Type_media {
-  stringValue: string;
-  kind: string;
-}
 interface Description_media {
   stringValue: string;
   kind: string;
 }
-interface Name_media {
+
+interface Link {
   stringValue: string;
   kind: string;
 }
@@ -40,4 +35,4 @@ interface Nivelcurso {
   kind: string;
 }
 
-export { PayloadBoot, PayloadCurso }
+export { PayloadBoot, PayloadCurso, Message, Media, Description_media, Link}

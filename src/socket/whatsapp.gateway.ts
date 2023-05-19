@@ -1,13 +1,10 @@
 import { WebSocketGateway, 
          WebSocketServer} from '@nestjs/websockets';
 import { InternalServerErrorException } from '@nestjs/common'
-import { whatsApp } from 'src/helpers/whatsapp';
 import { Socket, Server } from 'socket.io';
 import { Chat, Client, LocalAuth } from 'whatsapp-web.js';
-import { CursoService } from 'src/curso/curso.service';
 import { Cron } from '@nestjs/schedule';
 import { DataSource } from 'typeorm';
-import { PersonaComunicado } from 'src/class/PersonaComunicado';
 import * as moment from "moment";
 import { BotSendDto } from 'src/bot/dto/bot-send.dto';
 import { MessageStatusBot } from 'src/class/Bot';
@@ -25,20 +22,22 @@ export class WhatsappGateway {
   countQrShow:number;
   showQR:boolean;
 
-  constructor(private readonly dataSource:DataSource,
-              private readonly _curso:CursoService){
+  constructor(private readonly dataSource:DataSource){
     this.countQrShow = 0;
     this.isAuth = false;
     this.showQR = false;
   }
 
   async afterInit(server: Server) {
-
     this.server = server;
-    this.client = new Client({ puppeteer: { headless: true,args: ['--no-sandbox'] },
-            authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
+    this.client = new Client({ puppeteer: { 
+      headless: true,
+      args: ['--no-sandbox'] 
+    },
+    authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
     });
-    await this.whatsapp();
+    
+    this.whatsapp();
   }
 
   handleConnection(client: Socket) {
@@ -56,13 +55,24 @@ export class WhatsappGateway {
 
   }
 
-  async whatsapp(){
+  whatsapp(){
+
+    this.inicializarWhatsApp();
+
+    // this.client.on('loading_screen', (percent, message) => {
+    //   console.log('LOADING SCREEN', percent, message);
+    // });
 
     this.client.on('authenticated', async () => {
       this.isAuth = true;
       this.showQR = false;
       console.log("Session iniciada");
     })
+
+    // this.client.on('auth_failure', msg => {
+    //   // Fired if session restore was unsuccessful
+    //   console.error('AUTHENTICATION FAILURE', msg);
+    // });
 
     this.client.on('qr', (qr:any) => {
       this.isAuth = false;
@@ -78,7 +88,7 @@ export class WhatsappGateway {
       this.showQR = false;
       console.log('Client is ready!');
       this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo 🚀. Listo para recibir mensajes.', null, true);
-      this.emitStatusServerBot( this.server, this.messageStatusBot);
+      this.emitStatusServerBot(this.server, this.messageStatusBot);
     });
 
     this.client.on("disconnected",async (reson)=> {
@@ -87,7 +97,7 @@ export class WhatsappGateway {
         this.isAuth = false;
         this.showQR = false;
         this.countQrShow = 0;
-        await this.inicializarWhatsApp();
+        this.inicializarWhatsApp();
       } catch (e) {
         console.log('disconnected: ', e)
       }
@@ -95,11 +105,11 @@ export class WhatsappGateway {
 
     this.client.on('message', async (message) => {
         const chat:Chat = await message.getChat()
-        if(!chat.isGroup && message.type=='chat')
-          chatbot(this.client, message, this._curso);                
+        if(!chat.isGroup && message.type=='chat'){
+          chatbot(this.client, message, this.dataSource);                
+        }
     })
 
-    await this.inicializarWhatsApp();
   }
 
   async hidenQRWhatsApp(){
@@ -119,7 +129,8 @@ export class WhatsappGateway {
     try {
       this.messageStatusBot = new MessageStatusBot('Prendiendo','Se está activando sesión de whatsApp para CEIDBOT. Espere un momento', null, false);
       this.emitStatusServerBot(this.server, this.messageStatusBot);
-      return await this.client.initialize().catch(_ => _);
+      return this.client.initialize().catch(_ => _);
+      // return this.client.initialize().then().catch(_ => _);
     } catch (e) {
       console.log("Error al inicializar whatsapp: ", e)
     }
