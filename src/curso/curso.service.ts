@@ -22,7 +22,7 @@ export class CursoService {
       const curso = await this.cursoModel.save(createCursoDto);
       return new HandleCurso(`Curso ${curso.NombreCurso } de nivel ${curso.nivel.Nivel } registrado correctamente`, true, curso);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_CREATE_CURSO');
+      throw new InternalServerErrorException(e.message);
     }
   }
   
@@ -36,7 +36,7 @@ export class CursoService {
       return new HandleModulo(`Módulo ${resModulo.Modulo } registrado correctamente`, true, resModulo);
     } catch (e) {
       console.log(e)
-      throw new InternalServerErrorException('ERROR_CREATE_MODULO');
+      throw new InternalServerErrorException(e.message);
     }
   }
 
@@ -53,7 +53,7 @@ export class CursoService {
       return new HandleCurso(`Lista de cursos`, true, cursos, count);
     } catch (e) {
       console.log(e);
-      throw new InternalServerErrorException('ERROR_FIND_ALL_CURSOS');
+      throw new InternalServerErrorException(e.message);
     }
   }
 
@@ -68,7 +68,7 @@ export class CursoService {
       return new HandleModulo(`Lista de modulos`, true, modulos, count);
     } catch (e) {
       console.log(e);
-      throw new InternalServerErrorException('ERROR_FIND_ALL_MODULOS');
+      throw new InternalServerErrorException(e.message);
     }
   }
 
@@ -82,7 +82,7 @@ export class CursoService {
       });
       return new HandleCurso(`Lista de cursos`, true, cursos, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_FIND_ALL_CURSOS_MATRICULA');
+      throw new InternalServerErrorException(e.message);
     }
   }
 
@@ -95,7 +95,7 @@ export class CursoService {
       return new HandleCurso(`Curso ${curso.NombreCurso}`, true, curso);
     } catch (e) {
       console.log(e);
-      throw new InternalServerErrorException('ERROR_FIND_ONE_CURSO');
+      throw new InternalServerErrorException(e.message);
     }
   }
 
@@ -110,7 +110,7 @@ export class CursoService {
       });
     } catch (e) {
       console.log(e);
-      throw new InternalServerErrorException('ERROR_FIND_ONE_CURSO_BY_NAME');
+      throw new InternalServerErrorException(e.message);
     }
   }
 

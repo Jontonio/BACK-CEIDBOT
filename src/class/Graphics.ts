@@ -1,11 +1,9 @@
-class Data {
+class DataHorizontalBar {
   name: string;
-  series: Series[];
+  value: number;
 }
-
-class Series {
-  name: string;
-  value: number | any;
+class DataVerticalBar{
+  name:string;
+  series:DataHorizontalBar[];
 }
-
-export { Data, Series }
+export { DataHorizontalBar, DataVerticalBar }

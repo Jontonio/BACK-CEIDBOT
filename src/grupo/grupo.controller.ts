@@ -36,6 +36,11 @@ export class GrupoController {
     return this.grupoService.findAllMatricula(pagination);
   }
 
+  @Get('get-grupos-reporte/:idEstadoGrupo')
+  findAllGruposReporte(@Param('idEstadoGrupo') idEstadoGrupo: string, @Query() pagination: PaginationQueryDto) {
+    return this.grupoService.findAllGruposReporte(+idEstadoGrupo, pagination);
+  }
+
   @Get('get-one-grupo/:id')
   findOneGrupo(@Param('id') id: string) {
     return this.grupoService.findOneGrupo(+id);
@@ -51,13 +56,19 @@ export class GrupoController {
     return this.grupoService.updateGrupoModelo(+id, updateGrupoModuloDto);
   }
 
-  @Get('get-data-grupos-horizontal-bar-activos/:id')
+  @Get('get-data-horizontal-bar-estudiantes-grupos/:id')
   getDataGruposActivos(@Param('id') id: string){
-    return this.grupoService.getDataHorizontalBarGruposActivos(+id);
+    return this.grupoService.getDataHorizontalBarEstudiantesEnGrupos(+id);
+  }
+
+  @Get('get-data-vertical-bar-pagos-mora/:grupoId/:estadoGrupoId')
+  getDataVerticalBarcPagosDeuda(@Param('grupoId') grupoId: string, @Param('estadoGrupoId') estadoGrupoId: string){
+    return this.grupoService.getDataVerticalBarPagosMora(+grupoId, +estadoGrupoId);
   }
 
   @Delete('delete-grupo/:id')
   remove(@Param('id') id: string) {
     return this.grupoService.remove(+id);
   }
+
 }

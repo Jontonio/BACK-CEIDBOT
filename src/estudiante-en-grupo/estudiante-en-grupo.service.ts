@@ -14,7 +14,7 @@ import { EstudianteEnGrupoWithOutPagoDto } from './dto/create-estudiante-en-grup
 import * as moment from 'moment';
 import { Pago } from 'src/pago/entities/pago.entity';
 import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
-import { Data, Series } from 'src/class/Graphics';
+
 moment.locale('es');
 
 @Injectable()
@@ -217,22 +217,22 @@ export class EstudianteEnGrupoService {
   }
 
   dataHistorial(pagos:Pago[] = [], grupoMdulo:GrupoModulo[] = []){
-    const data:Data[] = [];
-    const gModulo = 'Fechas de pago';
-    const gSeries:Series[] = [];
-    grupoMdulo.forEach( gModulo => {
-      gSeries.push({value: moment(gModulo.FechaPago).valueOf(), name: `${gModulo.modulo.Modulo}`})
-    })
-    data.push({name:gModulo, series: gSeries})
-    const gPago = 'Fecha de pago realizadas';
-    const gPagos:Series[] = [];
-    pagos.forEach( (pago) => {
-      if(pago.grupoModulo){
-        console.log(pago)
-        gPagos.push({value: moment(pago.FechaPago).valueOf(), name: `${pago.grupoModulo.modulo.Modulo}`})
-      }
-    })
-    data.push({name:gPago, series:gPagos})
-    return data;
+    // const data:Data[] = [];
+    // const gModulo = 'Fechas de pago';
+    // const gSeries:Series[] = [];
+    // grupoMdulo.forEach( gModulo => {
+    //   gSeries.push({value: moment(gModulo.FechaPago).valueOf(), name: `${gModulo.modulo.Modulo}`})
+    // })
+    // data.push({name:gModulo, series: gSeries})
+    // const gPago = 'Fecha de pago realizadas';
+    // const gPagos:Series[] = [];
+    // pagos.forEach( (pago) => {
+    //   if(pago.grupoModulo){
+    //     console.log(pago)
+    //     gPagos.push({value: moment(pago.FechaPago).valueOf(), name: `${pago.grupoModulo.modulo.Modulo}`})
+    //   }
+    // })
+    // data.push({name:gPago, series:gPagos})
+    return [];
   }
 }

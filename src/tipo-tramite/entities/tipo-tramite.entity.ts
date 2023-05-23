@@ -15,6 +15,9 @@ export class TipoTramite {
     @Column({type:'varchar', length:350})
     DescripcionTramite:string;
 
+    @Column({type:'boolean', default:true})
+    Estado:boolean;
+
     @CreateDateColumn()
     createdAt:Date;
 

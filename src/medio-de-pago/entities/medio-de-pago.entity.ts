@@ -10,6 +10,9 @@ export class MedioDePago {
     @Column({type:'varchar', length:45})
     MedioDePago:string;
 
+    @Column({type:'boolean', default: true })
+    Estado:boolean;
+
     @CreateDateColumn()
     createdAt:Date;
 

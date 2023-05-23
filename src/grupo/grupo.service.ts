@@ -14,8 +14,7 @@ import { CreateGrupoModuloDto } from './dto/create-grupo-modulo.dto copy';
 import { Modulo } from 'src/curso/entities/modulo.entity';
 import { UpdateGrupoModuloDto } from './dto/update-grupo-modulo.dto';
 import { Cron } from '@nestjs/schedule';
-import { EstadoGrupo } from 'src/estado-grupo/entities/estado-grupo.entity';
-import { Data, Series } from 'src/class/Graphics';
+import { DataHorizontalBar, DataVerticalBar } from 'src/class/Graphics';
 
 @Injectable()
 export class GrupoService {
@@ -152,6 +151,24 @@ export class GrupoService {
       throw new InternalServerErrorException('ERROR_GET_GRUPOS_MATRICULA');
     }
   }
+
+  async findAllGruposReporte(idEstadoGrupo:number ,{limit, offset}: PaginationQueryDto) {
+    try {
+      const query = { Estado:true, estadoGrupo:{ Id:idEstadoGrupo } }
+      const count = await this.grupoModel.countBy( query );
+      const grupos = await this.grupoModel.find({
+        where:query, 
+        skip:offset, take:limit,
+        order: { curso:{ NombreCurso:'ASC' } },
+        relations:['horario',
+                   'tipoGrupo',
+                   'curso',
+                   'curso.nivel']});
+      return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
+    } catch (e) {
+      throw new InternalServerErrorException('ERROR_GET_GRUPOS_REPORTE');
+    }
+  }
   
   async findOneGrupo(Id: number) {
     try {
@@ -257,26 +274,88 @@ export class GrupoService {
     }
   }
 
-  async getDataHorizontalBarGruposActivos(estadoGrupoId:number){
-     const queryRunner = this.dataSource.createQueryRunner();
-     await queryRunner.connect();
-     await queryRunner.startTransaction();
+  async getDataHorizontalBarEstudiantesEnGrupos(estadoGrupoId:number){
+
     try {
+      
+      const query = this.grupoModel.createQueryBuilder('grupo')
+          .select('grupo.Id', 'id_grupo')
+          .addSelect('UPPER(tipo_grupo.NombreGrupo)', 'nombre_grupo')
+          .addSelect('UPPER(curso.NombreCurso)', 'nombre_curso')
+          .addSelect('nivel.Nivel', 'nivel')
+          .addSelect('COUNT(estudiante_en_grupo.Id)', 'total_estudiantes')
+          .leftJoin('grupo.estadoGrupo', 'estado_grupo')
+          .leftJoin('grupo.tipoGrupo', 'tipo_grupo')
+          .leftJoin('grupo.curso', 'curso')
+          .leftJoin('curso.nivel', 'nivel')
+          .leftJoin('grupo.estudianteEnGrupo', 'estudiante_en_grupo')
+          .where('grupo.Estado = :estado', { estado: 1 })
+          .andWhere('(estudiante_en_grupo.Estado IS NULL OR estudiante_en_grupo.Estado = :estado)', { estado: 1 })
+          .andWhere('(estado_grupo.Estado IS NULL OR estado_grupo.Estado = :estado)', { estado: 1 })
+          .andWhere('grupo.estadoGrupoId = :estadoGrupoId', { estadoGrupoId })
+          .groupBy('grupo.Id, tipo_grupo.NombreGrupo, nivel.Nivel')
 
-      const res = await queryRunner.query(`CALL getDataHorizontalBar(${estadoGrupoId})`);
-      await queryRunner.commitTransaction();
+      const result = await query.getRawMany();   
 
-      if(res[0].length > 0 ){
-        const data:any[] = res[0];
-        const newData:Series[] = [];
-        data.forEach(res => {
-          const name = `${res.Id} - ${res.NombreCurso} ${res.Nivel}`;
-          const value = res.cantidadEstudiante;
-          newData.push({name, value})
+      if(result.length > 0 ){
+        const data:DataHorizontalBar[] = [];
+        result.forEach(res => {
+          data.push({name:`${res.nombre_grupo} - ${res.nombre_curso} ${res.nivel}`, value:res.total_estudiantes})
         })
-        return newData;
+        return data;
       }
-      return [];
+      return [{value:0, name:'Sin registros'}];
+
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException("Error al obtener grupos dashboard");
+    }
+
+  }
+
+  async getDataVerticalBarPagosMora(grupoId:number, estadoGrupoId:number){
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+        const result:any[] = await queryRunner.query(`
+        SELECT
+          CONCAT(UPPER(tipo_grupo.NombreGrupo),' ',UPPER(curso.NombreCurso),' ', nivel.Nivel) as grupo,
+          modulo.Modulo as modulo, 
+          COUNT(mora.Id) AS cantidad_mora,
+          COUNT(pago.Id) AS cantidad_pago
+        FROM grupo
+        JOIN tipo_grupo on tipo_grupo.Id = grupo.tipoGrupoId
+        JOIN estado_grupo on estado_grupo.Id = grupo.estadoGrupoId
+        JOIN grupo_modulo ON grupo.Id = grupo_modulo.grupoId
+        JOIN modulo ON grupo_modulo.moduloId = modulo.Id
+        JOIN curso ON grupo.cursoId = curso.Id
+        JOIN nivel ON curso.nivelId = nivel.Id
+        LEFT JOIN pago ON grupo_modulo.Id = pago.grupoModuloId
+        LEFT JOIN mora ON grupo_modulo.Id = mora.grupoModuloId
+        WHERE grupo.Id = ${grupoId} AND estado_grupo.Id = ${estadoGrupoId}
+        GROUP BY grupo_modulo.moduloId, modulo.Modulo, curso.NombreCurso, nivel.Nivel;
+        `);
+        await queryRunner.commitTransaction();
+
+        if(result.length > 0 ){
+          const dataVerticalBar:DataVerticalBar[] = [];
+          
+          result.forEach(res => {
+            dataVerticalBar.push({
+              name:`Módulo ${res.modulo}`, 
+              series:[
+                {name:'Mensualidad', value:res.cantidad_pago}, {name:'Mora', value:res.cantidad_mora}
+              ]})
+          })
+          console.log(dataVerticalBar)
+          return dataVerticalBar;
+        }
+
+        return { name:'Sin registros', series:[] };
+
     } catch (e) {
       await queryRunner.rollbackTransaction();
       console.log(e)
@@ -284,6 +363,7 @@ export class GrupoService {
     } finally {
       await queryRunner.release();
     }
+
   }
 
   async getOneById(Id:number){
