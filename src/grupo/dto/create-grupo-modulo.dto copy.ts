@@ -8,6 +8,10 @@ export class CreateGrupoModuloDto {
     @IsDate({ message:'FechaPago tiene que ser de tipo DATE' })
     FechaPago:Date;
 
+    @IsNotEmpty({ message:'FechaFinalModulo es requerido' })
+    @IsDate({ message:'FechaFinalModulo tiene que ser de tipo DATE' })
+    FechaFinalModulo:Date;
+
     @IsOptional()
     @IsBoolean({ message:'CurrentModulo tiene que ser de tipo BOOLEAN'})
     CurrentModulo:boolean;

@@ -14,6 +14,7 @@ import { EstudianteEnGrupoWithOutPagoDto } from './dto/create-estudiante-en-grup
 import * as moment from 'moment';
 import { Pago } from 'src/pago/entities/pago.entity';
 import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
+import { UpdateGrupoDto } from 'src/grupo/dto/update-grupo.dto';
 
 moment.locale('es');
 
@@ -177,6 +178,9 @@ export class EstudianteEnGrupoService {
                    'grupo.curso.modulo', 
                    'estudiante',
                    'estudiante.apoderado',
+                   'moras',
+                   'moras.grupoModulo',
+                   'moras.grupoModulo.modulo',
                    'pagos',
                    'pagos.medioDePago',
                    'pagos.grupoModulo',
@@ -205,10 +209,21 @@ export class EstudianteEnGrupoService {
       }
       const { affected } = await this.estudEnGrupoModel.update(Id, { Estado: false })
       if(affected==0) return new HandleEstudianteEnGrupoPago(`Estudiante sin afectar`, false, null);
-      const { estudiante } = await this.estudEnGrupoModel.findOne({
+      const { estudiante, grupo } = await this.estudEnGrupoModel.findOne({
         where:{ Id },
-        relations:['estudiante']
+        relations:['estudiante','grupo']
       });
+
+      
+      // contar la cantidad de estudiantes
+      const countEstudiante = await this.estudEnGrupoModel.count({ 
+        where:{ Estado: true, 
+          grupo:{ Id: grupo.Id } 
+        }});
+        
+        // actualizar la cantidad de estudiantes 
+      await this.grupoService.updateGrupo(grupo.Id, { NumeroEstudiantes: countEstudiante } as UpdateGrupoDto);
+      // retornar resultados
       return new HandleEstudianteEnGrupoPago(`Estudiante ${estudiante.Nombres.toUpperCase()} ${estudiante.ApellidoPaterno.toUpperCase()} fue eliminado del grupo correctamente`, true, estudiante);
     } catch (e) {
       console.log(e)

@@ -13,6 +13,9 @@ export class GrupoModulo {
     @Column({type:'date'})
     FechaPago:Date;
 
+    @Column({type:'date'})
+    FechaFinalModulo:Date;
+
     @Column({type:'boolean', default:false})
     CurrentModulo:boolean;
     
@@ -32,6 +35,6 @@ export class GrupoModulo {
     @OneToMany(() => Pago, (pago:Pago) => pago.grupoModulo )
     pagos:Pago[];
 
-    @OneToMany(() => Mora, (mora:Mora) => mora)
+    @OneToMany(() => Mora, (mora:Mora) => mora.grupoModulo)
     moras: Mora[];
 }

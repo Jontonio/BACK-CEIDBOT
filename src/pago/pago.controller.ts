@@ -22,8 +22,19 @@ export class PagoController {
     return this.pagoService.remove(+id);
   }
 
-  @Get('generar-mora')
-  generateMora(){
-    return this.pagoService.generarMoras()
+  @Patch('update-mora/:id')
+  updateMora(@Param('id') id: string, @Body() updatePagoDto: UpdatePagoDto) {
+    return this.pagoService.updateMora(+id, updatePagoDto);
   }
+
+  @Delete('delete-mora/:id')
+  removeMora(@Param('id') id: string) {
+    return this.pagoService.deleteMora(+id);
+  }
+
+  // @Get('generar-mora')
+  // generateMora(){
+  //   return this.pagoService.generarMoras()
+  // }
+
 }

@@ -11,7 +11,6 @@ export class EstudianteEnGrupo {
     @PrimaryGeneratedColumn('increment')
     Id:number;
 
-    grupoId:number;
     
     @Column({default:true})
     Estado:boolean;
@@ -26,10 +25,10 @@ export class EstudianteEnGrupo {
     /** Tablas relacionadas */
     @ManyToOne( () => Estudiante, (estudiante:Estudiante) => estudiante.estudianteEnGrupo )
     estudiante:Estudiante;
-
+    
     @ManyToOne( () => Grupo, (grupo:Grupo) => grupo )
     grupo:Grupo;
-    
+
     @ManyToOne( () => Matricula, (matricula:Matricula) => matricula )
     matricula:Matricula;
 
@@ -38,6 +37,6 @@ export class EstudianteEnGrupo {
     })
     pagos:Pago[];
 
-    @OneToMany(() => Mora, (mora:Mora) => mora)
+    @OneToMany(() => Mora, (mora:Mora) => mora.estudianteEnGrupo)
     moras: Mora[];
 }

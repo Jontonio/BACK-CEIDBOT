@@ -17,11 +17,11 @@ export class Mora {
     @Column({type:'float'})
     MontoMora:number;
 
-    // @CreateDateColumn()
-    // createdAt:Date;
+    @CreateDateColumn()
+    createdAt:Date;
 
-    // @UpdateDateColumn()
-    // updatedAt:Date;
+    @UpdateDateColumn()
+    updatedAt:Date;
 
     /** Tablas relacionadas */
     @ManyToOne( () => EstudianteEnGrupo, (estudianteEnGrupo:EstudianteEnGrupo) => estudianteEnGrupo.moras )

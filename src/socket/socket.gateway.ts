@@ -20,6 +20,7 @@ moment.locale('es');
 @WebSocketGateway({
   cors:{ origin:'*' }
 })
+
 export class AppGateway implements OnGatewayInit, 
                                    OnGatewayConnection,
                                    OnGatewayDisconnect{

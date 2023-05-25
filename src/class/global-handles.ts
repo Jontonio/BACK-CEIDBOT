@@ -22,6 +22,7 @@ import { MedioDePago } from "src/medio-de-pago/entities/medio-de-pago.entity";
 import { Tramite } from "src/tramite/entities/tramite.entity";
 import { Modulo } from "src/curso/entities/modulo.entity";
 import { GrupoModulo } from "src/grupo/entities/grupoModulo.entity";
+import { Mora } from "src/pago/entities/mora.entity";
 
 class HandleWhatsapp{
   constructor(public msg:string, public ok:boolean, public data:any){}
@@ -58,8 +59,13 @@ class HandleEstadoGrupo{
 class HandleCategoriaPago{
   constructor(public msg:string, public ok:boolean,public data:CategoriaPago | CategoriaPago[], public count?:number){}
 }
+
 class HandlePago{
   constructor(public msg:string, public ok:boolean,public data:Pago | Pago[], public count?:number){}
+}
+
+class HandleMora{
+  constructor(public msg:string, public ok:boolean,public data:Mora | Mora[], public count?:number){}
 }
 
 class HandleEstudianteEnGrupo{
@@ -157,6 +163,7 @@ export {
     HandleMedioDePago,
     HandleTramite,
     HandleGrupoModulo,
-    HandleDialogFlow
+    HandleDialogFlow,
+    HandleMora
 }
 

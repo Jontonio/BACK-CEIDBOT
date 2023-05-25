@@ -53,10 +53,12 @@ export class GrupoService {
           tipoGrupo:{ NombreGrupo }, 
           estadoGrupo:{ CodeEstado }, 
           curso:{ NombreCurso, nivel:{ Nivel } } 
-        }
+        },
+        relations:['tipoGrupo','estadoGrupo','curso']
       });
 
       if(existsGrupo){
+        console.log(existsGrupo)
         return new HandleGrupo(`El grupo a registrar ya existe. Registre un nuevo grupo con un nombre diferente`, false, null);
       }
       /** registrar grupo */
@@ -69,10 +71,16 @@ export class GrupoService {
       const cantidadDiasModulo = Math.floor(diasEnClases / numModulos); // Numero de dias por modulo del curso
       const listFechas:CreateGrupoModuloDto[] = [];
       let fecha_sum = fecha1.toDate();
+      let fecha_finalModulo = moment(fecha_sum).add(cantidadDiasModulo,'days').subtract(1,'days').toDate();
       /** preparar fechas */
-      for (let index = 1; index <= numModulos+1; index++) { // Fechas de pago
-        listFechas.push({FechaPago:fecha_sum, CurrentModulo:false, grupo:{Id:grupo.Id} as Grupo, modulo: {Id:index} as Modulo});
-        fecha_sum = fecha1.add(cantidadDiasModulo,'days').toDate();
+      for (let index = 1; index <= numModulos; index++) { // Fechas de pago
+        listFechas.push({ FechaPago:fecha_sum, 
+                          FechaFinalModulo: fecha_finalModulo, 
+                          CurrentModulo:false, 
+                          grupo:{ Id:grupo.Id } as Grupo, 
+                          modulo:{ Id:index } as Modulo});
+        fecha_sum = fecha1.add(cantidadDiasModulo,'day').toDate();
+        fecha_finalModulo = moment(fecha_sum).add(cantidadDiasModulo,'days').subtract(1, 'days').toDate();
       }
       // insertar datos a grupo módulo}
       console.log(listFechas)
@@ -335,7 +343,7 @@ export class GrupoService {
         JOIN nivel ON curso.nivelId = nivel.Id
         LEFT JOIN pago ON grupo_modulo.Id = pago.grupoModuloId
         LEFT JOIN mora ON grupo_modulo.Id = mora.grupoModuloId
-        WHERE grupo.Id = ${grupoId} AND estado_grupo.Id = ${estadoGrupoId}
+        WHERE grupo.Id = ${grupoId} AND estado_grupo.Id = ${estadoGrupoId} AND pago.categoriaPagoId = 1
         GROUP BY grupo_modulo.moduloId, modulo.Modulo, curso.NombreCurso, nivel.Nivel;
         `);
         await queryRunner.commitTransaction();
@@ -347,14 +355,14 @@ export class GrupoService {
             dataVerticalBar.push({
               name:`Módulo ${res.modulo}`, 
               series:[
-                {name:'Mensualidad', value:res.cantidad_pago}, {name:'Mora', value:res.cantidad_mora}
+                { name:'Mensualidad', value:res.cantidad_pago}, {name:'Mora', value:res.cantidad_mora}
               ]})
           })
-          console.log(dataVerticalBar)
           return dataVerticalBar;
         }
-
-        return { name:'Sin registros', series:[] };
+        
+        console.log(result)
+        return [{ name:'Sin registros', series:[{ name:'Sin registros', value:0 }] }];
 
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -391,7 +399,7 @@ export class GrupoService {
           WHEN FechaFinalGrupo = DATE(NOW()) THEN 3
           ELSE estadoGrupoId
           END
-      WHERE Estado != 0;
+      WHERE Estado = 1;
       `);
       await queryRunner.commitTransaction();
       console.log("Estados de grupos actualizados")
@@ -422,10 +430,10 @@ export class GrupoService {
       UPDATE grupo_modulo
       JOIN grupo on grupo.Id = grupo_modulo.grupoId
       SET grupo_modulo.CurrentModulo = CASE
-            WHEN FechaPago = DATE(NOW()) THEN true
+            WHEN NOW() BETWEEN FechaPago AND FechaFinalModulo THEN true
             ELSE false
             END
-      WHERE grupo.estadoGrupoId != 3 || grupo.Estado != 0; 
+      WHERE grupo.estadoGrupoId != 3 || grupo.Estado = 1;
       -- Donde !=3 obviar a los grupos ya finalizados y !=0 obviar a los que ya se enceuntran eliminados 
       `);
       await queryRunner.commitTransaction();
@@ -436,7 +444,7 @@ export class GrupoService {
     } finally {
       await queryRunner.release();
     }
-
+    
   }   
 
 }

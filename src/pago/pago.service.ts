@@ -1,21 +1,23 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreatePagoDto } from './dto/create-pago.dto';
 import { UpdatePagoDto } from './dto/update-pago.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pago } from './entities/pago.entity';
 import { DataSource, Repository } from 'typeorm';
 import { FirstPagoDto } from './dto/first-pago.dto';
-import { HandlePago } from 'src/class/global-handles';
+import { HandleMora, HandlePago } from 'src/class/global-handles';
 import { Mora } from './entities/mora.entity';
+import { UpdateMoraPagoDto } from './dto/update-Mora-pago.dto';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class PagoService {
 
   constructor(private dataSource: DataSource,
               @InjectRepository(Pago) 
-               private pagoModel:Repository<Pago>,
-               @InjectRepository(Mora) 
-               private moraModel:Repository<Mora>){}
+              private pagoModel:Repository<Pago>,
+              @InjectRepository(Mora) 
+              private moraModel:Repository<Mora>){}
 
   async create(createPagoDto: CreatePagoDto) {
     try {
@@ -39,11 +41,41 @@ export class PagoService {
   async update(Id: number, updatePagoDto: UpdatePagoDto) {
     try {
       const { affected } = await this.pagoModel.update(Id, updatePagoDto);
-      if(affected==0) return new HandlePago(`Ningún pago sin actu`, false, null);
+      if(affected==0) return new HandlePago(`Ningún pago sin afectar`, false, null);
       return new HandlePago(`Los datos del pago realizado fueron actualizados correctamente`, true, null);
     } catch (e) {
       console.log(e)
-      throw new InternalServerErrorException('ERROR_UPDATE_MENSUALIDAD');
+      throw new InternalServerErrorException(e.message);
+    }
+  }
+
+  async updateMora(Id: number, updateMoraPagoDto: UpdateMoraPagoDto) {
+    try {
+      const existMoraPago = await this.moraModel.findOneBy({ Id });
+      if(!existMoraPago){
+        throw new NotFoundException(`La mora con el Id ${Id} no encontrada`);
+      }
+      const { affected } = await this.moraModel.update(Id, updateMoraPagoDto);
+      if(affected==0) return new HandleMora(`Ningúna mora sin afecta`, false, null);
+      return new HandleMora(`La mora del estudiante fue actualizada correctamente`, true, null);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException(e.message);
+    }
+  }
+
+  async deleteMora(Id: number) {
+    try {
+      const existMoraPago = await this.moraModel.findOneBy({ Id });
+      if(!existMoraPago){
+        throw new NotFoundException(`La mora con el Id ${Id} no encontrada`);
+      }
+      const { affected } = await this.moraModel.update(Id,{ EstadoMora: false });
+      if(affected==0) return new HandleMora(`Ningúna mora sin afecta`, false, null);
+      return new HandleMora(`La mora del estudiante fue eliminada correctamente`, true, null);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException(e.message);
     }
   }
 
@@ -61,10 +93,20 @@ export class PagoService {
       throw new InternalServerErrorException('ERROR DELETE MENSUALIDAD');
     }
   }
-  
-  async generarMoras(): Promise<void> {
+
+  /**
+   * 
+   * Genera la mora de los estudiantes a las 12:15 AM
+   * 
+   */
+
+  @Cron('0 15 0 * * *', { timeZone:'America/Lima' })
+  async registrarMorasAutomatico(){
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
-      const res = await this.dataSource.query(`
+      await queryRunner.query(`
       INSERT INTO mora (estudianteEnGrupoId, grupoModuloId, MontoMora, Verificado, EstadoMora)
       SELECT estudiante_en_grupo.Id, grupo_modulo.Id, 5, false, true
       FROM estudiante
@@ -72,10 +114,10 @@ export class PagoService {
       INNER JOIN grupo ON estudiante_en_grupo.grupoId = grupo.Id
       INNER JOIN grupo_modulo ON grupo.Id = grupo_modulo.grupoId
       WHERE grupo_modulo.CurrentModulo = true and
-          grupo.Estado != false AND
+          grupo.Estado != false AND grupo.AplicaMora = true AND 
             grupo.estadoGrupoId != 3 AND 
             estudiante_en_grupo.Estado != false AND 
-            DATEDIFF(CURDATE(), grupo_modulo.FechaPago) > 5 AND
+            DATEDIFF(CURDATE(), grupo_modulo.FechaPago) >= grupo.NumDiasHolaguraMora AND
             NOT EXISTS (
               SELECT * FROM mora
               WHERE mora.grupoModuloId = grupo_modulo.Id AND mora.estudianteEnGrupoId = estudiante_en_grupo.Id
@@ -86,9 +128,13 @@ export class PagoService {
               pago.estudianteEnGrupoId = estudiante_en_grupo.Id AND pago.grupoModuloId = grupo_modulo.Id
             );
       `);
-      return res;
-    } catch (e) {
-      throw new InternalServerErrorException('ERROR AL CREAR MORAS');
+      await queryRunner.commitTransaction();
+      console.log("REGISTRO DE MORAS ACTUALIZADO")
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 

@@ -40,6 +40,12 @@ export class Grupo {
     @Column({type:'int', default: 5})
     NumDiasHolaguraMora:number;
 
+    @Column({type:'boolean', default: true})
+    AplicaMora:boolean;
+
+    @Column({type:'boolean', default: true})
+    NotificarGrupo:boolean;
+
     @ManyToOne( () => Docente, (docente:Docente) => docente.grupos)
     docente:Docente;
 

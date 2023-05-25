@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUserDto } from './dto/update-usuario.dto';
@@ -6,6 +6,8 @@ import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { ReniecUsuarioDto } from './dto/usuario-reniec.dto';
 import { EnableUserDto } from './dto/enable-usuario.dto';
 import { PasswordUsuarioDto } from './dto/password-usuario.dto';
+import * as XLSX from 'xlsx';
+import { Response } from 'express';
 
 @Controller('usuario')
 export class UserController {
@@ -49,6 +51,24 @@ export class UserController {
   @Delete('delete-usuario/:id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Get('/export')
+  async exportExcel(@Res() res: Response, @Query() pagination: PaginationQueryDto) {
+
+    const users = await this.userService.findAll(pagination); // Obtener los datos de la base de datos
+
+    // Generar el archivo Excel utilizando SheetJS
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(Object.values(users.data));
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Usuarios');
+    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+     // Enviar el archivo Excel al cliente
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx');
+
+    return res.send(excelBuffer);
   }
   
 }

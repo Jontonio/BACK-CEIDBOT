@@ -50,7 +50,8 @@
     "rxjs": "^7.2.0",
     "typeorm": "^0.3.11",
     "uuid": "^9.0.0",
-    "whatsapp-web.js": "^1.19.5"
+    "whatsapp-web.js": "^1.19.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
