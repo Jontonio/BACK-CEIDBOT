@@ -170,6 +170,7 @@ export class EstudianteEnGrupoService {
         skip:offset, take:limit,
         relations:['matricula',
                    'matricula.denomiServicio',
+                   'matricula.institucion',
                    'grupo',
                    'grupo.tipoGrupo',
                    'grupo.docente',

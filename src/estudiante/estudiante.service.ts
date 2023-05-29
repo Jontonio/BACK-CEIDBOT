@@ -138,4 +138,19 @@ export class EstudianteService {
       throw new InternalServerErrorException('ERROR_REMOVE_ESTUDIANTE');
     }
   }
+
+  async update(Id:number, updateEstudianteDto:UpdateEstudianteDto){
+    try {
+      const existEstudiante = await this.estudianteModel.findOneBy({Id});
+      if(!existEstudiante){
+        throw new NotFoundException(`No se encontro al estudiante con el Id ${Id}`);
+      }
+      const { affected } = await this.estudianteModel.update(Id, updateEstudianteDto);
+      if(affected==0) return new HandleEstudiante('Estudiante sin afectar ', false, null)
+      return new HandleEstudiante(`Estudiante actualizado correctamente`, true, null);
+    } catch (e) {
+      console.log(e)
+      throw new InternalServerErrorException(e.message);
+    }
+  }
 }

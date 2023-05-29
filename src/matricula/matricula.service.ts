@@ -241,9 +241,14 @@ export class MatriculaService {
 
   async update(Id: number, matriculaDto:UpdateMatriculaDto){
     try {
+      const existMatricula = await this.matModel.findOneBy({Id});
+      if(!existMatricula){
+        throw new NotFoundException(`La matricula con ID ${Id} no se encontro`)
+      }
       await this.matModel.update(Id, matriculaDto);
       return new HandleMatricula('Matricula actualizado correctamente', true, null);
     } catch (e) {
+      console.log(e)
       throw new InternalServerErrorException('ERROR_UPDATE_MATRICULA');
     }
   }

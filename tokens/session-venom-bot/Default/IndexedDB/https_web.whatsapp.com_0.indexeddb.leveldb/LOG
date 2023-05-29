@@ -1,0 +1,7 @@
+2023/05/25-21:55:47.017 2b00 Creating DB C:\Users\H-P\Documents\Nestjs\Backend-CEIDBOT\tokens\session-venom-bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb since it was missing.
+2023/05/25-21:55:47.031 2b00 Reusing MANIFEST C:\Users\H-P\Documents\Nestjs\Backend-CEIDBOT\tokens\session-venom-bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/05/25-21:55:47.146 4614 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
+2023/05/25-21:55:48.259 4614 Level-0 table #5: started
+2023/05/25-21:55:48.270 4614 Level-0 table #5: 30770 bytes OK
+2023/05/25-21:55:48.273 4614 Delete type=0 #3
+2023/05/25-21:55:48.286 4614 Manual compaction at level-0 from '\x00\x06\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x07\x00\x00\x00' @ 0 : 0; will stop at (end)

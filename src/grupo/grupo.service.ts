@@ -171,7 +171,8 @@ export class GrupoService {
         relations:['horario',
                    'tipoGrupo',
                    'curso',
-                   'curso.nivel']});
+                   'curso.nivel',
+                   'curso.modulo']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
       throw new InternalServerErrorException('ERROR_GET_GRUPOS_REPORTE');

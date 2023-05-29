@@ -71,7 +71,6 @@ export class WhatsappGateway {
     })
 
     this.client.on('auth_failure', msg => {
-      // Fired if session restore was unsuccessful
       console.error('AUTHENTICATION FAILURE', msg);
     });
 
@@ -105,6 +104,7 @@ export class WhatsappGateway {
     })
 
     this.client.on('message', async (message) => {
+        this.isAuth = true;
         const chat:Chat = await message.getChat()
         if(!chat.isGroup && message.type=='chat'){
           chatbot(this.client, message, this.dataSource);                
@@ -130,7 +130,7 @@ export class WhatsappGateway {
     try {
       this.messageStatusBot = new MessageStatusBot('Prendiendo','Se está activando sesión de whatsApp para CEIDBOT. Espere un momento', null, false);
       this.emitStatusServerBot(this.server, this.messageStatusBot);
-      return this.client.initialize().catch(_ => _);
+      this.client.initialize().catch(_ => _);
       // return this.client.initialize().then().catch(_ => _);
     } catch (e) {
       console.log("Error al inicializar whatsapp: ", e)

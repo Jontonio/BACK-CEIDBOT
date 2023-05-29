@@ -25,9 +25,24 @@ interface Link {
   kind: string;
 }
 
+interface DataString {
+  stringValue: string;
+  kind: string;
+}
+
+interface DataNumber {
+  numberValue: string;
+  kind: string;
+}
+
 interface PayloadCurso {
   nivel_curso: Nivelcurso;
   curso_especifico: Nivelcurso;
+}
+
+interface PayloadDocumento {
+  TipoDocumento: DataString;
+  Documento: DataNumber;
 }
 
 interface Nivelcurso {
@@ -35,4 +50,4 @@ interface Nivelcurso {
   kind: string;
 }
 
-export { PayloadBoot, PayloadCurso, Message, Media, Description_media, Link}
+export { PayloadBoot, PayloadCurso, Message, Media, Description_media, Link, PayloadDocumento }
