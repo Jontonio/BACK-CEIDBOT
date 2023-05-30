@@ -1,54 +1,26 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { jsPDF } from "jspdf";
-import { join } from 'path';
 import { DataHorizontalBar } from 'src/class/Graphics';
-import { PaginationQueryDto } from 'src/usuario/dto/pagination-query.dto';
-import { UsuarioService } from 'src/usuario/usuario.service';
 import { DataSource } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
-
 
 @Injectable()
 export class ReportsService {
 
-  constructor(private dataSource: DataSource, 
-              private _userService:UsuarioService){}
+  constructor(private dataSource: DataSource){}
 
-  async generateReportUser(pagination:PaginationQueryDto){
-      
-      const doc = new jsPDF('p');
-      doc.text('Lista de usuarios activos',20,20);
-      const listUsers = await this._userService.findAll(pagination);
-
-      const headersUsers = ['idUser','name','lastName','email','isActive'];
-
-      const data:any[] = [];
-
-      // listUsers.data.forEach( res => {
-      //     const user = { idUser:String(res.Id),
-      //                    name: res.Nombres, 
-      //                    lastName:res.ApellidoPaterno, 
-      //                    email:res.Email,
-      //                    isActive: 'yes'
-      //                 }
-      //     data.push(user)
-      // });
-
-      doc.table(20, 25, data, headersUsers,null);
-
-      const baseURL  = '../public/';
-      // const baseFile = `reports-user/${uuidv4()}.pdf`;
-      const baseFile = `reports-user/mi-reporte.pdf`;
-
-      const filePath = join(__dirname,`${baseURL}${baseFile}`);
-      await doc.save(filePath);
-      
-      return {
-          msg:'Rporte generado',
-          url:`http://localhost:3000/${baseFile}`
-      };
-  }
-  
+/**
+ * This function retrieves a list of students with their payment information for a specific group,
+ * payment category, and module.
+ * @param {number} IdGrupo - The ID of the group for which you want to retrieve the list of students
+ * with payments.
+ * @param {number} IdCategoriaPago - The Id of the payment category for which you want to retrieve the
+ * list of students with payments.
+ * @param {number} Modulo - The "Modulo" parameter is a number that represents a module. It is used in
+ * the SQL query to filter the results by a specific module.
+ * @returns the result of a SQL query that retrieves information about students who have made a payment
+ * for a specific group and module, filtered by a specific payment category. The returned data includes
+ * the student's name, payment category type, payment amount, payment date, payment verification
+ * status, payment method, and module number.
+ */
   async listaEstudiantesConPagoGrupoModulo(IdGrupo:number, IdCategoriaPago:number, Modulo:number){
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
@@ -75,12 +47,25 @@ export class ReportsService {
         return res;
       } catch (e) {
         await queryRunner.rollbackTransaction();
-        throw new InternalServerErrorException(e.message);
+        console.log(e.message)
+        throw new InternalServerErrorException('ERROR LISTA ESTUDIANTES PAGO GRUPO MODULO');
       } finally {
         await queryRunner.release();
       }
   }
 
+ /**
+  * This function retrieves a summary of total payments by category and group for a specific month and
+  * year.
+  * @param {string} anio - A string representing the year for which the payment summary is to be
+  * generated.
+  * @param {string} numMes - numMes is a string parameter representing the month number for which the
+  * total payments summary is being requested. For example, "01" for January, "02" for February, and so
+  * on.
+  * @returns the result of a SQL query that retrieves a summary of total payments by category and group
+  * for a given year and month. The result includes the group ID, course name, level, total payment
+  * amount, month number, and payment category type.
+  */
   async resumenTotalPagosPorCategoriaGrupo(anio:string, numMes:string){
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
@@ -107,13 +92,25 @@ export class ReportsService {
         console.log("Reporte de resumen total por categoria y grupo")
         return res;
       } catch (e) {
+        console.log(e.message)
         await queryRunner.rollbackTransaction();
-        throw new InternalServerErrorException(e.message);
+        throw new InternalServerErrorException('ERROR RESUMENTO TOTAL PAGOS');
       } finally {
         await queryRunner.release();
       }
   }
 
+  /**
+   * This function generates a report of payments for other types of procedures based on the year and
+   * month provided.
+   * @param {string} anio - The year for which the payment report is being generated. It is a string
+   * type parameter.
+   * @param {string} numMes - numMes is a string parameter representing the month number for which the
+   * report is being generated. For example, "01" for January, "02" for February, and so on.
+   * @returns the result of a SQL query that calculates the total payment amount for each type of
+   * tramite (transaction) in a given month and year. The result is grouped by the type of tramite and
+   * includes the total payment amount and the month number.
+   */
   async reportePagosOtrosTipos(anio:string, numMes:string){
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
@@ -131,13 +128,24 @@ export class ReportsService {
         console.log("Reporte de otros pagos")
         return res;
       } catch (e) {
+        console.log(e.message)
         await queryRunner.rollbackTransaction();
-        throw new InternalServerErrorException(e.message);
+        throw new InternalServerErrorException('ERROR REPORTE PAGOS OTROS TIPOS');
       } finally {
         await queryRunner.release();
       }
   }
 
+ /**
+  * This function retrieves the debt index for a specific group and returns the total amount paid,
+  * total amount to be paid, percentage of current payment, and percentage of overdue debt.
+  * @param {string} grupoId - The `grupoId` parameter is a string representing the ID of a group for
+  * which the debt index report is being generated.
+  * @returns an object with two properties: "total" and "indice". Both properties are arrays of objects
+  * with "name" and "value" properties. The "total" array contains two objects representing the total
+  * amount paid and the total amount to be paid for a specific group and module. The "indice" array
+  * contains two objects representing the percentage of the current payment and the percentage of the
+  */
   async indiceDeudaGruposEnProceso(grupoId:string){
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
@@ -171,8 +179,9 @@ export class ReportsService {
         }
         return { total:[], indice:[] };
       } catch (e) {
+        console.log(e.message)
         await queryRunner.rollbackTransaction();
-        throw new InternalServerErrorException(e.message);
+        throw new InternalServerErrorException('ERROR INDICE DEUDA GRUPOS EN PROCESO');
       } finally {
         await queryRunner.release();
       }

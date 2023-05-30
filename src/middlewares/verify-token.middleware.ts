@@ -10,10 +10,10 @@ export class VerifyTokenMiddleware implements NestMiddleware {
       const authHeader = req.headers.authorization;
       const token = authHeader && authHeader.split(' ')[1];
       compareToken(token);
+      next();
     } catch(e) {
-      console.log(e)
+      console.log(e.message)
       throw new UnauthorizedException(e.message);
     }
-    next();
   }
 }

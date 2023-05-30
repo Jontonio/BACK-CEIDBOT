@@ -7,11 +7,6 @@ import { ReportsService } from './reports.service';
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
-  @Get('users')
-  reportsUsers(@Query() pagination: PaginationQueryDto){
-    return this.reportsService.generateReportUser(pagination);
-  }
-
   @Get('lista-estudiantes-pago-categoria-modulo-grupo/:IdGrupo/:IdCategoriaPago/:Modulo')
   listaEstudiantesPagoCategoriaModuloGrupo(@Param('IdGrupo') IdGrupo:number, 
                                            @Param('IdCategoriaPago') IdCategoriaPago:number,

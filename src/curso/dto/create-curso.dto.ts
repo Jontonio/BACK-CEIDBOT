@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator"
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator"
 import { Nivel } from "src/nivel/entities/nivel.entity";
 import { Modulo } from "../entities/modulo.entity";
 

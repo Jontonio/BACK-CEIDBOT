@@ -13,10 +13,7 @@ import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
     TypeOrmModule.forFeature([Curso, Modulo])
   ],
   controllers: [BotController],
-  providers: [BotService, 
-              WhatsappGateway,
-              CursoService,
-            ]
+  providers: [BotService, WhatsappGateway, CursoService ]
 })
 export class BotModule {
   configure(consumer: MiddlewareConsumer) {

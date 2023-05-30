@@ -25,6 +25,15 @@ export class MatriculaService {
               private estudianteService:EstudianteService,
               private institucioService:InstitucionService){}
 
+  /**
+   * This function creates a new registration for a student, including verifying if the student and
+   * their guardian already exist and inserting them if necessary.
+   * @param {CreateMatriculaDto} createMatDto - createMatDto is an object of type CreateMatriculaDto,
+   * which contains the data needed to create a new matricula (enrollment) in the system. It includes
+   * information about the student, the institution, and the apoderado (guardian) if applicable.
+   * @returns the result of the `save` method called on the `matModel` object, which is likely a
+   * Promise that resolves to the saved `createMatDto` object.
+   */
   async create(createMatDto: CreateMatriculaDto) {
 
     try {
@@ -87,12 +96,22 @@ export class MatriculaService {
       }
 
     } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException('ERROR_REGISTRAR_PREMATRICULA');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR REGISTRAR PREMATRICULA');
     }
   
   }
 
+  /**
+   * This function registers a prematricula (pre-enrollment) for a student, checking if the student and
+   * their apoderado (legal guardian) exist and inserting them if necessary, and then saving the
+   * matricula (enrollment) information.
+   * @param {CreateMatriculaDto} createMatDto - The parameter `createMatDto` is an object of type
+   * `CreateMatriculaDto`, which contains information about a student's pre-registration for a course.
+   * It includes information about the student, the course, and the institution offering the course.
+   * @returns an instance of the `HandleMatricula` class with a success message, a boolean value
+   * indicating success or failure, and the saved `matricula` object.
+   */
   async registerPrematricula(createMatDto: CreateMatriculaDto) {
 
     try {
@@ -159,12 +178,21 @@ export class MatriculaService {
       }
 
     } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException('ERROR_REGISTRAR_PREMATRICULA');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR REGISTRAR PREMATRICULA SYSTEM');
     }
   
   }
 
+ /**
+  * This function finds all pre-registered students for a course and returns them with pagination and
+  * related data.
+  * @param {PaginationQueryDto}  - - `limit`: The maximum number of records to be returned in a single
+  * query.
+  * @returns The `findAll` method is returning an object of type `HandleMatricula` which contains a
+  * message, a boolean value indicating if the operation was successful, an array of matriculation
+  * data, and a count of the total number of matriculations that meet the specified criteria.
+  */
   async findAll({limit, offset}:PaginationQueryDto) {
     try {
       const count = await this.matModel.countBy({ Estado:true, EstadoMatricula:'prematricula' });
@@ -175,10 +203,20 @@ export class MatriculaService {
         relations:['estudiante', 'estudiante.apoderado','curso','curso.nivel','horario','denomiServicio','institucion'] });
       return new HandleMatricula('Lista registro de matriculas', true, data, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_MATRICULADOS');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER ESTUDIANTES MATRICULADOS');
     }
   }
 
+ /**
+  * This function removes a student and their related data from the database, including their
+  * enrollment, institution, and potentially their guardian.
+  * @param {number} Id - The parameter `Id` is a number that represents the unique identifier of a
+  * matricula (enrollment) that needs to be removed from the database.
+  * @returns an instance of the `HandleMatricula` class with a message indicating that the student has
+  * been successfully deleted, a boolean value of `true` to indicate success, and a `null` value for
+  * the data property.
+  */
   async remove(Id: number) {
     try {
       //? TODO: verificar si existe persona
@@ -209,10 +247,23 @@ export class MatriculaService {
       }
       return new HandleMatricula(`Estudiante ${estudiante.Nombres} eliminado satisfactoriamente`, true, null);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_REMOVE_PERSONA');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR EMILINAR PERSONA');
     }
   }
 
+/**
+ * This function uploads a file and checks if it meets certain requirements, such as file type and
+ * size, before uploading it to Google Drive.
+ * @param file - The file that is being uploaded using Multer middleware in an Express application. It
+ * is of type Express.Multer.File.
+ * @param {Request} Req - Req is an object of type Request, which is a part of the Express.js
+ * framework. It contains information about the HTTP request that triggered the function, such as the
+ * request headers, request body, request method, request URL, etc.
+ * @returns the data object obtained from uploading the file to Google Drive after performing some
+ * validations on the file. If any error occurs during the process, it throws an exception with an
+ * error message.
+ */
   async uploadFileMatricula(file:Express.Multer.File, Req:Request){
     try {
       const allowedMimes = ['image/jpeg','image/jpg', 'image/png', 'application/pdf'];
@@ -235,10 +286,21 @@ export class MatriculaService {
       return data;
     } catch (e) {
       const error = (e.code && e.code=='ETIMEDOUT')?'Revise su conexión a internet o la estabilidad del internet':'';
-      throw new InternalServerErrorException(`Error al subir el archivo | ${(e.response?e.response:error)}`);
+      console.log(e.message)
+      throw new InternalServerErrorException(`ERROR AL SUBIR ARCHIVO | ${(e.response?e.response:error)}`);
     }
   }
 
+ /**
+  * This is an async function that updates a matricula record in a database and returns a success
+  * message or throws an error if the record is not found or there is an internal server error.
+  * @param {number} Id - The ID of the matricula (enrollment) that needs to be updated.
+  * @param {UpdateMatriculaDto} matriculaDto - UpdateMatriculaDto is a data transfer object that
+  * contains the updated information for a matricula (enrollment) entity. It is used to update the
+  * existing matricula record in the database.
+  * @returns an instance of the `HandleMatricula` class with a success message, a boolean value
+  * indicating success, and a null error message.
+  */
   async update(Id: number, matriculaDto:UpdateMatriculaDto){
     try {
       const existMatricula = await this.matModel.findOneBy({Id});
@@ -248,8 +310,8 @@ export class MatriculaService {
       await this.matModel.update(Id, matriculaDto);
       return new HandleMatricula('Matricula actualizado correctamente', true, null);
     } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException('ERROR_UPDATE_MATRICULA');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR ACTUALIZAR MATRICULA');
     }
   }
 }

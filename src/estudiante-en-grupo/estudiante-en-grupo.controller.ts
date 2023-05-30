@@ -35,11 +35,6 @@ export class EstudianteEnGrupoController {
     return this.estudianteEnGrupoService.findByIdGrupo(+id, pagination);
   }
 
-  @Get('get-estudiantes-en-grupo-especifico/:idGrupo/:idEstudiante')
-  findEstudianteEnGrupoById(@Param('idGrupo') idGrupo: string, @Param('idEstudiante') idEstudiante: string) {
-    return this.estudianteEnGrupoService.findEstudianteEnGrupoById(+idGrupo, +idEstudiante);
-  }
-
   @Delete('delete-estudiantes-en-grupo/:id')
   remove(@Param('id') id: string) {
     return this.estudianteEnGrupoService.remove(+id);

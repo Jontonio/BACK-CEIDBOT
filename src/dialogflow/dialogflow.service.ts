@@ -19,6 +19,14 @@ export class DialogflowService {
         });
     }
     
+   /**
+    * This function retrieves a list of intents from DialogFlow using the provided keyFilename and
+    * projectId.
+    * @returns an instance of the `HandleDialogFlow` class with a message, a boolean value indicating
+    * success or failure, and the data obtained from the DialogFlow API. The message is "Lista de
+    * intents", the boolean value is `true`, and the data is either the first intent in the list of
+    * intents obtained from the API or an empty array if the list is empty.
+    */
     async getIntents() {
         try {
             const intentsClient  = new IntentsClient({ 
@@ -30,11 +38,21 @@ export class DialogflowService {
             const data = (res.length > 0)?res[0]:[];
             return new HandleDialogFlow('Lista de intens', true, data)
         } catch (e) {
-            console.log(e)
-          throw new InternalServerErrorException('Error get list intens')  
+            console.log(e.message)
+          throw new InternalServerErrorException('ERROR OBTENER LISTA INTENTS')  
         }
     }
 
+   /**
+    * This is an async function that retrieves a single intent from DialogFlow using its UUID.
+    * @param {string} uuid - The `uuid` parameter is a string that represents the unique identifier of
+    * an intent in Dialogflow. It is used to retrieve information about a specific intent from the
+    * Dialogflow API.
+    * @returns A `HandleDialogFlow` object with the result of the `getIntent` method from the
+    * `IntentsClient` class, which contains information about the intent with the specified UUID. If
+    * the intent is found, the `success` property of the `HandleDialogFlow` object will be `true` and
+    * the `data` property will contain the intent information. If the intent is not found,
+    */
     async getOneIntent(uuid:string) {
         try {
             const name = `projects/ceidbot-bjpe/agent/intents/${uuid}`;
@@ -45,11 +63,22 @@ export class DialogflowService {
             const data = (res.length > 0)?res[0]:[];
             return new HandleDialogFlow('get on intent', true, data)
         } catch (e) {
-            console.log(e)
-          throw new InternalServerErrorException('Error get one intent')  
+            console.log(e.message)
+          throw new InternalServerErrorException('ERROR OBTENER EL INTENT')  
         }
     }
 
+    /**
+     * This function updates a text message in a DialogFlow intent or adds a new one if none exist.
+     * @param {string} uuid - The `uuid` parameter is a string representing the unique identifier of
+     * the intent that needs to be updated in DialogFlow.
+     * @param {DialogFlowTextDto} dialogFlowTextDto - `dialogFlowTextDto` is an object that contains
+     * the text message to be updated or inserted in a DialogFlow intent. It has the following
+     * properties:
+     * @returns a `HandleDialogFlow` object with a message indicating that the possible response
+     * phrases of the updated intent have been updated successfully, a boolean value of `true`
+     * indicating success, and the result of the update operation.
+     */
     async updateOneTxtIntent(uuid:string, dialogFlowTextDto:DialogFlowTextDto) {
         try {
             const name = `projects/ceidbot-bjpe/agent/intents/${uuid}`;
@@ -77,11 +106,22 @@ export class DialogflowService {
             });
             return new HandleDialogFlow('Posibles frases de respuesta del intent actualizado correctamente', true, result)
         } catch (e) {
-            console.log(e)
+            console.log(e.message)
           throw new InternalServerErrorException('Error update txt intent')  
         }
     }
 
+   /**
+    * This function updates the payload of a DialogFlow intent with the provided UUID and payload DTO.
+    * @param {string} uuid - The UUID (Universally Unique Identifier) of the intent that needs to be
+    * updated.
+    * @param {DialogFlowPayloadDto} dialogFlowPayloadDto - `dialogFlowPayloadDto` is an object of type
+    * `DialogFlowPayloadDto` which contains the fields to be updated in the DialogFlow intent's
+    * payload. The fields can include text, images, cards, etc. that will be used as responses by the
+    * intent.
+    * @returns a `HandleDialogFlow` object with a message indicating whether the update of the intent's
+    * payload was successful or not, and the result of the update operation.
+    */
     async updateOnePayloadIntent(uuid:string, dialogFlowPayloadDto:DialogFlowPayloadDto) {
         try {
             const name = `projects/ceidbot-bjpe/agent/intents/${uuid}`;
@@ -110,11 +150,18 @@ export class DialogflowService {
             });
             return new HandleDialogFlow('Posibles frases de respuesta del intent actualizado correctamente', true, result)
         } catch (e) {
-            console.log(e)
-          throw new InternalServerErrorException('Error update payload intent')  
+            console.log(e.mensaje)
+          throw new InternalServerErrorException('ERROR ACTUALIZAR PAYLOAD INTENT')  
         }
     }
     
+    /**
+     * This function retrieves a list of entities from DialogFlow using the DialogFlow API client
+     * library for Node.js.
+     * @returns The `getEntities()` function is returning a `HandleDialogFlow` object with the message
+     * "Lista de entities", a boolean value of `true`, and the data obtained from a call to the
+     * Dialogflow API to list all entity types in the project.
+     */
     async getEntities() {
         try {
             const entityTypesClient  = new EntityTypesClient({ 
@@ -125,8 +172,8 @@ export class DialogflowService {
             const data = await entityTypesClient.listEntityTypes(request);
             return new HandleDialogFlow('Lista de entities', true, data)
         } catch (e) {
-            console.log(e)
-            throw new InternalServerErrorException('Error get all entities');
+            console.log(e.mensaje)
+            throw new InternalServerErrorException('ERRO LIST INTENTS');
         }
     }
 

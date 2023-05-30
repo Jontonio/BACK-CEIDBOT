@@ -28,6 +28,13 @@ export class GrupoService {
               private grupoModuloModel:Repository<GrupoModulo>){}
 
   /** Crea el nombre del grupo como por ejemplo grupo A, grupo B, grupo C etc  */
+  /**
+   * This function creates a new group type and checks if a similar group name already exists.
+   * @param {CreateTipoGrupoDto} createTipo - CreateTipoGrupoDto, which is a data transfer object
+   * containing the information needed to create a new tipo grupo (group type).
+   * @returns an instance of the `HandleGrupo` class with a message, a boolean value indicating if the
+   * operation was successful, and either the data created or null.
+   */
   async createTipoGrupo(createTipo: CreateTipoGrupoDto) {
     try {
       /** verifcar si ya existe un nombre similar del grupo*/
@@ -36,11 +43,22 @@ export class GrupoService {
       const data = await this.tipoGrupoModel.save(createTipo);
       return new HandleGrupo(`Grupo ${data.NombreGrupo.toUpperCase()} registrado correctamente`, true, data);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_CREATE_TIPO_GRUPO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR CREAR TIPO GRUPO');
     }
   }
 
   /** Crea el grupo  */
+
+  /**
+   * This function creates a new group and calculates the payment dates for each module of the course.
+   * @param {CreateGrupoDto} createGrupo - The parameter `createGrupo` is an object of type
+   * `CreateGrupoDto` which contains information about a group to be created, including the type of
+   * group, the course it belongs to, and its start and end dates.
+   * @returns an instance of the `HandleGrupo` class with a message, a boolean value indicating success
+   * or failure, and either the newly created `grupo` object or `null` depending on the success of the
+   * operation.
+   */
   async createGrupo(createGrupo: CreateGrupoDto) {
     try {
       // verificar si existe un grupo con el mismo nombre y que sea del mismo nivel y que estado se activo */
@@ -88,11 +106,17 @@ export class GrupoService {
 
       return new HandleGrupo(`Grupo con código ${grupo.Id} registrado correctamente`, true, grupo);
     } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException('ERROR_CREATE_GRUPO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR REGISTRAR GRUPO');
     }
   }
 
+/**
+ * This function finds and returns a list of registered group types with their count.
+ * @returns A HandleGrupo object with a message, a boolean indicating success, an array of data
+ * containing information about registered types of groups, and a count of the number of registered
+ * types of groups.
+ */
   async findTipoGrupos() {
     try {
       const count = await this.tipoGrupoModel.countBy({ Estado:true });
@@ -102,10 +126,19 @@ export class GrupoService {
       });
       return new HandleGrupo('Lista de tipo de grupos registrados', true, data, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_TIPOS_GRUPOS');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTNER GRUPOS');
     }
   }
 
+  /**
+   * This function retrieves a list of registered group types with pagination and returns it along with
+   * a success message and count.
+   * @param {PaginationQueryDto}  - - `limit`: The maximum number of items to return in the result set.
+   * @returns This function is returning a HandleGrupo object that contains a message, a boolean value
+   * indicating if the operation was successful or not, an array of data (tipo de grupos), and a count
+   * of the total number of tipo de grupos that meet the criteria.
+   */
   async findAllTipoGrupos({limit, offset}: PaginationQueryDto) {
     try {
       const count = await this.tipoGrupoModel.countBy({ Estado:true });
@@ -115,10 +148,19 @@ export class GrupoService {
         order: { createdAt:'DESC' } });
       return new HandleGrupo('Lista de tipo de grupos registrados', true, data, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_TIPOS_GRUPOS');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER TIPOS GRUPOS');
     }
   }
 
+  /**
+   * This function finds all active groups with pagination and related entities and returns them with a
+   * count.
+   * @param {PaginationQueryDto}  - - `limit`: The maximum number of items to return in the result set.
+   * @returns an object of type `HandleGrupo` which contains a message, a boolean value indicating if
+   * the operation was successful, an array of `grupos` (groups) and a `count` of the total number of
+   * groups.
+   */
   async findAllGrupos({limit, offset}: PaginationQueryDto) {
     try {
       const count = await this.grupoModel.countBy({ Estado:true });
@@ -136,10 +178,17 @@ export class GrupoService {
                    'grupoModulo.modulo']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_GRUPOS');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER GRUPOS');
     }
   }
 
+  /**
+   * This function finds all registered groups for matriculation with pagination and related entities.
+   * @param {PaginationQueryDto}  - - `limit`: The maximum number of results to return.
+   * @returns an object of type `HandleGrupo` which contains a message, a boolean value indicating if
+   * the operation was successful, an array of `grupos` (groups) and a `count` value.
+   */
   async findAllMatricula({limit, offset}: PaginationQueryDto) {
     try {
       const count = await this.grupoModel.countBy({ Estado:true });
@@ -156,10 +205,21 @@ export class GrupoService {
                    'estadoGrupo']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_GRUPOS_MATRICULA');
+      throw new InternalServerErrorException('ERROR OBTENER GRUPOS MATRICULA');
     }
   }
 
+ /**
+  * This function finds all groups that match a certain state and state ID, with pagination and related
+  * data, and returns them in a custom object.
+  * @param {number} idEstadoGrupo - The ID of the state of the group that is being searched for in the
+  * database.
+  * @param {PaginationQueryDto}  - - `idEstadoGrupo`: a number representing the ID of the state of the
+  * group
+  * @returns an object of type `HandleGrupo` which contains a message, a boolean value indicating if
+  * the operation was successful, an array of `grupos` (groups) and a `count` of the total number of
+  * groups that match the query.
+  */
   async findAllGruposReporte(idEstadoGrupo:number ,{limit, offset}: PaginationQueryDto) {
     try {
       const query = { Estado:true, estadoGrupo:{ Id:idEstadoGrupo } }
@@ -175,10 +235,18 @@ export class GrupoService {
                    'curso.modulo']});
       return new HandleGrupo('Lista de grupos registrados', true, grupos, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_GRUPOS_REPORTE');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER GRUPOS REPORTE');
     }
   }
   
+ /**
+  * This function finds a group by its ID and returns it with related data.
+  * @param {number} Id - The parameter `Id` is a number that represents the unique identifier of a
+  * group. It is used to search for a specific group in the database.
+  * @returns an object of type `HandleGrupo` with a message, a boolean value indicating if the group
+  * was found or not, and the group object itself.
+  */
   async findOneGrupo(Id: number) {
     try {
       const grupo = await this.grupoModel.findOne({ 
@@ -196,10 +264,21 @@ export class GrupoService {
                    'grupoModulo.modulo']});
       return new HandleGrupo('Un grupo encontrado', true, grupo);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER UN GRUPO');
     }
   }
 
+ /**
+  * This is an asynchronous function that finds a group by its ID and returns it with its related data.
+  * @param {number} Id - The parameter "Id" is a number that represents the unique identifier of a
+  * group. This function uses this parameter to search for a group in the database and return its
+  * information along with some related entities.
+  * @returns The `findOne` method is returning a Promise that resolves to a single `Grupo` object that
+  * matches the provided `Id`. The `Grupo` object includes related entities such as `tipoGrupo`,
+  * `curso`, `docente`, `grupoModulo`, and their respective related entities. If an error occurs, an
+  * `InternalServerErrorException` is thrown with the message "ERROR OBTENER UN GRU
+  */
   async findOne(Id: number) {
     try {
       return await this.grupoModel.findOne({ 
@@ -213,10 +292,24 @@ export class GrupoService {
                    'grupoModulo.modulo']
       });
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_FIND_ONE_GRUPO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER UN GRUPO');
     }
   }
 
+  /**
+   * This is an async function that updates a group and returns a message indicating whether the update
+   * was successful or not.
+   * @param {number} Id - The Id parameter is a number that represents the unique identifier of a
+   * group.
+   * @param {UpdateGrupoDto} updateGrupoDto - UpdateGrupoDto is a data transfer object that contains
+   * the updated information for a group. It is used to update the group with the specified Id in the
+   * database.
+   * @returns an instance of the `HandleGrupo` class with a message indicating whether the update was
+   * successful or not, and a boolean value indicating the success status. The `null` value is being
+   * returned as the third parameter of the `HandleGrupo` constructor, which is not being used in this
+   * case.
+   */
   async updateGrupo(Id: number, updateGrupoDto: UpdateGrupoDto) {
     try {
       const { affected } = await this.grupoModel.update(Id, updateGrupoDto);
@@ -224,11 +317,22 @@ export class GrupoService {
       const grupo = await this.grupoModel.findOneBy({Id});
       return new HandleGrupo(`Grupo G-${grupo.Id} actualizado correctamente`, true, null);
     } catch (e) {
-      console.log(e);
-      throw new InternalServerErrorException('ERROR_UPDATE_GRUPO');
+      console.log(e.message);
+      throw new InternalServerErrorException('ERROR ACTUALIZAR GRUPO');
     }
   }
 
+  /**
+   * This is an async function that updates the payment date of a group module and performs some
+   * validations before updating.
+   * @param {number} Id - The ID of the grupo módulo that needs to be updated.
+   * @param {UpdateGrupoModuloDto} updateGrupoModuloDto - `updateGrupoModuloDto` is an object that
+   * contains the data needed to update a group module. It has two properties: `grupo` and `FechaPago`.
+   * `grupo` is an object that contains the ID of the group to be updated, while `FechaPago` is the
+   * date of
+   * @returns an instance of the `HandleGrupoModulo` class, which contains a message, a boolean
+   * indicating success or failure, and possibly some data.
+   */
   async updateGrupoModelo(Id:number, updateGrupoModuloDto:UpdateGrupoModuloDto){
     try {
       const { grupo, FechaPago } = updateGrupoModuloDto;
@@ -253,11 +357,19 @@ export class GrupoService {
       if(affected==0) return new HandleGrupo('Grupo módulo sin afectar ', false, null)
       return new HandleGrupoModulo(`Fecha de cobro del grupo G-${grupo.Id} actualizado correctamente`, true, null);
     } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException('ERROR UPDATE GRUPO MODULO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR ACTUALIZAR GRUPO MODULO');
     }
   }
 
+ /**
+  * This function retrieves a list of group modules that are currently active and belong to a group
+  * with a specific status.
+  * @returns The `getGrupoModulos` function is returning a promise that resolves to an array of objects
+  * that match the specified criteria. The objects will have properties `grupo`, `modulo`, and
+  * `CurrentModulo`. The `where` clause filters the results based on the `CurrentModulo` property being
+  * true and the `estadoGrupo` property of the related `grupo` object having a `CodeEstado
+  */
   async getGrupoModulos(){
     try {
       return await this.grupoModuloModel.find({
@@ -265,10 +377,20 @@ export class GrupoService {
         relations:['grupo','modulo']
       });
     } catch (e) {
-      throw new InternalServerErrorException("ERROR GET GRUPO MODULO")
+      console.log(e.message)
+      throw new InternalServerErrorException("ERROR OBTENER GRUPO MODULO")
     }
   }
 
+/**
+ * This function removes a group by setting its Estado property to false and returns a success message
+ * or throws an error if the group does not exist or there is an internal server error.
+ * @param {number} Id - The parameter `Id` is a number representing the ID of the group to be removed.
+ * @returns an instance of the `HandleGrupoModulo` class with a success message if the group with the
+ * given `Id` is successfully removed, or an instance of the `HandleGrupo` class with a failure message
+ * if the group module is not affected. If an error occurs during the removal process, an
+ * `InternalServerErrorException` is thrown.
+ */
   async remove(Id: number) {
     try {
       const existGrupo = await this.grupoModel.findOneBy({ Id });
@@ -279,10 +401,21 @@ export class GrupoService {
       if(affected==0) return new HandleGrupo('Grupo módulo sin afectar ', false, null)
       return new HandleGrupoModulo(`Grupo G-${Id} se ha eliminado correctamente`, true, null);
     } catch (e) {
-      throw new InternalServerErrorException("ERROR REMOVE GRUPO")
+      console.log(e.message)
+      throw new InternalServerErrorException("ERROR ELIMINAR GRUPO")
     }
   }
 
+  /**
+   * This function retrieves data for a horizontal bar chart displaying the number of students in each
+   * group, filtered by a specified group state.
+   * @param {number} estadoGrupoId - The parameter `estadoGrupoId` is a number that represents the ID
+   * of the group state for which the horizontal bar data is being retrieved.
+   * @returns an array of objects with two properties: "name" and "value". The "name" property is a
+   * string that concatenates the group name, course name, and level. The "value" property is the total
+   * number of students in that group. If there are no results, the function returns an array with a
+   * single object with "value" set to 0 and "
+   */
   async getDataHorizontalBarEstudiantesEnGrupos(estadoGrupoId:number){
 
     try {
@@ -316,12 +449,22 @@ export class GrupoService {
       return [{value:0, name:'Sin registros'}];
 
     } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException("Error al obtener grupos dashboard");
+      console.log(e.message)
+      throw new InternalServerErrorException("ERROR OBTENER DATA HORIZONTAL GRUPOS DASHBOARD");
     }
 
   }
 
+  /**
+   * This function retrieves data for a vertical bar chart displaying the number of payments and late
+   * payments for a specific group and its modules.
+   * @param {number} grupoId - The ID of the group for which data is being fetched.
+   * @param {number} estadoGrupoId - The parameter `estadoGrupoId` is an integer representing the ID of
+   * the state of a group.
+   * @returns an array of objects of type `DataVerticalBar` which contains information about the number
+   * of payments and late payments for a given group and state. If there are no results, it returns an
+   * array with a single object indicating that there are no records.
+   */
   async getDataVerticalBarPagosMora(grupoId:number, estadoGrupoId:number){
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -367,14 +510,23 @@ export class GrupoService {
 
     } catch (e) {
       await queryRunner.rollbackTransaction();
-      console.log(e)
-      throw new InternalServerErrorException("Error al obtener grupos dashboard");
+      console.log(e.message)
+      throw new InternalServerErrorException("ERROR OBTENER DATA VERTICAL GRUPOS DASHBOARD");
     } finally {
       await queryRunner.release();
     }
 
   }
 
+ /**
+  * This function retrieves a single record from a database table based on its ID.
+  * @param {number} Id - The parameter `Id` is a number that represents the unique identifier of a
+  * record in the database. The `getOneById` function is an asynchronous function that retrieves a
+  * single record from the database based on the provided `Id`. The function uses the `findOne` method
+  * of the `grupoModel`
+  * @returns a Promise that resolves to the result of a database query to find one record in the
+  * "grupoModel" table where the "Id" column matches the provided "Id" parameter.
+  */
   async getOneById(Id:number){
     return await this.grupoModel.findOne({ where:{ Id } });
   }
@@ -404,9 +556,10 @@ export class GrupoService {
       `);
       await queryRunner.commitTransaction();
       console.log("Estados de grupos actualizados")
-    } catch (error) {
+    } catch (e) {
+      console.log(e.message)
       await queryRunner.rollbackTransaction();
-      throw error;
+      throw new InternalServerErrorException("ERROR ACTUALIZAR ESTADOS DEL GRUPO");
     } finally {
       await queryRunner.release();
     }
@@ -439,9 +592,10 @@ export class GrupoService {
       `);
       await queryRunner.commitTransaction();
       console.log("Modulos actuales actualizado correctamente")
-    } catch (error) {
+    } catch (e) {
+      console.log(e.message)
       await queryRunner.rollbackTransaction();
-      throw error;
+      throw new InternalServerErrorException("ERROR ACTUALIZAR MODULO ACTUAL");
     } finally {
       await queryRunner.release();
     }

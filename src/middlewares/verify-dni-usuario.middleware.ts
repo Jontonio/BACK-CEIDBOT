@@ -25,7 +25,7 @@ export class VerifyDniUsuarioMiddleware implements NestMiddleware {
       next();
 
     } catch (e) {
-      console.log(e)
+      console.log(e.message);
       throw new InternalServerErrorException(e);
     }
   }

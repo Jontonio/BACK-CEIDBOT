@@ -28,6 +28,17 @@ export class EstudianteEnGrupoService {
   private pagoService:PagoService,
   private estudianteService:EstudianteService){}
 
+  /**
+   * This function creates a new student in a group and updates the corresponding matricula and group
+   * information.
+   * @param {EstudianteEnGrupoWithOutPagoDto} createEstudEnGrupoDto - createEstudEnGrupoDto is an
+   * object of type EstudianteEnGrupoWithOutPagoDto, which contains the information needed to create a
+   * new EstudianteEnGrupo (student in a group) entity. This object includes the IDs of the student,
+   * group, and matricula (enrollment), as
+   * @returns an instance of the `HandleEstudianteEnGrupo` class with a message, a boolean value
+   * indicating if the operation was successful, and either the saved `estudEnGrupo` object or `null`
+   * depending on the outcome of the operation.
+   */
   async create(createEstudEnGrupoDto: EstudianteEnGrupoWithOutPagoDto) {
     try {
       const { curso, NumeroEstudiantes, MaximoEstudiantes } = await this.grupoService.findOne(createEstudEnGrupoDto.grupo.Id);
@@ -42,11 +53,20 @@ export class EstudianteEnGrupoService {
       }
       return new HandleEstudianteEnGrupo(`El grupo del curso ${curso.NombreCurso} supera la cantidad de estudiantes permitidos`, false, null);
     } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException('ERROR_REGISTER_ESTUDIANTE_EN_GRUPO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR REGISTRAR ESTUDIANTE EN GRUPO');
     }
   }
 
+ /**
+  * This function registers a student in a group, creates a new matricula, updates the group's student
+  * count, and registers monthly payments.
+  * @param {EstudianteEnGrupoWithPagoDto} createEstudEnGrupoDto - The parameter `createEstudEnGrupoDto`
+  * is an object of type `EstudianteEnGrupoWithPagoDto` which contains information about a student's
+  * enrollment in a group along with payment details.
+  * @returns an instance of the `HandleEstudianteEnGrupo` class, which contains a message, a boolean
+  * value indicating success or failure, and data related to the registration of a student in a group.
+  */
   async registerFromMatricula(createEstudEnGrupoDto: EstudianteEnGrupoWithPagoDto) {
     try {
       // Veriifcar la cantidad de estudiantes en el grupo
@@ -84,11 +104,21 @@ export class EstudianteEnGrupoService {
       }
       return new HandleEstudianteEnGrupo(`El grupo del curso ${curso.NombreCurso} - ${curso.nivel.Nivel} supera la cantidad de estudiantes permitidos`, false, null);
     } catch (e) {
-      console.log(e)
+      console.log(e.message)
       throw new InternalServerErrorException('ERROR REGISTER DE MATRICULA ESTUDIANTE EN GRUPO');
     }
   }
 
+  /**
+   * This function finds all students assigned to a group with pagination and related data.
+   * @param {PaginationQueryDto}  - - `limit`: The maximum number of records to be returned in a single
+   * query.
+   * @returns The `findAll` method is returning an instance of the `HandleEstudianteEnGrupo` class with
+   * a message, a boolean value indicating success or failure, an array of data containing information
+   * about students assigned to a group, and a count of the total number of students assigned to a
+   * group. The data includes information about the student's enrollment, service denomination, course,
+   * group, student, and student's
+   */
   async findAll({limit, offset}:PaginationQueryDto) {
     try {
       const count = await this.estudEnGrupoModel.countBy({ Estado:true });
@@ -105,10 +135,19 @@ export class EstudianteEnGrupoService {
                   });
       return new HandleEstudianteEnGrupo('Lista estudiantes asignados al grupo', true, data, count);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER ESTUDIANTES EN GRUPO');
     }
   }
 
+  /**
+   * This function finds a student in a group and returns information about the group and the student.
+   * @param {EstudianteDataDto} estudianteDataDto - The parameter `estudianteDataDto` is an object of
+   * type `EstudianteDataDto` which contains the following properties:
+   * @returns an instance of the `HandleEstudianteEnGrupo` class, which contains a message, a boolean
+   * value indicating whether the data is empty or not, and an array of data related to the student in
+   * a group.
+   */
   async findEstudianteEnGrupo(estudianteDataDto:EstudianteDataDto){
     try {
       const { Documento, TipoDocumento } = estudianteDataDto;
@@ -128,30 +167,21 @@ export class EstudianteEnGrupoService {
                            :`Hola 👋 ${estudiante.Nombres} se encuentra en la sesión de sus cursos`;
       return new HandleEstudianteEnGrupo(msg, !isEmpty, data);
     } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER ESTUDIANTES EN GRUPO');
     }
   }
 
-  async findEstudianteEnGrupoById(IdGrupo:number, IdEstudiante:number){
-    try {
-      const res = await this.estudEnGrupoModel.find({ 
-        where:{ Estado:true, estudiante:{ Id:IdEstudiante }, grupo:{ Id:IdGrupo}}, 
-        relations:['estudiante',
-                  'estudiante.apoderado',
-                  'matricula.denomiServicio',
-                  'grupo.curso',
-                  'grupo.curso.nivel',
-                  'grupo.grupoModulo',
-                  'grupo.grupoModulo.modulo',
-                  'pagos',
-                  'pagos.grupoModulo',
-                  'pagos.grupoModulo.modulo'] });
-      const result = (res.length>0)?res[0]:null;
-      return new HandleEstudianteEnGrupo(`Datos encontrados para el estudiante ${IdEstudiante} y el grupo ${IdGrupo}`, true, result, 1, (result)?this.dataHistorial(result.pagos, result.grupo.grupoModulo):null);
-    } catch (e) {
-      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO');
-    }
-  }
+/**
+ * This function finds and returns a list of students assigned to a specific group, along with
+ * information about the group and the number of days since the start of classes.
+ * @param {number} Id - The ID of the group to find students for.
+ * @param {PaginationQueryDto}  - - `Id`: a number representing the ID of a group
+ * @returns an instance of the `HandleEstudianteEnGrupoPago` class with a message, a boolean value
+ * indicating success or failure, an object containing information about the group, an array of objects
+ * containing information about the students in the group, and an object containing information about
+ * the number of students in the group and the pagination parameters.
+ */
 
   async findByIdGrupo(Id: number, {limit, offset}:PaginationQueryDto) {
     try {
@@ -197,11 +227,18 @@ export class EstudianteEnGrupoService {
       const data = { grupo, estudiantesEnGrupo, infoDateGrupo } 
       return new HandleEstudianteEnGrupoPago('Lista estudiantes asignados al grupo', true, data, count);
     } catch (e) {
-      console.log(e)
-      throw new InternalServerErrorException('ERROR_GET_ESTUDIANTES_EN_GRUPO_ESPECIFICO');
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR OBTENER ESTUDIANTES EN GRUPO ESPECIFICO');
     }
   }
 
+  /**
+   * This function removes a student from a group and updates the group's number of students.
+   * @param {number} Id - The parameter `Id` is a number that represents the unique identifier of the
+   * student in a group.
+   * @returns an instance of the `HandleEstudianteEnGrupoPago` class with a message, a boolean value
+   * indicating if the operation was successful, and the `estudiante` object.
+   */
   async remove(Id: number) {
     try{
       const estudentGrupo = await this.estudEnGrupoModel.update(Id, {Estado: false})
@@ -214,41 +251,19 @@ export class EstudianteEnGrupoService {
         where:{ Id },
         relations:['estudiante','grupo']
       });
-
       
       // contar la cantidad de estudiantes
       const countEstudiante = await this.estudEnGrupoModel.count({ 
-        where:{ Estado: true, 
-          grupo:{ Id: grupo.Id } 
-        }});
+        where:{ Estado: true, grupo:{ Id: grupo.Id } }});
         
         // actualizar la cantidad de estudiantes 
       await this.grupoService.updateGrupo(grupo.Id, { NumeroEstudiantes: countEstudiante } as UpdateGrupoDto);
       // retornar resultados
       return new HandleEstudianteEnGrupoPago(`Estudiante ${estudiante.Nombres.toUpperCase()} ${estudiante.ApellidoPaterno.toUpperCase()} fue eliminado del grupo correctamente`, true, estudiante);
     } catch (e) {
-      console.log(e)
+      console.log(e.message)
       throw new InternalServerErrorException('ERROR ELIMINAR ESTUDIANTE EN GRUPO');
     }
   }
-
-  dataHistorial(pagos:Pago[] = [], grupoMdulo:GrupoModulo[] = []){
-    // const data:Data[] = [];
-    // const gModulo = 'Fechas de pago';
-    // const gSeries:Series[] = [];
-    // grupoMdulo.forEach( gModulo => {
-    //   gSeries.push({value: moment(gModulo.FechaPago).valueOf(), name: `${gModulo.modulo.Modulo}`})
-    // })
-    // data.push({name:gModulo, series: gSeries})
-    // const gPago = 'Fecha de pago realizadas';
-    // const gPagos:Series[] = [];
-    // pagos.forEach( (pago) => {
-    //   if(pago.grupoModulo){
-    //     console.log(pago)
-    //     gPagos.push({value: moment(pago.FechaPago).valueOf(), name: `${pago.grupoModulo.modulo.Modulo}`})
-    //   }
-    // })
-    // data.push({name:gPago, series:gPagos})
-    return [];
-  }
+  
 }
