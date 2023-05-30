@@ -11,14 +11,15 @@ async function bootstrap() {
 
   // app.setGlobalPrefix('api'); 
   
-  app.enableCors({ origin:'*' })
+  // app.enableCors({ origin:'*' })
+  app.enableCors({ origin:['http://localhost:4200','https://unajma.ceidbot.com'] })
 
   app.useGlobalPipes(new ValidationPipe({
     transformOptions:{ enableImplicitConversion:true }
   }))
 
-  await app.listen(configService.get('SERVER_PORT'),'0.0.0.0');
-  // await app.listen( PORT );
+  // await app.listen(configService.get('SERVER_PORT'),'0.0.0.0');
+  await app.listen( configService.get('SERVER_PORT') );
 }
 
 bootstrap();
