@@ -11,8 +11,8 @@ async function bootstrap() {
 
   // app.setGlobalPrefix('api'); 
   
-  // app.enableCors({ origin:'*' })
-  app.enableCors({ origin:['http://localhost:4200','https://unajma.ceidbot.com'] })
+  app.enableCors({ origin:'*' })
+  // app.enableCors({ origin:['http://localhost:4200','https://unajma.ceidbot.com','http://192.168.0.114:4200'] })
 
   app.useGlobalPipes(new ValidationPipe({
     transformOptions:{ enableImplicitConversion:true }

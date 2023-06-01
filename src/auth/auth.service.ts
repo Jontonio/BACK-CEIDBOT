@@ -150,7 +150,7 @@ export class AuthService {
       console.log(res)
       return new HandleResetPassword('Mensaje enviado correctamente', true, null);
     } catch (e) {
-      console.log(e.message)
+      console.log(e.message);
       throw new InternalServerErrorException("ERROR RESET PASSWORD");
     }
   }

@@ -154,8 +154,8 @@ export class ReportsService {
         const res = await queryRunner.query(`
         SELECT grupo_modulo.grupoId, 
                modulo.Modulo as modulo, 
-               SUM(CASE WHEN categoria_pago.Id = 1 THEN pago.MontoPago ELSE 0 END) as total_pagado, SUM(denominacion_servicio.MontoPension) As total_a_pagar,
-          (SUM(CASE WHEN categoria_pago.Id = 1 THEN pago.MontoPago ELSE 0 END) * 100) / SUM(denominacion_servicio.MontoPension) As indice_del_pago_actual, (100 - (SUM(CASE WHEN categoria_pago.Id = 1 THEN pago.MontoPago ELSE 0 END) * 100) / SUM(denominacion_servicio.MontoPension)) as indice_de_la_deuda_vencida
+               SUM(CASE WHEN categoria_pago.Id = 1 THEN pago.MontoPago ELSE 0 END) as total_pagado, (SELECT SUM(denominacion_servicio.MontoPension) from denominacion_servicio INNER JOIN matricula ON denominacion_servicio.Id = matricula.denomiServicioId INNER JOIN estudiante_en_grupo on matricula.Id = estudiante_en_grupo.matriculaId WHERE estudiante_en_grupo.grupoId = grupo_modulo.grupoId) As total_a_pagar,
+          (SUM(CASE WHEN categoria_pago.Id = 1 THEN pago.MontoPago ELSE 0 END) * 100) / (SELECT SUM(denominacion_servicio.MontoPension) from denominacion_servicio INNER JOIN matricula ON denominacion_servicio.Id = matricula.denomiServicioId INNER JOIN estudiante_en_grupo on matricula.Id = estudiante_en_grupo.matriculaId WHERE estudiante_en_grupo.grupoId = grupo_modulo.grupoId) As indice_del_pago_actual
           FROM grupo_modulo
           INNER JOIN modulo ON modulo.Id = grupo_modulo.moduloId
           INNER JOIN pago ON grupo_modulo.Id = pago.grupoModuloId
@@ -172,9 +172,9 @@ export class ReportsService {
           const total:DataHorizontalBar[] = [];
           const indice:DataHorizontalBar[] = [];
           total.push({name:`Pagado módulo ${res[0].modulo}`, value:res[0].total_pagado},
-                     {name:`Por pagar módulo ${res[0].modulo}`, value:res[0].total_a_pagar})
+                     {name:`Por pagar módulo ${res[0].modulo}`, value:res[0].total_a_pagar - res[0].total_pagado})
           indice.push({name:`Porcentaje pago módulo ${res[0].modulo}`, value:res[0].indice_del_pago_actual},
-                      {name:`Porcentaje deuda vencida módulo ${res[0].modulo}`, value:res[0].indice_de_la_deuda_vencida})
+                      {name:`Porcentaje deuda vencida módulo ${res[0].modulo}`, value:100-res[0].indice_del_pago_actual})
           return { total, indice };
         }
         return { total:[], indice:[] };
