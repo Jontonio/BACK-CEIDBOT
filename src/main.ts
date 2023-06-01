@@ -18,8 +18,8 @@ async function bootstrap() {
     transformOptions:{ enableImplicitConversion:true }
   }))
 
-  // await app.listen(configService.get('SERVER_PORT'),'0.0.0.0');
-  await app.listen( configService.get('SERVER_PORT') );
+  await app.listen(configService.get('SERVER_PORT'),'0.0.0.0');
+  // await app.listen( configService.get('SERVER_PORT') );
 }
 
 bootstrap();
