@@ -4,6 +4,8 @@ import { PayloadBoot, PayloadCurso, PayloadDocumento } from '../class/PayloadBoo
 import { DataSource } from "typeorm";
 import { HistorialEstudiante } from "src/class/HistorialEstudiante";
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
+import * as moment from 'moment';
+moment.locale('es');
 
 export const chatbot = async (client:Client, message:WAWebJS.Message, dataSource:DataSource) => {
 
@@ -13,7 +15,6 @@ export const chatbot = async (client:Client, message:WAWebJS.Message, dataSource
         for(const response of resGlobal.fulfillmentMessages){
 
             // TODO: Enviar texto de respuesta : enviar resuesta txt
-            console.log(response.text)
             if(response.text){
                 await client.sendMessage(message.from, response.text.text[0]);
             }
@@ -27,10 +28,9 @@ export const chatbot = async (client:Client, message:WAWebJS.Message, dataSource
                             sendCursos(client, message, dataSource);
                             break;
                         case 'consulta_curso_especifico':
-                            sendCursoEspecifico(client, message, resGlobal.parameters);
+                            sendCursoEspecifico(client, message, resGlobal.parameters, dataSource);
                             break;
                         case 'pedido_documento':
-                            // console.log(JSON.stringify(response))
                             cosultaMensualidadDeuda(client, message, resGlobal.parameters, dataSource)
                             break;
                     }
@@ -116,30 +116,30 @@ const sendCursos = async (client:Client, message:WAWebJS.Message, dataSource:Dat
         await queryRunner.release();
     }
 } 
-const sendCursoEspecifico = async (client:Client, message:WAWebJS.Message, response:any) => {
+const sendCursoEspecifico = async (client:Client, message:WAWebJS.Message, response:any, dataSource:DataSource) => {
     const payloadCurso:PayloadCurso = response.fields;
     const NombreCurso = payloadCurso.curso_especifico.stringValue;
     const NivelCurso = payloadCurso.nivel_curso.stringValue;
-    console.log(NombreCurso, NivelCurso)
-    // if(!NombreCurso){
-    //     await client.sendMessage(message.from,`😬 Disculpa, podría especificar la información del curso solicitado por favor?`);   
-    //     return;
-    // }
-    // // console.log("curso: ", NombreCurso,"Nivel:", (NivelCurso)?NivelCurso:'no existe')
-    // const cursos = await _curso.findByName(NombreCurso,(NivelCurso)?NivelCurso:'');
 
-    // let lista = '';
+    if(!NombreCurso){
+        await client.sendMessage(message.from,`😬 Disculpa, podría especificar la información del curso solicitado por favor?`);   
+        return;
+    }
 
-    // if(cursos.length==0){
-    //     await client.sendMessage(message.from,`😬 Disculpa, por el momento no tenemos información sobre el curso ${NombreCurso} ${NivelCurso}`);   
-    //     return;
-    // }
+    const cursos = await consultaCursos(dataSource, NombreCurso, NivelCurso)
 
-    // cursos.forEach(curso => {
-    //     lista += `📘 *Curso:* ${curso.NombreCurso.toUpperCase()} \n 🎯 *Nivel del curso:* ${curso.nivel.Nivel} \n #️ *Módulos:* ${curso.modulo.Modulo} módulos \n 📝 *Descripción:* \n ${curso.DescripcionCurso} \n *👉 Link de los requisitos:* ${curso.LinkRequisitos}`;
-    // })
+    
+    if(cursos.length==0){
+        await client.sendMessage(message.from,`😬 Disculpa, por el momento no tenemos información sobre el curso ${NombreCurso} ${NivelCurso}`);   
+        return;
+    }
+    let lista = '';
+    
+    cursos.forEach( curso => {
+        lista += `📘 *Curso:* ${curso.NombreCurso.toUpperCase()} \n 🎯 *Nivel del curso:* ${curso.Nivel} \n #️ *Módulos:* ${curso.Modulo} módulos \n 📝 *Descripción:* \n ${curso.DescripcionCurso} \n ${curso.LinkRequisitos?`*👉 Link de los requisitos:* ${curso.LinkRequisitos}`:''}`;
+    })
  
-    // await client.sendMessage(message.from, lista);
+    await client.sendMessage(message.from, lista);
 } 
 
 const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, response:any, dataSource:DataSource) => {
@@ -178,17 +178,19 @@ const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, r
 
         let msg = `${estudiante.Nombres} su historial de pago:\n`;
         data.forEach( info => {
-            msg +=`Grupo ID: ${info.grupoId}\n`
-            msg +=`Módulo: ${info.Modulo}\n`
-            msg +=`Fecha de pago: ${info.FechaPago}\n`
-            msg +=`Monto de pago: ${info.MontoPago}\n`
-            msg +=`Estado pago: ${info.pago_verificado?'Su pago fue verificado':'Su pago no fue verificado'}\n`
-            msg +=`Código de voucher: ${info.CodigoVoucher}\n`
-            msg +=`Mora: ${info.MontoMora?info.MontoMora:'No cuenta con mora'}\n`
-            msg +=`Estado mora: ${info.mora_verificada?'Mora subsanada':'Mora no subsanada'}\n`
-            msg +=`-----------\n`
+            msg +=`*Grupo ID:* ${info.grupoId}\n`
+            msg +=`*Curso:* ${info.cursoNombre.toUpperCase()} ${info.Nivel.toUpperCase()}\n`
+            msg +=`*Etiqueta del curso:* ${info.tipoGrupoNombre}\n`
+            msg +=`*Módulo:* ${info.Modulo}\n`
+            msg +=`*Fecha de pago:* ${moment(info.FechaPago).format('DD [de] MMMM [del] YYYY')}\n`
+            msg +=`*Monto de pago:* S/. ${info.MontoPago}\n`
+            msg +=`*Estado pago:* ${info.pago_verificado?'Su pago fue verificado':'Su pago no fue verificado'}\n`
+            msg +=`*Código de voucher:* ${info.CodigoVoucher}\n`
+            msg +=`*Información de mora del módulo ${info.Modulo}*\n`
+            msg +=`*Mora:* ${info.MontoMora?`S/. ${info.MontoMora}`:'No cuenta con mora'}\n`
+            msg +=`*Estado mora:* ${info.mora_verificada?'Mora subsanada':((info.MontoMora && !info.mora_verificada)?'Mora no subsanada':'')}\n`
+            msg +=`------------------------------\n`
         })
-        console.log(data)
         await client.sendMessage(message.from, msg);
 
     }catch (e) {
@@ -200,6 +202,7 @@ const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, r
     }
 } 
 
+
 const historialPagosestudiante = async (dataSource:DataSource, TipoDocumento:string, Documento:string) => {
 
     const queryRunner = dataSource.createQueryRunner();
@@ -207,37 +210,84 @@ const historialPagosestudiante = async (dataSource:DataSource, TipoDocumento:str
     await queryRunner.startTransaction();
     try {
         const estudiante = await queryRunner.query(`
-        SELECT grupo.Id as grupoId, 
-            estudiante.Nombres, 
-            estudiante.ApellidoPaterno, 
-            estudiante.ApellidoMaterno, 
-            categoria_pago.TipoCategoriaPago, 
-            pago.MontoPago, 
-            pago.FechaPago, 
+        SELECT
+            grupo.Id AS grupoId,
+            estudiante.Nombres,
+            estudiante.ApellidoPaterno,
+            estudiante.ApellidoMaterno,
+            categoria_pago.TipoCategoriaPago,
+            pago.MontoPago,
+            pago.FechaPago,
             pago.CodigoVoucher,
-            pago.Verificado as pago_verificado,
+            pago.Verificado AS pago_verificado,
             mora.MontoMora,
-            mora.Verificado as mora_verificada,
-            modulo.Modulo  FROM estudiante
-        INNER JOIN estudiante_en_grupo on estudiante.Id = estudiante_en_grupo.estudianteId
-        INNER JOIN grupo on grupo.Id = estudiante_en_grupo.grupoId
-        LEFT JOIN mora on mora.estudianteEnGrupoId = estudiante_en_grupo.Id
-        LEFT JOIN pago on estudiante_en_grupo.Id = pago.estudianteEnGrupoId
-        LEFT JOIN categoria_pago on categoria_pago.Id = pago.categoriaPagoId
-        LEFT JOIN medio_de_pago on medio_de_pago.Id = pago.medioDePagoId
-        LEFT JOIN grupo_modulo on pago.grupoModuloId = grupo_modulo.Id
-        LEFT JOIN modulo on grupo_modulo.moduloId = modulo.Id
-        WHERE (pago.Estado=true OR pago.Estado is null) and 
-            (categoria_pago.Id= 1 OR categoria_pago.Id = 4 OR categoria_pago.Id is null) and 
-            grupo.Estado = 1 and
-            (SELECT estado_grupo.Id from estado_grupo WHERE estado_grupo.Id = grupo.estadoGrupoId ) !=3 AND
-            estudiante.Documento = '${Documento}' AND estudiante.TipoDocumento = '${TipoDocumento}'; 
+            mora.Verificado AS mora_verificada,
+            modulo.Modulo,
+            curso.NombreCurso AS cursoNombre,
+            tipo_grupo.NombreGrupo AS tipoGrupoNombre,
+            nivel.Nivel
+            FROM estudiante
+            INNER JOIN estudiante_en_grupo ON estudiante.Id = estudiante_en_grupo.estudianteId
+            INNER JOIN grupo ON grupo.Id = estudiante_en_grupo.grupoId
+            LEFT JOIN mora ON mora.estudianteEnGrupoId = estudiante_en_grupo.Id
+            LEFT JOIN pago ON estudiante_en_grupo.Id = pago.estudianteEnGrupoId
+            LEFT JOIN categoria_pago ON categoria_pago.Id = pago.categoriaPagoId
+            LEFT JOIN medio_de_pago ON medio_de_pago.Id = pago.medioDePagoId
+            LEFT JOIN grupo_modulo ON pago.grupoModuloId = grupo_modulo.Id
+            LEFT JOIN modulo ON grupo_modulo.moduloId = modulo.Id
+            LEFT JOIN curso ON grupo.cursoId = curso.Id
+            LEFT JOIN tipo_grupo ON grupo.tipoGrupoId = tipo_grupo.Id
+            LEFT JOIN nivel ON curso.nivelId = nivel.Id
+            WHERE
+            (pago.Estado = true OR pago.Estado IS NULL)
+            AND (categoria_pago.Id = 1 OR categoria_pago.Id = 4 OR categoria_pago.Id IS NULL)
+            AND grupo.Estado = 1
+            AND (
+                SELECT estado_grupo.Id
+                FROM estado_grupo
+                WHERE estado_grupo.Id = grupo.estadoGrupoId
+            ) != 3
+            AND estudiante.Documento = '${Documento}' AND estudiante.TipoDocumento = '${TipoDocumento}';
         `);
 
         await queryRunner.commitTransaction();
         return estudiante;
     }catch (e) {
         console.log("Error consulta estudiantes pagos: ", e);
+        await queryRunner.rollbackTransaction();
+        throw new Error(e);
+    } finally {
+        await queryRunner.release();
+    }
+}
+
+const consultaCursos = async (dataSource:DataSource, NombreCurso:string, NivelCurso='') => {
+
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    const firstQuery = `SELECT curso.NombreCurso, 
+                        nivel.Nivel, 
+                        modulo.Modulo, 
+                        curso.DescripcionCurso,
+                        curso.LinkRequisitos FROM curso 
+                    INNER JOIN nivel on nivel.Id = curso.nivelId
+                    INNER JOIN modulo on modulo.Id = curso.moduloId
+                    WHERE curso.Estado = true AND curso.EstadoApertura = true AND curso.NombreCurso = '${NombreCurso}';`;
+    const secondQuery = `SELECT curso.NombreCurso, 
+                        nivel.Nivel, 
+                        modulo.Modulo, 
+                        curso.DescripcionCurso,
+                        curso.LinkRequisitos FROM curso 
+                    INNER JOIN nivel on nivel.Id = curso.nivelId
+                    INNER JOIN modulo on modulo.Id = curso.moduloId
+                    WHERE curso.Estado = true AND curso.EstadoApertura = true AND curso.NombreCurso = '${NombreCurso}' AND nivel.Nivel = '${NivelCurso}';`;
+    try {
+        const cursos = await queryRunner.query(NivelCurso?secondQuery:firstQuery);
+        await queryRunner.commitTransaction();
+        return cursos;
+    }catch (e) {
+        console.log("Error lista de cursos: ", e);
         await queryRunner.rollbackTransaction();
         throw new Error(e);
     } finally {

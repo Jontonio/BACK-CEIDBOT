@@ -76,7 +76,6 @@ export class GrupoService {
       });
 
       if(existsGrupo){
-        console.log(existsGrupo)
         return new HandleGrupo(`El grupo a registrar ya existe. Registre un nuevo grupo con un nombre diferente`, false, null);
       }
       /** registrar grupo */
@@ -101,7 +100,6 @@ export class GrupoService {
         fecha_finalModulo = moment(fecha_sum).add(cantidadDiasModulo,'days').subtract(1, 'days').toDate();
       }
       // insertar datos a grupo módulo}
-      console.log(listFechas)
       await this.grupoModuloModel.save(listFechas);
 
       return new HandleGrupo(`Grupo con código ${grupo.Id} registrado correctamente`, true, grupo);
@@ -505,7 +503,6 @@ export class GrupoService {
           return dataVerticalBar;
         }
         
-        console.log(result)
         return [{ name:'Sin registros', series:[{ name:'Sin registros', value:0 }] }];
 
     } catch (e) {

@@ -27,7 +27,14 @@ export class ReportsService {
       await queryRunner.startTransaction();
       try {
         const res = await queryRunner.query(`
-        SELECT grupo.Id as grupoId, estudiante.Nombres, estudiante.ApellidoPaterno, estudiante.ApellidoMaterno, categoria_pago.TipoCategoriaPago, medio_de_pago.MedioDePago, pago.MontoPago, pago.FechaPago, pago.CodigoVoucher ,modulo.Modulo  FROM estudiante
+        SELECT grupo.Id as grupoId, 
+               estudiante.Nombres, 
+               estudiante.ApellidoPaterno, 
+               estudiante.ApellidoMaterno, 
+               categoria_pago.TipoCategoriaPago, 
+               medio_de_pago.MedioDePago, 
+               pago.MontoPago, 
+               pago.FechaPago, pago.CodigoVoucher ,modulo.Modulo  FROM estudiante
           INNER JOIN estudiante_en_grupo on estudiante.Id = estudiante_en_grupo.estudianteId
           INNER JOIN grupo on grupo.Id = estudiante_en_grupo.grupoId
           LEFT JOIN pago on estudiante_en_grupo.Id = pago.estudianteEnGrupoId

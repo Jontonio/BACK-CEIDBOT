@@ -10,16 +10,18 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // app.setGlobalPrefix('api'); 
-  
-  app.enableCors({ origin:'*' })
-  // app.enableCors({ origin:['http://localhost:4200','https://unajma.ceidbot.com','http://192.168.0.114:4200'] })
+  // app.enableCors({ origin:'*' })
+  app.enableCors({ origin:['http://localhost:4200',
+                           'https://unajma.ceidbot.com',
+                           'http://:51.79.108.81',
+                           'https://:51.79.108.81'] })
 
   app.useGlobalPipes(new ValidationPipe({
     transformOptions:{ enableImplicitConversion:true }
   }))
 
-  await app.listen(configService.get('SERVER_PORT'),'0.0.0.0');
-  // await app.listen( configService.get('SERVER_PORT') );
+  // await app.listen(configService.get('SERVER_PORT'),'0.0.0.0');
+  await app.listen( configService.get('SERVER_PORT') );
 }
 
 bootstrap();

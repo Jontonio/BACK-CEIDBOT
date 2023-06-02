@@ -185,8 +185,7 @@ export class AuthService {
       /** cifrar la contraseña */
       const Password = hashPassword(NewPassword);
       /** actualizar el password del usuario */
-      const resUpdate = await this.userModel.update({ResetPasswordToken},{ Password, ResetPasswordToken:null});
-      console.log(resUpdate)
+      await this.userModel.update({ResetPasswordToken},{ Password, ResetPasswordToken:null});
 
       return new HandleResetPassword('Nueva contraseña registrada correctamente', true, null);
     } catch (e) {

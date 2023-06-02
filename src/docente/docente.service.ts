@@ -119,7 +119,7 @@ export class DocenteService {
       const usuario = await this.docenteModel.findOneBy({Id});
       return new HandleDocente(`Docente ${usuario.Nombres} eliminado correctamente`, true, usuario);
     } catch (e) {
-      console.log(e);
+      console.log(e.message);
       throw new InternalServerErrorException('ERROR ELIMINAR DOCENTE');
     }
   }

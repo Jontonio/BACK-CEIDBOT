@@ -11,10 +11,8 @@ import { EstudianteEnGrupo } from './entities/estudiante-en-grupo.entity';
 import { PagoService } from 'src/pago/pago.service';
 import { EstudianteDataDto } from './dto/estudiante-data.dto';
 import { EstudianteEnGrupoWithOutPagoDto } from './dto/create-estudiante-en-grupo-without-pago.dto';
-import * as moment from 'moment';
-import { Pago } from 'src/pago/entities/pago.entity';
-import { GrupoModulo } from 'src/grupo/entities/grupoModulo.entity';
 import { UpdateGrupoDto } from 'src/grupo/dto/update-grupo.dto';
+import * as moment from 'moment';
 
 moment.locale('es');
 
@@ -75,7 +73,6 @@ export class EstudianteEnGrupoService {
         estudiante:{ Documento: createEstudEnGrupoDto.estudiante.Documento },
         grupo:{ Id: createEstudEnGrupoDto.grupo.Id }
       }); 
-      console.log(createEstudEnGrupoDto)
       if(resEstudiante){
         return new HandleEstudianteEnGrupo(`El estudiante ya se encuentra registrado en el grupo. Elija un curso con un grupo diferente`, false, null);
       }

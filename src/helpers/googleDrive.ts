@@ -2,10 +2,10 @@ import { google } from 'googleapis';
 import * as fs from "fs";
 
 const SCOPES = [ 'https://www.googleapis.com/auth/drive' ];
-const parentFolderId = '1Qub4HU4zJHFm3OeynEwdGjVZigerGLKz';
+const parentFolderId = '1Ob8oliM4RM3wsH4PtEy9_38NMBiB_mMq';
 
 const auth = new google.auth.GoogleAuth({
-    keyFile: 'src/config/ceid-storage-unajma.json',
+    keyFile: 'src/config/storage-ceid-v2.json',
     scopes: SCOPES,
   });
 

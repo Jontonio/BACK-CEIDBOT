@@ -1,5 +1,8 @@
 class HistorialEstudiante{
     grupoId:number;
+    cursoNombre:string;
+    tipoGrupoNombre:string;
+    Nivel:string;
     Nombres:string;
     ApellidoPaterno:string;
     ApellidoMaterno:string;
