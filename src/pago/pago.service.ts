@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, ConflictException } from '@nestjs/common';
 import { CreatePagoDto } from './dto/create-pago.dto';
 import { UpdatePagoDto } from './dto/update-pago.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +9,7 @@ import { HandleMora, HandlePago } from 'src/class/global-handles';
 import { Mora } from './entities/mora.entity';
 import { UpdateMoraPagoDto } from './dto/update-Mora-pago.dto';
 import { Cron } from '@nestjs/schedule';
+import { CreateMoraPagoDto } from './dto/mora-pago.dto';
 
 @Injectable()
 export class PagoService {
@@ -38,6 +39,25 @@ export class PagoService {
     }
   }
 
+  async createMora(createMoraPagoDto: CreateMoraPagoDto) {
+    try {
+      const existMora = await this.moraModel.findOne({
+        where:{ EstadoMora:true,
+                estudianteEnGrupo:{Id: createMoraPagoDto.estudianteEnGrupo.Id}, 
+                grupoModulo:{Id: createMoraPagoDto.grupoModulo.Id }
+              } 
+      })
+      if(existMora){
+        return new HandleMora(`El estudiante ya cuenta con mora ese el módulo selecionado`, false, null);
+      }
+      const mora =  await this.moraModel.save(createMoraPagoDto);
+      return new HandleMora(`Se ha registrado el pago extemporáneo (mora) correctamente`, true, mora);
+    } catch (e) {
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR AL REGISTRAR DATOS DE LA MORA');
+    }
+  }
+
   /**
    * This is an async function that saves a first payment DTO to the payment model and throws an error
    * if there is an issue.
@@ -59,6 +79,19 @@ export class PagoService {
     }
   }
 
+/**
+ * This function updates payment data and returns a success message or an error message if the update
+ * fails.
+ * @param {number} Id - The ID of the payment to be updated.
+ * @param {UpdatePagoDto} updatePagoDto - UpdatePagoDto is a data transfer object that contains the
+ * updated information for a payment. It is used as a parameter in the update method to update the
+ * payment record in the database.
+ * @returns This function returns an instance of the `HandlePago` class with a message indicating
+ * whether the payment data was successfully updated or not. If the `affected` property is equal to 0,
+ * it returns a message indicating that no payment was affected. If an error occurs during the update
+ * process, it throws an `InternalServerErrorException` with a message indicating that there was an
+ * error updating the payment.
+ */
   async update(Id: number, updatePagoDto: UpdatePagoDto) {
     try {
       const { affected } = await this.pagoModel.update(Id, updatePagoDto);

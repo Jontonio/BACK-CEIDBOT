@@ -2,6 +2,7 @@ import { Controller, Post, Body, Patch, Param, Delete, Get } from '@nestjs/commo
 import { PagoService } from './pago.service';
 import { CreatePagoDto } from './dto/create-pago.dto';
 import { UpdatePagoDto } from './dto/update-pago.dto';
+import { CreateMoraPagoDto } from './dto/mora-pago.dto';
 
 @Controller('pago')
 export class PagoController {
@@ -10,6 +11,11 @@ export class PagoController {
   @Post('register-pago')
   create(@Body() createPagoDto: CreatePagoDto) {
     return this.pagoService.create(createPagoDto);
+  }
+
+  @Post('register-mora')
+  createMora(@Body() createMoraPagoDto: CreateMoraPagoDto) {
+    return this.pagoService.createMora(createMoraPagoDto);
   }
 
   @Patch('update-one-pago/:id')

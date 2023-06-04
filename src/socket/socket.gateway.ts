@@ -111,8 +111,9 @@ export class AppGateway implements OnGatewayInit,
   }
 
   @SubscribeMessage('updated_list_matriculados')
-  async handleListMatriculados(){
-    const res =  await this._matri.findAll({ limit:5, offset:0 });
+  async handleListMatriculados(@MessageBody() data: any){
+    const query = data? { limit: data.limit, offset: data.offset }:{ limit: 5, offset: 0 };
+    const res =  await this._matri.findAll(query);
     this.server.emit('list_matriculados', res );
   } 
   

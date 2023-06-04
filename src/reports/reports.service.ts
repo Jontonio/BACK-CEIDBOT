@@ -178,10 +178,10 @@ export class ReportsService {
         if(res.length > 0){
           const total:DataHorizontalBar[] = [];
           const indice:DataHorizontalBar[] = [];
-          total.push({name:`Pagado módulo ${res[0].modulo}`, value:res[0].total_pagado},
-                     {name:`Por pagar módulo ${res[0].modulo}`, value:res[0].total_a_pagar - res[0].total_pagado})
-          indice.push({name:`Porcentaje pago módulo ${res[0].modulo}`, value:res[0].indice_del_pago_actual},
-                      {name:`Porcentaje deuda vencida módulo ${res[0].modulo}`, value:100-res[0].indice_del_pago_actual})
+          total.push({name:`Pagado módulo ${res[0].modulo} en S/.`, value:res[0].total_pagado},
+                     {name:`Por pagar módulo ${res[0].modulo} en S/.`, value:res[0].total_a_pagar - res[0].total_pagado})
+          indice.push({name:`Porcentaje pago módulo ${res[0].modulo} (%)`, value:res[0].indice_del_pago_actual},
+                      {name:`Porcentaje deuda vencida módulo ${res[0].modulo} (%)`, value:100-res[0].indice_del_pago_actual})
           return { total, indice };
         }
         return { total:[], indice:[] };
