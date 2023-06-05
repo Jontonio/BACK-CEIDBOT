@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
+import * as express from 'express';
 
 async function bootstrap() {
 
@@ -19,6 +20,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({
     transformOptions:{ enableImplicitConversion:true }
   }))
+
+  // Configurar el límite de carga a 10 MB
+  app.use(express.json({ limit: '10mb' }));
 
   // await app.listen(configService.get('SERVER_PORT'),'0.0.0.0');
   await app.listen( configService.get('SERVER_PORT') );
