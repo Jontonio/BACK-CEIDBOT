@@ -9,4 +9,5 @@ export class PersonaComunicado{
     FechaPago:Date;
     NombreCurso:string;
     Nivel:string;
+    NumDiasHolaguraMora:number;
 }

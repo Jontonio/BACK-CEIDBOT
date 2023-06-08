@@ -38,7 +38,7 @@ export class MatriculaController {
     return this.matriculaService.uploadFileMatricula(file, req);
   }
 
-  @Delete('remove-matriculado/:id')
+  @Delete('eliminar-matriculado/:id')
   remove(@Param('id') id: string) {
     return this.matriculaService.remove(+id);
   }

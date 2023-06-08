@@ -60,7 +60,7 @@ const existPayload = async (client:Client, message:WAWebJS.Message, payload:Payl
     try {
         let msg:string;
         if((payload.message.stringValue!='') && (payload.link.stringValue!='')){
-            msg = `${payload.message.stringValue} 👉 ${payload.link.stringValue}`;
+            msg = `${payload.message.stringValue} ${payload.link.stringValue?`👉 ${payload.link.stringValue}`:``}`;
         }else if(payload.message.stringValue){
             msg = `${payload.message.stringValue}`;
         }else if(payload.link.stringValue){
@@ -172,7 +172,7 @@ const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, r
 
         const data:HistorialEstudiante[] = await historialPagosestudiante(dataSource, TipoDocumento, Documento);
         if(data.length == 0){
-            await client.sendMessage(message.from, `${estudiante.Nombres} aún no cuentas con un historial de pagos.\n Se le recomienda registrar tus pagos antes de la fecha del inicio de los módulos de tu curso o cursos.`);
+            await client.sendMessage(message.from, `¡Hola *${estudiante.Nombres}* 👋! aún no cuentas con un historial de pagos.\nSe le recomienda registrar tus pagos antes de la fecha del inicio de los módulos de tu curso o cursos.\nCualquier duda estamos aquí para ayudarte o puede solicitar un operador humano.`);
             return;
         }
 
@@ -267,21 +267,21 @@ const consultaCursos = async (dataSource:DataSource, NombreCurso:string, NivelCu
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const firstQuery = `SELECT curso.NombreCurso, 
-                        nivel.Nivel, 
-                        modulo.Modulo, 
-                        curso.DescripcionCurso,
-                        curso.LinkRequisitos FROM curso 
-                    INNER JOIN nivel on nivel.Id = curso.nivelId
-                    INNER JOIN modulo on modulo.Id = curso.moduloId
-                    WHERE curso.Estado = true AND curso.EstadoApertura = true AND curso.NombreCurso = '${NombreCurso}';`;
+                            nivel.Nivel, 
+                            modulo.Modulo, 
+                            curso.DescripcionCurso,
+                            curso.LinkRequisitos FROM curso 
+                        INNER JOIN nivel on nivel.Id = curso.nivelId
+                        INNER JOIN modulo on modulo.Id = curso.moduloId
+                        WHERE curso.Estado = true AND curso.EstadoApertura = true AND curso.NombreCurso = '${NombreCurso}';`;
     const secondQuery = `SELECT curso.NombreCurso, 
-                        nivel.Nivel, 
-                        modulo.Modulo, 
-                        curso.DescripcionCurso,
-                        curso.LinkRequisitos FROM curso 
-                    INNER JOIN nivel on nivel.Id = curso.nivelId
-                    INNER JOIN modulo on modulo.Id = curso.moduloId
-                    WHERE curso.Estado = true AND curso.EstadoApertura = true AND curso.NombreCurso = '${NombreCurso}' AND nivel.Nivel = '${NivelCurso}';`;
+                            nivel.Nivel, 
+                            modulo.Modulo, 
+                            curso.DescripcionCurso,
+                            curso.LinkRequisitos FROM curso 
+                        INNER JOIN nivel on nivel.Id = curso.nivelId
+                        INNER JOIN modulo on modulo.Id = curso.moduloId
+                        WHERE curso.Estado = true AND curso.EstadoApertura = true AND curso.NombreCurso = '${NombreCurso}' AND nivel.Nivel = '${NivelCurso}';`;
     try {
         const cursos = await queryRunner.query(NivelCurso?secondQuery:firstQuery);
         await queryRunner.commitTransaction();

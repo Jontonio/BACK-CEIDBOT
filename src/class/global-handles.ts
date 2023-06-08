@@ -23,9 +23,10 @@ import { Tramite } from "src/tramite/entities/tramite.entity";
 import { Modulo } from "src/curso/entities/modulo.entity";
 import { GrupoModulo } from "src/grupo/entities/grupoModulo.entity";
 import { Mora } from "src/pago/entities/mora.entity";
+import { ClientInfo } from "./Bot";
 
 class HandleWhatsapp{
-  constructor(public msg:string, public ok:boolean, public data:any){}
+  constructor(public msg:string, public ok:boolean, public data:any | ClientInfo){}
 }
 
 class HandleDialogFlow{

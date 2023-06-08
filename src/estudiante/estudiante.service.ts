@@ -8,12 +8,15 @@ import { EmailDocEstudianteDto } from './dto/emailDocestudiante.dto';
 import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
 import { Estudiante } from './entities/estudiante.entity';
 import { RequestEstudianteDto } from './dto/request-estudiante.dto';
+import { Apoderado } from 'src/apoderado/entities/apoderado.entity';
 
 @Injectable()
 export class EstudianteService {
 
   constructor(@InjectRepository(Estudiante) 
-              private estudianteModel:Repository<Estudiante>){}
+              private estudianteModel:Repository<Estudiante>,
+              @InjectRepository(Apoderado) 
+              private apoderadoModel:Repository<Apoderado>){}
 
   /**
    * This function creates a new student record and returns a success message with the student data or
@@ -245,7 +248,7 @@ export class EstudianteService {
       if(!estudiante){
         throw new NotFoundException(`No se encontro al estudiante con el Id ${Id}`);
       }
-      return await this.estudianteModel.delete({Id});
+      return await this.estudianteModel.update({Id},{ Estado:false });
     } catch (e) {
       console.log(e.message)
       throw new InternalServerErrorException('ERROR ELIMINAR ESTUDIANTE');
@@ -275,6 +278,34 @@ export class EstudianteService {
     } catch (e) {
       console.log(e.message)
       throw new InternalServerErrorException('ERROR ACTUALIZAR ESTUDIANTE');
+    }
+  }
+
+  async updateEstudianteApoderado(Id:number, updateEstudianteDto:UpdateEstudianteDto){
+    try {
+      const existEstudiante = await this.estudianteModel.findOne({
+        where:{Id},
+        relations:['apoderado']
+      });
+      if(!existEstudiante){
+        throw new NotFoundException(`No se encontro al estudiante con el Id ${Id}`);
+      }
+      //TODO: verificar si existe apoderado
+      if(existEstudiante.apoderado){
+        // Actualizar data apoderado
+        await this.apoderadoModel.update({Id: existEstudiante.apoderado.Id }, updateEstudianteDto.apoderado);
+        return new HandleEstudiante(`Datos del apoderado actualizado correctamente`, true, null);
+      }
+      // insertar nuevo apoderado y actualizar estudiante
+      const resApoderado = await this.apoderadoModel.save(updateEstudianteDto.apoderado);
+
+      const { affected } = await this.estudianteModel.update(Id,{ apoderado:resApoderado });
+      if(affected==0) return new HandleEstudiante('Estudiante sin afectar ', false, null);
+
+      return new HandleEstudiante(`Datos del apoderado se han registrado correctamente`, true, null);
+    } catch (e) {
+      console.log(e.message)
+      throw new InternalServerErrorException('ERROR ACTUALIZAR DATOS DEL APODERADO-ESTUDIANTE');
     }
   }
 }

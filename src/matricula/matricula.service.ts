@@ -219,36 +219,15 @@ export class MatriculaService {
   */
   async remove(Id: number) {
     try {
-      //? TODO: verificar si existe persona
-      const inscrito = await this.matModel.findOne({where:{ Id }, relations:['estudiante', 'estudiante.apoderado','institucion']})
+      const inscrito = await this.matModel.findOne({where:{ Id }})
       if(!inscrito){
         throw new NotFoundException(`La persona con Id ${Id} no existe, posiblemente ya haya sido eliminado`);
       }
-      const { estudiante, institucion } = inscrito;
-      //? TODO: Eliminar matricula
-      await this.matModel.delete({Id});
-      //? TODO: Eliminar institución
-      await this.institucioService.remove(institucion.Id);
-      //? TODO: Eliminar apoderado si existe
-      if(estudiante.apoderado){
-        const hermanos = await this.estudianteService.findAllHermanos(estudiante.apoderado.Id);
-        if(hermanos.length==1){
-          //? TODO: Eiminar estudiante
-          await this.estudianteService.remove(estudiante.Id);
-          const Id = estudiante.apoderado.Id;
-          await this.apoderadoService.remove(Id);
-        }else{
-          //? TODO: Eiminar estudiante
-          await this.estudianteService.remove(estudiante.Id);
-        }
-      }else{
-        //? TODO: Eiminar estudiante sin padre
-        await this.estudianteService.remove(estudiante.Id);
-      }
-      return new HandleMatricula(`Estudiante ${estudiante.Nombres} eliminado satisfactoriamente`, true, null);
+      await this.matModel.update({Id},{ Estado:false });
+      return new HandleMatricula(`Estudiante fue eliminado de la lista de prematriculas correctamente`, true, null);
     } catch (e) {
       console.log(e.message)
-      throw new InternalServerErrorException('ERROR EMILINAR PERSONA');
+      throw new InternalServerErrorException('ERROR EMILINAR ESTUDIANTE');
     }
   }
 

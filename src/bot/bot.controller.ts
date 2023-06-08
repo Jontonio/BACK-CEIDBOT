@@ -16,4 +16,9 @@ export class BotController {
     return this.botService.generateQrWhatsapp();
   }
 
+  @Get('info-whatsapp')
+  infoWhatsapp(){
+    return this.botService.getInfoCelphone();
+  }
+
 }

@@ -90,7 +90,7 @@ export class ApoderadoService {
       if(!apoderado){
         throw new NotFoundException(`No se encontro al apoderado con el Id ${Id}`);
       }
-      return await this.apoderadoModel.delete({Id});
+      return await this.apoderadoModel.update({Id},{ Estado:false });
     } catch (e) {
       console.log(e.message)
       throw new InternalServerErrorException('ERROR REMOVE APODERADO');

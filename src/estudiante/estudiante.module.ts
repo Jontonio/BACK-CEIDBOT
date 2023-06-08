@@ -4,9 +4,10 @@ import { EstudianteController } from './estudiante.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Estudiante } from './entities/estudiante.entity';
 import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
+import { Apoderado } from 'src/apoderado/entities/apoderado.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Estudiante])],
+  imports:[TypeOrmModule.forFeature([Estudiante, Apoderado])],
   controllers: [EstudianteController],
   providers: [EstudianteService]
 })

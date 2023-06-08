@@ -68,8 +68,7 @@ export class AppGateway implements OnGatewayInit,
   async handleEstudianteGrupo(@MessageBody() data: any){
     const query = data? { limit: data.limit, offset: data.offset }:{ limit: 5, offset: 0 };
     const res = await this._estudianteEngrupo.findByIdGrupo(data.Id, query);
-    console.log(res)
-    this.server.emit('list_estudian_en_grupo', res );
+    this.server.emit('list_estudian_en_grupo', res);
   }
 
   @SubscribeMessage('updated_list_tramites')

@@ -229,6 +229,23 @@ export class EstudianteEnGrupoService {
     }
   }
 
+  async getEstudianteEnGrupo(idGrupo:number, idEstudiante:number){
+    try {
+      const estudianteEnGrupo = await this.estudEnGrupoModel.findOne({
+        where:{estudiante:{ Id:idEstudiante }, grupo:{Id: idGrupo }},
+        relations:['estudiante',
+                   'estudiante.apoderado',
+                   'matricula',
+                   'matricula.curso',
+                   'matricula.institucion',
+                   'matricula.denomiServicio']
+      });
+      return new HandleEstudianteEnGrupoPago('Estudiante en el grupo', true, estudianteEnGrupo); 
+    } catch (e) {
+      throw new InternalServerErrorException();
+    }
+  }
+
   /**
    * This function removes a student from a group and updates the group's number of students.
    * @param {number} Id - The parameter `Id` is a number that represents the unique identifier of the
@@ -248,7 +265,7 @@ export class EstudianteEnGrupoService {
         where:{ Id },
         relations:['estudiante','grupo']
       });
-      
+
       // contar la cantidad de estudiantes
       const countEstudiante = await this.estudEnGrupoModel.count({ 
         where:{ Estado: true, grupo:{ Id: grupo.Id } }});

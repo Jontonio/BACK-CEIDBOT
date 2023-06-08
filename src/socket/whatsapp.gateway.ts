@@ -107,6 +107,7 @@ export class WhatsappGateway {
         this.isAuth = true;
         const chat:Chat = await message.getChat()
         if(!chat.isGroup && message.type=='chat'){
+          console.log(message)
           chatbot(this.client, message, this.dataSource);                
         }
     })
@@ -131,7 +132,6 @@ export class WhatsappGateway {
       this.messageStatusBot = new MessageStatusBot('Prendiendo','Se está activando sesión de whatsApp para CEIDBOT. Espere un momento', null, false);
       this.emitStatusServerBot(this.server, this.messageStatusBot);
       this.client.initialize().catch(_ => _);
-      // return this.client.initialize().then().catch(_ => _);
     } catch (e) {
       console.log("Error al inicializar whatsapp: ", e)
     }
@@ -151,6 +151,22 @@ export class WhatsappGateway {
     }
   }
 
+  getInfoCelphone(){
+    try {
+      return this.client.info;
+    } catch (e) {
+      console.log(e.message)
+    }
+  }
+
+  getMoreInfo(){
+    try {
+      return this.client.getProfilePicUrl('');
+    } catch (e) {
+      console.log(e.message)
+    }
+  }
+
   emitStatusClientBot(client:Socket, isAuthMessageBot:MessageStatusBot){
     client.emit('boot', isAuthMessageBot );
   }
@@ -166,18 +182,17 @@ export class WhatsappGateway {
    * a las 10:AM eso se verifica todos los dias
    * 
    * */
-  @Cron('0 0 10 * * *', { timeZone:'America/Lima' })
+  // @Cron('0 0 10 * * *', { timeZone:'America/Lima' })
+  @Cron('0 4 22 * * *', { timeZone:'America/Lima' })
   async sendMessageEstudiante(){
     try {
       if(this.isAuth){
         const lista:PersonaComunicado[] = await this.getEstudiantesSinPagoMensualidad();
         if(lista.length!=0){
           for(const estudiante of lista){
-            const {Celular, CodePhone, Nombres, NombreCurso, FechaPago, Nivel} = estudiante;
+            const {Celular, CodePhone, Nombres, NombreCurso, FechaPago, Nivel, NumDiasHolaguraMora } = estudiante;
             const Numero = `${CodePhone}${Celular}`.replace('+','').concat('@c.us').trim();
-            const Message = `Hola ${Nombres}, \n Te escribimos desde para recordarte que tienes un pago pendiente por el módulo del curso de ${NombreCurso} ${Nivel}, cuya fecha límite de pago es el día ${moment(FechaPago).format('D [de] MMMM [de] YYYY')}.
-            Por favor, asegúrate de realizar el pago a tiempo para evitar inconvenientes y no perder acceso al contenido del curso. Si ya realizaste el pago, por favor ignora este mensaje.
-            Quedamos atentos a cualquier duda o consulta que tengas.\n Saludos cordiales CEIBOT`;
+            const Message = `¡Hola *${Nombres}* 👋!\nTe escribimos para recordarte que tienes un pago pendiente por el módulo del curso de *${NombreCurso.toUpperCase()} ${Nivel.toUpperCase()}*, cuya fecha límite de pago es el día *${moment(FechaPago).add(NumDiasHolaguraMora,'days').format('D [de] MMMM [de] YYYY')}*.\nPor favor, asegúrate de realizar el pago a tiempo para evitar inconvenientes y evitar pagos con mora, asimismo no perder acceso al contenido del curso. Si ya realizaste el pago, por favor ignora este mensaje.\nQuedamos atentos a cualquier duda o consulta que tengas.\n*Saludos cordiales CEIDBOT del CEID*`;
             const whatsAppDto:BotSendDto = {Numero, Nombres, Message};
             await this.sendMessageWhatsapp( whatsAppDto );
             console.log("Mensaje enviado a "+Nombres)
@@ -188,6 +203,7 @@ export class WhatsappGateway {
       throw new InternalServerErrorException("SEND MESSAGE ESTUDIANTE")
     }
   }
+  
 
   async getEstudiantesSinPagoMensualidad(){
     const queryRunner = this.dataSource.createQueryRunner();
@@ -204,8 +220,10 @@ export class WhatsappGateway {
         estudiante.Celular,
         FechaPago,
         curso.NombreCurso,
-        nivel.Nivel
+        nivel.Nivel,
+        grupo.NumDiasHolaguraMora 
         FROM estudiante
+            INNER JOIN matricula on matricula.estudianteId = estudiante.Id
               INNER JOIN estudiante_en_grupo ON estudiante.Id = estudiante_en_grupo.estudianteId
               INNER JOIN grupo ON estudiante_en_grupo.grupoId = grupo.Id
               INNER JOIN curso ON grupo.cursoId = curso.Id
@@ -213,10 +231,11 @@ export class WhatsappGateway {
               INNER JOIN grupo as reg_grupo on curso.Id = grupo.cursoId
               INNER JOIN grupo_modulo ON grupo.Id = grupo_modulo.grupoId
               WHERE grupo.Estado != false AND grupo.NotificarGrupo = true AND
-                    grupo.estadoGrupoId != 3 AND 
+                    grupo.estadoGrupoId != 3 AND
+                    matricula.EstadoMatricula = 'matriculado' AND
                     estudiante_en_grupo.Estado != false  AND 
                     grupo_modulo.CurrentModulo = true AND
-                    grupo_modulo.FechaPago >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) AND
+                    grupo_modulo.FechaPago >= DATE_SUB(CURDATE(), INTERVAL 2 DAY) AND
                     grupo_modulo.FechaPago <= DATE_ADD(CURDATE(), INTERVAL 1 DAY)
               AND NOT EXISTS ( SELECT * FROM pago
                               WHERE pago.grupoModuloId = grupo_modulo.Id AND 
@@ -230,8 +249,8 @@ export class WhatsappGateway {
       return listaEstudiantes;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw error;
       console.log("ERROR GET LISTA ESTUDIANTES SIN MENSUALIDAD")
+      throw error;
     } finally {
       await queryRunner.release();
     }

@@ -66,7 +66,7 @@ export class InstitucionService {
       if(!institucion){
         throw new NotFoundException(`No se encontro a la institución con el Id ${Id}`);
       }
-      return await this.instituModel.delete({Id});
+      return await this.instituModel.update({Id},{Estado:false});
     } catch (e) {
       console.log(e.message)
       throw new InternalServerErrorException('ERROR ELIMINAR INSTITUCION');

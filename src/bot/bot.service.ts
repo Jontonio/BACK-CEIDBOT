@@ -45,6 +45,15 @@ export class BotService {
         }
     }
 
+    async getInfoCelphone(){
+        try {
+            return new HandleWhatsapp('Información del cliente WhatsApp', true, this.whatsappGateway.getInfoCelphone());
+        } catch (e) {
+            console.log(e.message)
+            throw new InternalServerErrorException("ERROR OBTENER INFORMACIÓN WHATSAPP")
+        }
+    }
+
 
     
 }

@@ -581,7 +581,7 @@ export class GrupoService {
       UPDATE grupo_modulo
       JOIN grupo on grupo.Id = grupo_modulo.grupoId
       SET grupo_modulo.CurrentModulo = CASE
-            WHEN NOW() BETWEEN FechaPago AND FechaFinalModulo THEN true
+            WHEN DATE(NOW()) BETWEEN FechaPago AND FechaFinalModulo THEN true
             ELSE false
             END
       WHERE grupo.estadoGrupoId != 3 || grupo.Estado = 1;

@@ -13,6 +13,9 @@ export class Institucion {
     @Column({nullable:true,type:'varchar', length:60})
     EscuelaProfe:string;
 
+    @Column({type:'boolean', default:true })
+    Estado:boolean;
+
     @CreateDateColumn()
     createdAt:Date;
 

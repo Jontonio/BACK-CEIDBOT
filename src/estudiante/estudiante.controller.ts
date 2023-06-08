@@ -38,4 +38,9 @@ export class EstudianteController {
   updateEstudiante(@Param('id') id:string, @Body() updateEstudianteDto:UpdateEstudianteDto){
     return this.estudianteService.update(+id, updateEstudianteDto);
   }
+
+  @Patch('update-apoderado-estudiante/:id')
+  updateAñoderadoEstudiante(@Param('id') id:string, @Body() updateEstudianteDto:UpdateEstudianteDto){
+    return this.estudianteService.updateEstudianteApoderado(+id, updateEstudianteDto);
+  }
 }
