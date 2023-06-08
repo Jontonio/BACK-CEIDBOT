@@ -183,7 +183,7 @@ export class WhatsappGateway {
    * 
    * */
   // @Cron('0 0 10 * * *', { timeZone:'America/Lima' })
-  @Cron('0 4 22 * * *', { timeZone:'America/Lima' })
+  @Cron('0 10 18 * * *', { timeZone:'America/Lima' })
   async sendMessageEstudiante(){
     try {
       if(this.isAuth){
