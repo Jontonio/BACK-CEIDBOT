@@ -39,6 +39,7 @@ export class WhatsappGateway {
     });
     
     this.whatsapp();
+
   }
 
   handleConnection(client: Socket) {
@@ -175,15 +176,6 @@ export class WhatsappGateway {
     server.emit('boot', isAuthMessageBot );
   }
 
-  /** 
-   * 
-   * 
-   * enviar comunicado un día antes, el mismo dia, un día despues de legue la fecha programada de los módulos
-   * a las 10:AM eso se verifica todos los dias
-   * 
-   * */
-  // @Cron('0 0 10 * * *', { timeZone:'America/Lima' })
-  @Cron('0 10 18 * * *', { timeZone:'America/Lima' })
   async sendMessageEstudiante(){
     try {
       if(this.isAuth){
@@ -203,7 +195,6 @@ export class WhatsappGateway {
       throw new InternalServerErrorException("SEND MESSAGE ESTUDIANTE")
     }
   }
-  
 
   async getEstudiantesSinPagoMensualidad(){
     const queryRunner = this.dataSource.createQueryRunner();

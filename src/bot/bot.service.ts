@@ -1,13 +1,27 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { BotSendDto } from './dto/bot-send.dto';
 import { WhatsappGateway } from 'src/socket/whatsapp.gateway';
-import { HandleWhatsapp } from 'src/class/global-handles';
-
+import { HandleConfigNotification, HandleWhatsapp } from 'src/class/global-handles';
+import { CronJob } from 'cron';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigNotification } from './entities/configNotification.entity';
+import { Repository } from 'typeorm';
+import { UpdateConfigNotificacionDto } from './dto/update-configNotification.dto';
+import { ConfigNotificacionDto } from './dto/configNotification.dto copy';
 
 @Injectable()
 export class BotService {
 
-    constructor(private readonly whatsappGateway:WhatsappGateway){}
+    private cronJob: any;
+    private HoraNotificacion = 18;
+    private MinutoNotificacion = 0;
+
+    constructor(@InjectRepository(ConfigNotification) 
+                private confNotificationModel:Repository<ConfigNotification>,
+                private readonly whatsappGateway:WhatsappGateway){
+        this.getDataConfigNotification();
+        this.setNewTimeNotificacions(this.HoraNotificacion, this.MinutoNotificacion);
+    }
 
     /**
      * This function generates a QR code for initializing WhatsApp and logs the result or any errors.
@@ -37,7 +51,6 @@ export class BotService {
                 return new HandleWhatsapp(`CEIBOT aún no está listo para enviar mensajes. espere un momento o visualice el apartado del CHATBOT`, false, null);
             }
             const res = await this.whatsappGateway.sendMessageWhatsapp(botDto);
-            console.log(res)
             return new HandleWhatsapp(`Mensaje enviado al número ${botDto.Nombres} correctamente`, true, res);
         } catch (e) {
             console.log(e.message) 
@@ -54,6 +67,94 @@ export class BotService {
         }
     }
 
+    async getTimeNotification(){
+        try {
+            const data = await this.confNotificationModel.find();
+            const firstData = (data.length!=0)?data[0]:null;
+            return new HandleConfigNotification('Tiempo de notifiación', true, firstData);
+        } catch (e) {
+            console.log(e.message);
+            throw new InternalServerErrorException('ERROR OBTENER TIME NOTIFICACION');
+        }
+    }
 
+    setNewTimeNotificacions(hora:number, minuto:number){
+        try {
+
+            const cronExpression = `0 ${minuto} ${hora} * * *`;
+            
+            if (this.cronJob) {
+                this.cronJob.stop(); // Detener el cron job anterior si existe
+            }
+
+            this.cronJob = new CronJob(cronExpression, async () => {
+                try {
+                    // realizar el envio de mensajes a estudiante sin pago a la fecha.
+                    await this.whatsappGateway.sendMessageEstudiante();
+                    console.log("Envio de mensajes correctamente")
+                } catch (e) {
+                    throw new InternalServerErrorException('ERROR AL ENVIAR MENSAJES DESDE EL SERVICIO');
+                }
+            });
+
+            this.cronJob.start(); // Iniciar el nuevo cron job
+
+        } catch (e) {
+            console.log(e.message)
+            throw new InternalServerErrorException("ERROR OBTENER INFORMACIÓN WHATSAPP")
+        }
+    }
+
+    async updateTimeNotifications(Id:number, upConfigNotificacionDto:UpdateConfigNotificacionDto){
+        try {
+            // verificar si existe data
+            const existData = await this.confNotificationModel.findOneBy({Id});
+
+            if(!existData){
+                throw new NotFoundException(`No se encontró la configuración con el ID ${Id}`);
+            }
+            // actualizar data
+            await this.confNotificationModel.update({Id}, upConfigNotificacionDto);
+            const resData = await this.confNotificationModel.findOneBy({Id});
+            //set nuevos valores
+            this.MinutoNotificacion = resData.MinutoNotificacion;
+            this.HoraNotificacion = resData.HoraNotificacion;
+            // actualizar cron job
+            this.setNewTimeNotificacions(this.HoraNotificacion, this.MinutoNotificacion);
+
+            return new HandleConfigNotification('Se ha actualizado el tiempo de notificación de WhatsApp', true, resData);
+        } catch (e) {
+            console.log(e.message)
+            throw new InternalServerErrorException('ERROR AL ACUALIZAR TIME NOTIFICACION')
+        }
+    }
+
+    async getDataConfigNotification(){
+        try {
+            //obtiene los datos para la notificación
+            const data = await this.confNotificationModel.find();
+            // verifica si hay datos y si no hay inserta datos
+            if(data.length==0){
+                const insertNotify:ConfigNotificacionDto = {
+                    HoraNotificacion:18, 
+                    MinutoNotificacion:0, 
+                    DescriptionNotificacion:'Representa la hora y minuto en que notificará el chatbot a estudiantes'
+                }
+                const newData = await this.confNotificationModel.save(insertNotify);
+                this.HoraNotificacion = newData.HoraNotificacion;
+                this.MinutoNotificacion = newData.MinutoNotificacion;
+            }else{
+                this.HoraNotificacion = data[0].HoraNotificacion;
+                this.MinutoNotificacion = data[0].MinutoNotificacion;
+            }
+
+             // actualizar cron job
+             this.setNewTimeNotificacions(this.HoraNotificacion, this.MinutoNotificacion);
+
+                
+        } catch (e) {
+            throw new InternalServerErrorException('ERRO GET CONFIG NOTIFICATION')
+        }
+    }
     
 }

@@ -7,10 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Curso } from 'src/curso/entities/curso.entity';
 import { Modulo } from 'src/curso/entities/modulo.entity';
 import { VerifyTokenMiddleware } from 'src/middlewares/verify-token.middleware';
+import { ConfigNotification } from './entities/configNotification.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Curso, Modulo])
+    TypeOrmModule.forFeature([Curso, Modulo, ConfigNotification])
   ],
   controllers: [BotController],
   providers: [BotService, WhatsappGateway, CursoService ]

@@ -147,7 +147,6 @@ export class AuthService {
       const nodeMailer = new NodeMailer(this.mailService);
       const infoRecuperar = new RecuperarCuenta(process.env.URL_FRONT_RESET_PASS, uui, user.Nombres );
       const res = await nodeMailer.sendEmailResetPassword(Email, infoRecuperar);
-      console.log(res)
       return new HandleResetPassword('Mensaje enviado correctamente', true, null);
     } catch (e) {
       console.log(e.message);

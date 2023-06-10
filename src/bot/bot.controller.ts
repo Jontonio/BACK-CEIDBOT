@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Patch, Param } from '@nestjs/common';
 import { BotService } from './bot.service';
 import { BotSendDto } from './dto/bot-send.dto';
+import { UpdateConfigNotificacionDto } from './dto/update-configNotification.dto';
 
 @Controller('bot')
 export class BotController {
@@ -19,6 +20,16 @@ export class BotController {
   @Get('info-whatsapp')
   infoWhatsapp(){
     return this.botService.getInfoCelphone();
+  }
+
+  @Patch('update-time-notification-bot/:id')
+  setNewTimeNotificacions(@Param('id') id:number, @Body() upConfigNotificacionDto:UpdateConfigNotificacionDto){
+    return this.botService.updateTimeNotifications(+id,upConfigNotificacionDto);
+  }
+
+  @Get('get-time-notification')
+  getTimeNotification(){
+    return this.botService.getTimeNotification();
   }
 
 }

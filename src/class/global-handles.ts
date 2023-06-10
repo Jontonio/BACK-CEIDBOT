@@ -24,6 +24,11 @@ import { Modulo } from "src/curso/entities/modulo.entity";
 import { GrupoModulo } from "src/grupo/entities/grupoModulo.entity";
 import { Mora } from "src/pago/entities/mora.entity";
 import { ClientInfo } from "./Bot";
+import { ConfigNotification } from "src/bot/entities/configNotification.entity";
+
+class HandleConfigNotification{
+  constructor(public msg:string, public ok:boolean, public data:ConfigNotification){}
+}
 
 class HandleWhatsapp{
   constructor(public msg:string, public ok:boolean, public data:any | ClientInfo){}
@@ -165,6 +170,7 @@ export {
     HandleTramite,
     HandleGrupoModulo,
     HandleDialogFlow,
-    HandleMora
+    HandleMora,
+    HandleConfigNotification
 }
 
