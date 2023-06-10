@@ -3,7 +3,6 @@ import { WebSocketGateway,
 import { InternalServerErrorException } from '@nestjs/common'
 import { Socket, Server } from 'socket.io';
 import { Chat, Client, LocalAuth } from 'whatsapp-web.js';
-import { Cron } from '@nestjs/schedule';
 import { DataSource } from 'typeorm';
 import * as moment from "moment";
 import { BotSendDto } from 'src/bot/dto/bot-send.dto';
