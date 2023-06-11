@@ -47,13 +47,8 @@ export class BotService {
     */
     async senMessageWhatsap(botDto:BotSendDto){
         try {
-            console.log('is auth whatsApp',this.whatsappGateway.statusAuth())
-            console.log(this.whatsappGateway.statusAuth())
-            if(this.whatsappGateway.statusAuth()){
-                const res = await this.whatsappGateway.sendMessageWhatsapp(botDto);
-                return new HandleWhatsapp(`Mensaje enviado al número ${botDto.Nombres} correctamente`, true, res);
-            }
-            return new HandleWhatsapp(`CEIBOT aún no está listo para enviar mensajes. espere un momento o visualice el apartado del CHATBOT`, false, null);
+            const res = await this.whatsappGateway.sendMessageWhatsapp(botDto);
+            return new HandleWhatsapp(`Mensaje enviado al número ${botDto.Nombres} correctamente`, true, res);
         } catch (e) {
             console.log(e.message) 
             throw new InternalServerErrorException("ERROR AL ENVIAR MENSAJE DE WHATSAPP - VERIFIQUE EL CHATBOT")

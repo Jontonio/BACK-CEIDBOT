@@ -2,7 +2,7 @@ import { WebSocketGateway,
          WebSocketServer} from '@nestjs/websockets';
 import { InternalServerErrorException } from '@nestjs/common'
 import { Socket, Server } from 'socket.io';
-import { Chat, Client, LocalAuth } from 'whatsapp-web.js';
+import WAWebJS, { Chat, Client, LocalAuth } from 'whatsapp-web.js';
 import { DataSource } from 'typeorm';
 import * as moment from "moment";
 import { BotSendDto } from 'src/bot/dto/bot-send.dto';
@@ -21,6 +21,7 @@ export class WhatsappGateway {
   private messageStatusBot:MessageStatusBot;
   private countQrShow:number;
   private showQR:boolean;
+  private state:WAWebJS.WAState;
 
   constructor(private readonly dataSource:DataSource){
     this.countQrShow = 0;
@@ -44,8 +45,8 @@ export class WhatsappGateway {
   handleConnection(client: Socket) {
     
     if(this.isAuth){
-      this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo 🚀. Listo para recibir mensajes.', null, true) 
-      this.emitStatusClientBot(client, this.messageStatusBot);
+      this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo ⚡⚡. Listo para recibir mensajes.', null, true) 
+      this.emitStatusServerBot(this.server, this.messageStatusBot);
       this.showQR = false;
     }
 
@@ -53,6 +54,8 @@ export class WhatsappGateway {
       this.messageStatusBot = new MessageStatusBot('Apagado','Tiene que generar el código QR para continuar con CEIDBOT.', null, false, true);
       this.emitStatusServerBot(this.server, this.messageStatusBot);
     }
+
+    this.server.emit('change_state_whatsApp',{ state:this.state });
 
   }
 
@@ -86,7 +89,7 @@ export class WhatsappGateway {
     this.client.on('ready', () => {
       this.isAuth = true;
       this.showQR = false;
-      this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo 🚀. Listo para recibir mensajes.', null, true);
+      this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo ⚡⚡. Listo para recibir mensajes.', null, true);
       this.emitStatusServerBot(this.server, this.messageStatusBot);
       console.log('Client is ready!');
     });
@@ -109,6 +112,12 @@ export class WhatsappGateway {
           console.log(message)
           chatbot(this.client, message, this.dataSource);                
         }
+    })
+
+    this.client.on('change_state', state => {
+      this.state = state;
+      console.log('change_state: ', state)
+      this.server.emit('change_state_whatsApp',{ state:this.state });
     })
 
   }
@@ -141,7 +150,12 @@ export class WhatsappGateway {
 
   async sendMessageWhatsapp({ Numero, Message }:BotSendDto ){
     try {
-      return await this.client.sendMessage(Numero, Message);
+
+      if(this.statusAuth()){
+        return await this.client.sendMessage(Numero, Message);
+      }
+
+      throw new Error('CEIBOT aún no está listo para enviar mensajes. espere un momento o visualice el apartado del CHATBOT');
     } catch (e) {
       console.log(e.message)
       throw new InternalServerErrorException("ERROR AL ENVIAR MENSAJE")
@@ -249,7 +263,5 @@ export class WhatsappGateway {
       await queryRunner.release();
     }
   }
-
-
   
 }
