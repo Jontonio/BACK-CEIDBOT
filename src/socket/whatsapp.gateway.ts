@@ -16,11 +16,11 @@ export class WhatsappGateway {
   
   @WebSocketServer() server:Server;
 
-  client:Client;
-  isAuth:boolean;
-  messageStatusBot:MessageStatusBot;
-  countQrShow:number;
-  showQR:boolean;
+  private client:Client;
+  private isAuth:boolean;
+  private messageStatusBot:MessageStatusBot;
+  private countQrShow:number;
+  private showQR:boolean;
 
   constructor(private readonly dataSource:DataSource){
     this.countQrShow = 0;
@@ -86,9 +86,9 @@ export class WhatsappGateway {
     this.client.on('ready', () => {
       this.isAuth = true;
       this.showQR = false;
-      console.log('Client is ready!');
       this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo 🚀. Listo para recibir mensajes.', null, true);
       this.emitStatusServerBot(this.server, this.messageStatusBot);
+      console.log('Client is ready!');
     });
 
     this.client.on("disconnected",async (reson)=> {
@@ -104,7 +104,6 @@ export class WhatsappGateway {
     })
 
     this.client.on('message', async (message) => {
-        this.isAuth = true;
         const chat:Chat = await message.getChat()
         if(!chat.isGroup && message.type=='chat'){
           console.log(message)
@@ -114,9 +113,12 @@ export class WhatsappGateway {
 
   }
 
+  statusAuth(){
+    return this.isAuth;
+  }
+  
   async hidenQRWhatsApp(){
     try {
-      this.isAuth = false;
       this.showQR = true;
       this.countQrShow = 0;
       this.messageStatusBot = new MessageStatusBot('Apagado','Tiene que generar el código QR para continuar con CEIDBOT.', null, false, true);
@@ -141,6 +143,7 @@ export class WhatsappGateway {
     try {
       return await this.client.sendMessage(Numero, Message);
     } catch (e) {
+      console.log(e.message)
       throw new InternalServerErrorException("ERROR AL ENVIAR MENSAJE")
     }
   }
@@ -191,7 +194,8 @@ export class WhatsappGateway {
         }
       }
     } catch (e) {
-      throw new InternalServerErrorException("SEND MESSAGE ESTUDIANTE")
+      console.log(e.menssage)
+      throw new InternalServerErrorException("ERROR SEND MESSAGE ESTUDIANTE")
     }
   }
 
