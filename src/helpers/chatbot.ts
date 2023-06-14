@@ -2,7 +2,7 @@ import { sendToDialogFlow } from "./dialogflow";
 import WAWebJS, { Client, MessageMedia } from "whatsapp-web.js"
 import { PayloadBoot, PayloadCurso, PayloadDocumento } from '../class/PayloadBoot';
 import { DataSource } from "typeorm";
-import { HistorialEstudiante } from "src/class/HistorialEstudiante";
+import { HistorialMensualidadEstudiante, HistorialMoraEstudiante } from "src/class/HistorialEstudiante";
 import { Estudiante } from "src/estudiante/entities/estudiante.entity";
 import * as moment from 'moment';
 moment.locale('es');
@@ -116,6 +116,7 @@ const sendCursos = async (client:Client, message:WAWebJS.Message, dataSource:Dat
         await queryRunner.release();
     }
 } 
+
 const sendCursoEspecifico = async (client:Client, message:WAWebJS.Message, response:any, dataSource:DataSource) => {
     const payloadCurso:PayloadCurso = response.fields;
     const NombreCurso = payloadCurso.curso_especifico.stringValue;
@@ -148,9 +149,15 @@ const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, r
     const payloadDoc:PayloadDocumento = response.fields;
     const Documento = payloadDoc.Documento.numberValue;
     const TipoDocumento = payloadDoc.TipoDocumento.stringValue;
-    console.log(Documento, TipoDocumento)
+    // validar documentos
+    const esNumero: boolean = /^[0-9]+$/.test(Documento);
 
-    // SELECT estudiante.Nombres from estudiante WHERE estudiante.TipoDocumento = 'DNI' AND estudiante.Documento = '71690691';
+    if(!esNumero){
+        await client.sendMessage(message.from, '¿Podría digitar un documento válido por favor?');
+        return;
+    }
+
+    // realizar la consulta
     const queryRunner = dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -170,13 +177,14 @@ const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, r
         /** cuando existe el estudiante */
         const estudiante:Estudiante = resEstudiante[0];
 
-        const data:HistorialEstudiante[] = await historialPagosestudiante(dataSource, TipoDocumento, Documento);
+        const data:HistorialMensualidadEstudiante[] = await historialPagosEstudiante(dataSource, TipoDocumento, Documento);
+
         if(data.length == 0){
             await client.sendMessage(message.from, `¡Hola *${estudiante.Nombres}* 👋! aún no cuentas con un historial de pagos.\nSe le recomienda registrar tus pagos antes de la fecha del inicio de los módulos de tu curso o cursos.\nCualquier duda estamos aquí para ayudarte o puede solicitar un operador humano.`);
             return;
         }
 
-        let msg = `${estudiante.Nombres} su historial de pago:\n`;
+        let msg = `¡Hola *${estudiante.Nombres}* 👋! su historial de su mensualidad es:\n`;
         data.forEach( info => {
             msg +=`*Grupo ID:* ${info.grupoId}\n`
             msg +=`*Curso:* ${info.cursoNombre.toUpperCase()} ${info.Nivel.toUpperCase()}\n`
@@ -186,12 +194,26 @@ const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, r
             msg +=`*Monto de pago:* S/. ${info.MontoPago}\n`
             msg +=`*Estado pago:* ${info.pago_verificado?'Su pago fue verificado':'Su pago no fue verificado'}\n`
             msg +=`*Código de voucher:* ${info.CodigoVoucher}\n`
-            msg +=`*Información de mora del módulo ${info.Modulo}*\n`
-            msg +=`*Mora:* ${info.MontoMora?`S/. ${info.MontoMora}`:'No cuenta con mora'}\n`
-            msg +=`*Estado mora:* ${info.mora_verificada?'Mora subsanada':((info.MontoMora && !info.mora_verificada)?'Mora no subsanada':'')}\n`
             msg +=`------------------------------\n`
-        })
+        });
+        // Envio del mensajes de sus pagos
         await client.sendMessage(message.from, msg);
+
+        // Envio para ver si tienen deuda:
+        const dataMora:HistorialMoraEstudiante[] = await historialMoraEstudiante(dataSource, TipoDocumento, Documento);
+        if(dataMora.length == 0){
+            await client.sendMessage(message.from, `😊 Te encuentras al día con tus pagos, no cuentas con ningún pago extemporaneo (MORA).`);
+            return;
+        }
+
+        let msgMora = `📢 ${estudiante.Nombres} su historial de mora:\n`;
+        dataMora.forEach( info => {
+            msgMora +=`*Mora del módulo ${info.Modulo}*\n`
+            msgMora +=`*Mora:* ${info.MontoMora?`S/. ${info.MontoMora}`:'aun sin especificar'}\n`
+            msgMora +=`*Estado mora:* ${info.mora_verificada?'Mora subsanada':((info.MontoMora && !info.mora_verificada)?'Mora no subsanada':'')}\n`
+            msgMora +=`------------------------------\n`
+        });
+        await client.sendMessage(message.from, msgMora);
 
     }catch (e) {
         console.log("Error consulta cursos CEIDBOT: ", e);
@@ -203,7 +225,7 @@ const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, r
 } 
 
 
-const historialPagosestudiante = async (dataSource:DataSource, TipoDocumento:string, Documento:string) => {
+const historialPagosEstudiante = async (dataSource:DataSource, TipoDocumento:string, Documento:string) => {
 
     const queryRunner = dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -220,8 +242,6 @@ const historialPagosestudiante = async (dataSource:DataSource, TipoDocumento:str
             pago.FechaPago,
             pago.CodigoVoucher,
             pago.Verificado AS pago_verificado,
-            mora.MontoMora,
-            mora.Verificado AS mora_verificada,
             modulo.Modulo,
             curso.NombreCurso AS cursoNombre,
             tipo_grupo.NombreGrupo AS tipoGrupoNombre,
@@ -229,7 +249,6 @@ const historialPagosestudiante = async (dataSource:DataSource, TipoDocumento:str
             FROM estudiante
             INNER JOIN estudiante_en_grupo ON estudiante.Id = estudiante_en_grupo.estudianteId
             INNER JOIN grupo ON grupo.Id = estudiante_en_grupo.grupoId
-            LEFT JOIN mora ON mora.estudianteEnGrupoId = estudiante_en_grupo.Id
             LEFT JOIN pago ON estudiante_en_grupo.Id = pago.estudianteEnGrupoId
             LEFT JOIN categoria_pago ON categoria_pago.Id = pago.categoriaPagoId
             LEFT JOIN medio_de_pago ON medio_de_pago.Id = pago.medioDePagoId
@@ -253,7 +272,55 @@ const historialPagosestudiante = async (dataSource:DataSource, TipoDocumento:str
         await queryRunner.commitTransaction();
         return estudiante;
     }catch (e) {
-        console.log("Error consulta estudiantes pagos: ", e);
+        console.log("Error consulta pagos mensualidad estudiante: ", e);
+        await queryRunner.rollbackTransaction();
+        throw new Error(e);
+    } finally {
+        await queryRunner.release();
+    }
+}
+
+const historialMoraEstudiante = async (dataSource:DataSource, TipoDocumento:string, Documento:string) => {
+
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+        const estudiante = await queryRunner.query(`
+        SELECT
+            grupo.Id AS grupoId,
+            estudiante.Nombres,
+            estudiante.ApellidoPaterno,
+            estudiante.ApellidoMaterno,
+            mora.MontoMora,
+            mora.Verificado AS mora_verificada,
+            modulo.Modulo,
+            curso.NombreCurso AS cursoNombre,
+            tipo_grupo.NombreGrupo AS tipoGrupoNombre,
+            nivel.Nivel
+            FROM estudiante
+            INNER JOIN estudiante_en_grupo ON estudiante.Id = estudiante_en_grupo.estudianteId
+            INNER JOIN grupo ON grupo.Id = estudiante_en_grupo.grupoId
+            LEFT JOIN mora ON estudiante_en_grupo.Id = mora.estudianteEnGrupoId
+            LEFT JOIN grupo_modulo ON mora.grupoModuloId = grupo_modulo.Id
+            LEFT JOIN modulo ON grupo_modulo.moduloId = modulo.Id
+            LEFT JOIN curso ON grupo.cursoId = curso.Id
+            LEFT JOIN tipo_grupo ON grupo.tipoGrupoId = tipo_grupo.Id
+            LEFT JOIN nivel ON curso.nivelId = nivel.Id
+            WHERE grupo.Estado = 1 AND
+            mora.EstadoMora = true
+            AND (
+                SELECT estado_grupo.Id
+                FROM estado_grupo
+                WHERE estado_grupo.Id = grupo.estadoGrupoId
+            ) != 3
+            AND estudiante.Documento = '${Documento}' AND estudiante.TipoDocumento = '${TipoDocumento}';
+        `);
+
+        await queryRunner.commitTransaction();
+        return estudiante;
+    }catch (e) {
+        console.log("Error consulta historial mora estudiante: ", e);
         await queryRunner.rollbackTransaction();
         throw new Error(e);
     } finally {

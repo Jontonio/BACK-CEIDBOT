@@ -1,4 +1,4 @@
-class HistorialEstudiante{
+class HistorialMensualidadEstudiante{
     grupoId:number;
     cursoNombre:string;
     tipoGrupoNombre:string;
@@ -11,9 +11,20 @@ class HistorialEstudiante{
     FechaPago:Date;
     CodigoVoucher:string;
     pago_verificado:boolean;
+    Modulo:number;
+}
+
+class HistorialMoraEstudiante{
+    grupoId:number;
+    cursoNombre:string;
+    tipoGrupoNombre:string;
+    Nivel:string;
+    Nombres:string;
+    ApellidoPaterno:string;
+    ApellidoMaterno:string;
     MontoMora:number;
     mora_verificada:boolean;
     Modulo:number;
 }
 
-export { HistorialEstudiante };
+export { HistorialMensualidadEstudiante, HistorialMoraEstudiante };
