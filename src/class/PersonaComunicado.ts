@@ -10,4 +10,5 @@ export class PersonaComunicado{
     NombreCurso:string;
     Nivel:string;
     NumDiasHolaguraMora:number;
+    ModuloActual:number;
 }

@@ -37,10 +37,5 @@ export class PagoController {
   removeMora(@Param('id') id: string) {
     return this.pagoService.deleteMora(+id);
   }
-
-  // @Get('generar-mora')
-  // generateMora(){
-  //   return this.pagoService.generarMoras()
-  // }
-
+  
 }
