@@ -43,7 +43,9 @@ export class WhatsappGateway {
   }
 
   handleConnection(client: Socket) {
-    
+
+    console.log("Cliente whatsappGatway ", client.id)
+
     if(this.isAuth){
       this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo ⚡⚡. Listo para recibir mensajes.', null, true) 
       this.emitStatusServerBot(this.server, this.messageStatusBot);
@@ -119,10 +121,11 @@ export class WhatsappGateway {
     })
 
     this.inicializarWhatsApp();
-    
+
   }
 
   statusAuth(){
+    console.log("Estado BOT (isAuth): ", this.isAuth);
     return this.isAuth;
   }
   
@@ -194,15 +197,17 @@ export class WhatsappGateway {
 
   async sendMessageEstudiante(){
     try {
-      const lista:PersonaComunicado[] = await this.getEstudiantesSinPagoMensualidad();
-      if(lista.length!=0){
-        for(const estudiante of lista){
-          const {Celular, CodePhone, Nombres, NombreCurso, FechaPago, Nivel, NumDiasHolaguraMora, ModuloActual } = estudiante;
-          const Numero = `${CodePhone}${Celular}`.replace('+','').concat('@c.us').trim();
-          const Message = `¡Hola *${Nombres}* 👋!\nTe escribimos para recordarte que tienes un pago pendiente por el *módulo ${ModuloActual}* del curso de *${NombreCurso.toUpperCase()} ${Nivel.toUpperCase()}*, cuya fecha límite de pago es el día *${moment(FechaPago).add(NumDiasHolaguraMora,'days').format('D [de] MMMM [de] YYYY')}*.\nPor favor, asegúrate de realizar el pago a tiempo para evitar inconvenientes y evitar pagos con mora, asimismo no perder acceso al contenido del curso. Si ya realizaste el pago, por favor ignora este mensaje.\nQuedamos atentos a cualquier duda o consulta que tengas.\n*Saludos cordiales CEIDBOT del CEID*`;
-          const whatsAppDto:BotSendDto = {Numero, Nombres, Message};
-          await this.sendMessageWhatsapp( whatsAppDto );
-          console.log("Mensaje enviado a "+Nombres)
+      if(this.statusAuth()){
+        const lista:PersonaComunicado[] = await this.getEstudiantesSinPagoMensualidad();
+        if(lista.length!=0){
+          for(const estudiante of lista){
+            const {Celular, CodePhone, Nombres, NombreCurso, FechaPago, Nivel, NumDiasHolaguraMora, ModuloActual } = estudiante;
+            const Numero = `${CodePhone}${Celular}`.replace('+','').concat('@c.us').trim();
+            const Message = `¡Hola *${Nombres}* 👋!\nTe escribimos para recordarte que tienes un pago pendiente por el *módulo ${ModuloActual}* del curso de *${NombreCurso.toUpperCase()} ${Nivel.toUpperCase()}*, cuya fecha límite de pago es el día *${moment(FechaPago).add(NumDiasHolaguraMora,'days').format('D [de] MMMM [de] YYYY')}*.\nPor favor, asegúrate de realizar el pago a tiempo para evitar inconvenientes y evitar pagos con mora, asimismo no perder acceso al contenido del curso. Si ya realizaste el pago, por favor ignora este mensaje.\nQuedamos atentos a cualquier duda o consulta que tengas.\n*Saludos cordiales CEIDBOT del CEID*`;
+            const whatsAppDto:BotSendDto = {Numero, Nombres, Message};
+            await this.sendMessageWhatsapp( whatsAppDto );
+            console.log("Mensaje enviado a "+Nombres)
+          }
         }
       }
     } catch (e) {
