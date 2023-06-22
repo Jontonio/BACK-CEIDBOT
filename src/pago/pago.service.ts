@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreatePagoDto } from './dto/create-pago.dto';
 import { UpdatePagoDto } from './dto/update-pago.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -195,16 +195,18 @@ export class PagoService {
     try {
       await queryRunner.query(`
       INSERT INTO mora (estudianteEnGrupoId, grupoModuloId, MontoMora, Verificado, EstadoMora)
-      SELECT estudiante_en_grupo.Id, grupo_modulo.Id, 5, false, true
+      SELECT estudiante_en_grupo.Id, grupo_modulo.Id, grupo.MontoMora, false, true
       FROM estudiante
+      INNER JOIN matricula on matricula.estudianteId = estudiante.Id
       INNER JOIN estudiante_en_grupo ON estudiante.Id = estudiante_en_grupo.estudianteId
       INNER JOIN grupo ON estudiante_en_grupo.grupoId = grupo.Id
       INNER JOIN grupo_modulo ON grupo.Id = grupo_modulo.grupoId
-      WHERE grupo_modulo.CurrentModulo = true and
-          grupo.Estado != false AND grupo.AplicaMora = true AND 
+      WHERE matricula.EstadoMatricula = 'matriculado' and
+      		grupo_modulo.CurrentModulo = true and
+            grupo.Estado != false AND grupo.AplicaMora = true AND 
             grupo.estadoGrupoId != 3 AND 
             estudiante_en_grupo.Estado != false AND 
-            DATEDIFF(CURDATE(), grupo_modulo.FechaPago) >= grupo.NumDiasHolaguraMora AND
+            DATEDIFF(CURDATE(), grupo_modulo.FechaPago) > grupo.NumDiasHolaguraMora AND
             NOT EXISTS (
               SELECT * FROM mora
               WHERE mora.grupoModuloId = grupo_modulo.Id AND mora.estudianteEnGrupoId = estudiante_en_grupo.Id
@@ -224,25 +226,6 @@ export class PagoService {
     } finally {
       await queryRunner.release();
     }
-  }
-
-  async listaEstudiantesSinPagar(){
-    return `
-    SELECT * FROM estudiante
-    INNER JOIN estudiante_en_grupo ON estudiante.Id = estudiante_en_grupo.estudianteId
-    INNER JOIN grupo ON estudiante_en_grupo.grupoId = grupo.Id
-    INNER JOIN grupo_modulo ON grupo.Id = grupo_modulo.grupoId
-    WHERE grupo.Estado != false AND
-          grupo.estadoGrupoId != 3 AND 
-          estudiante_en_grupo.Estado != false  AND 
-          grupo_modulo.FechaPago >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) AND
-          grupo_modulo.FechaPago <= DATE_ADD(CURDATE(), INTERVAL 1 DAY)
-    AND NOT EXISTS (
-      SELECT * FROM pago
-      WHERE pago.grupoModuloId = grupo_modulo.Id AND pago.Verificado IS NOT NULL AND pago.CodigoVoucher IS NOT NULL AND pago.CodigoVoucher <> '' AND (pago.Estado IS NULL OR pago.Estado != 0)
-      AND pago.estudianteEnGrupoId = estudiante_en_grupo.Id AND pago.grupoModuloId = grupo_modulo.Id
-    );
-    `;
   }
 
 }

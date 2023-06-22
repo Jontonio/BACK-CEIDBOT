@@ -216,6 +216,7 @@ export class WhatsappGateway {
     }
   }
 
+  /** se obtiene los datos el mismo dia de pago y un dia despues para notificar. */
   async getEstudiantesSinPagoMensualidad(){
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -247,7 +248,7 @@ export class WhatsappGateway {
                     matricula.EstadoMatricula = 'matriculado' AND
                     estudiante_en_grupo.Estado != false  AND 
                     grupo_modulo.CurrentModulo = true AND
-                    grupo_modulo.FechaPago >= DATE_SUB(CURDATE(), INTERVAL 2 DAY) AND
+                    grupo_modulo.FechaPago >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) AND
                     grupo_modulo.FechaPago <= DATE_ADD(CURDATE(), INTERVAL 1 DAY)
               AND NOT EXISTS ( SELECT * FROM pago
                               WHERE pago.grupoModuloId = grupo_modulo.Id AND 

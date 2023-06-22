@@ -9,9 +9,10 @@ import { TipoGrupo } from './entities/tipo-grupo.entity';
 import { RequestMethod } from '@nestjs/common/enums';
 import { VerifyIdGrupoMiddleware } from 'src/middlewares/verify-id-grupo.middleware';
 import { GrupoModulo } from './entities/grupoModulo.entity';
+import { EstudianteEnGrupo } from 'src/estudiante-en-grupo/entities/estudiante-en-grupo.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Grupo, TipoGrupo, GrupoModulo])],
+  imports:[TypeOrmModule.forFeature([Grupo, TipoGrupo, GrupoModulo, EstudianteEnGrupo])],
   controllers: [GrupoController],
   providers: [GrupoService]
 })

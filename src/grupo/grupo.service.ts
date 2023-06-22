@@ -15,6 +15,7 @@ import { Modulo } from 'src/curso/entities/modulo.entity';
 import { UpdateGrupoModuloDto } from './dto/update-grupo-modulo.dto';
 import { Cron } from '@nestjs/schedule';
 import { DataHorizontalBar, DataVerticalBar } from 'src/class/Graphics';
+import { EstudianteEnGrupo } from 'src/estudiante-en-grupo/entities/estudiante-en-grupo.entity';
 
 @Injectable()
 export class GrupoService {
@@ -25,7 +26,9 @@ export class GrupoService {
               @InjectRepository(TipoGrupo) 
               private tipoGrupoModel:Repository<TipoGrupo>,
               @InjectRepository(GrupoModulo) 
-              private grupoModuloModel:Repository<GrupoModulo>){}
+              private grupoModuloModel:Repository<GrupoModulo>,
+              @InjectRepository(EstudianteEnGrupo) 
+              private estudianteEnGrupoModel:Repository<EstudianteEnGrupo>){}
 
   /** Crea el nombre del grupo como por ejemplo grupo A, grupo B, grupo C etc  */
   /**
@@ -161,6 +164,7 @@ export class GrupoService {
    */
   async findAllGrupos({limit, offset}: PaginationQueryDto) {
     try {
+      
       const count = await this.grupoModel.countBy({ Estado:true });
       const grupos = await this.grupoModel.find({
         where:{ Estado:true }, 
@@ -247,6 +251,16 @@ export class GrupoService {
   */
   async findOneGrupo(Id: number) {
     try {
+
+      // obtener la cantidad de estudiantes
+      const cantidaEstudianteMatriculados = await this.estudianteEnGrupoModel.countBy({
+        matricula:{EstadoMatricula:'matriculado'}, grupo:{ Id }, Estado:true
+      });
+
+      // actualizar la cantidad de estudiantes
+      await this.grupoModel.update({Id},{ NumeroEstudiantes: cantidaEstudianteMatriculados });
+
+      // obtener el grupo 
       const grupo = await this.grupoModel.findOne({ 
         where:{ Id }, 
         relations:['docente',
@@ -416,26 +430,29 @@ export class GrupoService {
    */
   async getDataHorizontalBarEstudiantesEnGrupos(estadoGrupoId:number){
 
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
       
-      const query = this.grupoModel.createQueryBuilder('grupo')
-          .select('grupo.Id', 'id_grupo')
-          .addSelect('UPPER(tipo_grupo.NombreGrupo)', 'nombre_grupo')
-          .addSelect('UPPER(curso.NombreCurso)', 'nombre_curso')
-          .addSelect('nivel.Nivel', 'nivel')
-          .addSelect('COUNT(estudiante_en_grupo.Id)', 'total_estudiantes')
-          .leftJoin('grupo.estadoGrupo', 'estado_grupo')
-          .leftJoin('grupo.tipoGrupo', 'tipo_grupo')
-          .leftJoin('grupo.curso', 'curso')
-          .leftJoin('curso.nivel', 'nivel')
-          .leftJoin('grupo.estudianteEnGrupo', 'estudiante_en_grupo')
-          .where('grupo.Estado = :estado', { estado: 1 })
-          .andWhere('(estudiante_en_grupo.Estado IS NULL OR estudiante_en_grupo.Estado = :estado)', { estado: 1 })
-          .andWhere('(estado_grupo.Estado IS NULL OR estado_grupo.Estado = :estado)', { estado: 1 })
-          .andWhere('grupo.estadoGrupoId = :estadoGrupoId', { estadoGrupoId })
-          .groupBy('grupo.Id, tipo_grupo.NombreGrupo, nivel.Nivel')
+      const result:any[] = await queryRunner.query(`
+          SELECT grupo.Id as id_grupo, tipo_grupo.NombreGrupo as nombre_grupo, curso.NombreCurso as nombre_curso, nivel.Nivel as nivel, COUNT(estudiante_en_grupo.Id) AS total_estudiantes
+          FROM grupo
+            LEFT JOIN estado_grupo ON estado_grupo.Id = grupo.estadoGrupoId
+            LEFT JOIN tipo_grupo ON tipo_grupo.Id = grupo.tipoGrupoId
+            LEFT JOIN curso ON curso.Id = grupo.cursoId
+            LEFT JOIN nivel ON nivel.Id = curso.nivelId
+            LEFT JOIN estudiante_en_grupo ON grupo.Id = estudiante_en_grupo.grupoId
+            WHERE grupo.Estado = 1
+              AND (estudiante_en_grupo.Estado IS NULL OR estudiante_en_grupo.Estado = 1)
+              AND (estado_grupo.Estado IS NULL OR estado_grupo.Estado = 1)
+              AND (SELECT matricula.Id FROM matricula WHERE matricula.Id = estudiante_en_grupo.matriculaId AND matricula.EstadoMatricula='matriculado')
+              AND grupo.estadoGrupoId = ${estadoGrupoId}
+            GROUP BY grupo.Id, tipo_grupo.NombreGrupo, nivel.Nivel;
+        `);
 
-      const result = await query.getRawMany();   
+        await queryRunner.commitTransaction();  
 
       if(result.length > 0 ){
         const data:DataHorizontalBar[] = [];
@@ -447,6 +464,7 @@ export class GrupoService {
       return [{value:0, name:'Sin registros'}];
 
     } catch (e) {
+      await queryRunner.rollbackTransaction();
       console.log(e.message)
       throw new InternalServerErrorException("ERROR OBTENER DATA HORIZONTAL GRUPOS DASHBOARD");
     }

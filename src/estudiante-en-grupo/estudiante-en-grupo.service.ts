@@ -183,7 +183,7 @@ export class EstudianteEnGrupoService {
   async findByIdGrupo(Id: number, {limit, offset}:PaginationQueryDto) {
     try {
       const count = await this.estudEnGrupoModel.count({
-        where:{ Estado:true, grupo:{ Id } }, 
+        where:{ Estado:true, grupo:{ Id }, matricula:{ EstadoMatricula:'matriculado'} }, 
         relations:['matricula',
                    'matricula.denomiServicio',
                    'grupo',
@@ -213,7 +213,8 @@ export class EstudianteEnGrupoService {
                    'pagos.medioDePago',
                    'pagos.grupoModulo',
                    'pagos.grupoModulo.modulo',
-                   'pagos.categoriaPago']});
+                   'pagos.categoriaPago'],
+          order:{matricula:{ EstadoMatricula:'ASC' }, estudiante:{ Nombres:'ASC' }}});
 
       const fecha1 = moment(grupo.FechaInicioGrupo); // fecha de inicio del grupo
       const fechaActual = moment().format('YYYY-MM-DD');  // fecha actual
