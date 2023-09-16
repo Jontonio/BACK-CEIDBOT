@@ -180,7 +180,7 @@ const cosultaMensualidadDeuda = async (client:Client, message:WAWebJS.Message, r
         const data:HistorialMensualidadEstudiante[] = await historialPagosEstudiante(dataSource, TipoDocumento, Documento);
 
         if(data.length == 0){
-            await client.sendMessage(message.from, `¡Hola *${estudiante.Nombres}* 👋! aún no cuentas con un historial de pagos.\nSe le recomienda registrar tus pagos antes de la fecha del inicio de los módulos de tu curso o cursos.\nCualquier duda estamos aquí para ayudarte o puede solicitar un operador humano.`);
+            await client.sendMessage(message.from, `¡Hola *${estudiante.Nombres}* 👋! aún no cuentas con un historial de pagos o consulte en el CEID la vigencia o estado del grupo.\nSe le recomienda registrar tus pagos antes de la fecha del inicio de los módulos de tu curso o cursos.\nCualquier duda estamos aquí para ayudarte o puede solicitar un operador humano.`);
             return;
         }
 
