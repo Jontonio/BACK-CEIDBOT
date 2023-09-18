@@ -489,22 +489,21 @@ export class GrupoService {
 
     try {
         const result:any[] = await queryRunner.query(`
-          SELECT CONCAT(UPPER(tipo_grupo.NombreGrupo),' ',UPPER(curso.NombreCurso),' ', nivel.Nivel) AS grupo,
-                modulo.Modulo AS modulo,
-                COUNT(DISTINCT CASE WHEN pago.categoriaPagoId = 1 THEN pago.Id END) AS cantidad_pago,
-                COUNT(DISTINCT CASE WHEN mora.EstadoMora = 1 THEN mora.Id END) AS cantidad_mora
-          FROM grupo
-          JOIN tipo_grupo ON tipo_grupo.Id = grupo.tipoGrupoId
-          JOIN estado_grupo ON estado_grupo.Id = grupo.estadoGrupoId
-          JOIN grupo_modulo AS gm ON grupo.Id = gm.grupoId
-          JOIN modulo ON gm.moduloId = modulo.Id
-          JOIN curso ON grupo.cursoId = curso.Id
-          JOIN nivel ON curso.nivelId = nivel.Id
-          LEFT JOIN pago ON gm.Id = pago.grupoModuloId
-          LEFT JOIN mora ON gm.Id = mora.grupoModuloId
-          WHERE grupo.Estado = true AND grupo.Id = ${grupoId} AND estado_grupo.Id = ${estadoGrupoId}
-          GROUP BY gm.Id, grupo, modulo;
-        `);
+        SELECT CONCAT(UPPER(tipo_grupo.NombreGrupo),' ',UPPER(curso.NombreCurso),' ', nivel.Nivel) AS grupo,
+              modulo.Modulo AS modulo,
+              COUNT(DISTINCT CASE WHEN ((pago.categoriaPagoId = 1 OR pago.categoriaPagoId = 4) AND pago.Estado = 1) THEN pago.Id END) AS cantidad_pago,
+              COUNT(DISTINCT CASE WHEN (mora.EstadoMora = 1 AND mora.Verificado = 1) THEN mora.Id END) AS cantidad_mora
+        FROM grupo
+        JOIN tipo_grupo ON tipo_grupo.Id = grupo.tipoGrupoId
+        JOIN estado_grupo ON estado_grupo.Id = grupo.estadoGrupoId
+        JOIN grupo_modulo AS gm ON grupo.Id = gm.grupoId
+        JOIN modulo ON gm.moduloId = modulo.Id
+        JOIN curso ON grupo.cursoId = curso.Id
+        JOIN nivel ON curso.nivelId = nivel.Id
+        LEFT JOIN pago ON gm.Id = pago.grupoModuloId
+        LEFT JOIN mora ON gm.Id = mora.grupoModuloId
+        WHERE grupo.Estado = true AND grupo.Id = ${grupoId} AND estado_grupo.Id = ${estadoGrupoId}
+        GROUP BY gm.Id, grupo, modulo; `);
         await queryRunner.commitTransaction();
 
         if(result.length > 0 ){
