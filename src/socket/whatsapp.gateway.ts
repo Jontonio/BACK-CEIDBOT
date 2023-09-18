@@ -154,11 +154,11 @@ export class WhatsappGateway {
   async sendMessageWhatsapp({ Numero, Message }:BotSendDto ){
     try {
 
-      if(this.statusAuth()){
+      // if(this.statusAuth()){
         return await this.client.sendMessage(Numero, Message);
-      }
+      // }
 
-      throw new Error('CEIBOT aún no está listo para enviar mensajes. espere un momento o visualice el apartado del CHATBOT');
+      // throw new Error('CEIBOT aún no está listo para enviar mensajes. espere un momento o visualice el apartado del CHATBOT');
     } catch (e) {
       console.log(e.message)
       throw new InternalServerErrorException("ERROR AL ENVIAR MENSAJE")
@@ -197,22 +197,45 @@ export class WhatsappGateway {
 
   async sendMessageEstudiante(){
     try {
-      if(this.statusAuth()){
-        const lista:PersonaComunicado[] = await this.getEstudiantesSinPagoMensualidad();
-        if(lista.length!=0){
-          for(const estudiante of lista){
-            const {Celular, CodePhone, Nombres, NombreCurso, FechaPago, Nivel, NumDiasHolaguraMora, ModuloActual } = estudiante;
-            const Numero = `${CodePhone}${Celular}`.replace('+','').concat('@c.us').trim();
-            const Message = `¡Hola *${Nombres}* 👋!\nTe escribimos para recordarte que tienes un pago pendiente por el *módulo ${ModuloActual}* del curso de *${NombreCurso.toUpperCase()} ${Nivel.toUpperCase()}*, cuya fecha límite de pago es el día *${moment(FechaPago).add(NumDiasHolaguraMora,'days').format('D [de] MMMM [de] YYYY')}*.\nPor favor, asegúrate de realizar el pago a tiempo para evitar inconvenientes y evitar pagos con mora, asimismo no perder acceso al contenido del curso. Si ya realizaste el pago, por favor ignora este mensaje.\nQuedamos atentos a cualquier duda o consulta que tengas.\n*Saludos cordiales CEIDBOT del CEID*`;
-            const whatsAppDto:BotSendDto = {Numero, Nombres, Message};
-            await this.sendMessageWhatsapp( whatsAppDto );
-            console.log("Mensaje enviado a "+Nombres)
+
+      const lista:PersonaComunicado[] = await this.getEstudiantesSinPagoMensualidad();
+      const sizeSend = lista.length; 
+      let countSend = 0;
+      const fechaHoraActual = moment();
+      const formatoPersonalizado = 'D [de] MMMM [de] YYYY [a las] HH:mm:ss';
+      const fechaHoraFormateada = fechaHoraActual.format(formatoPersonalizado);
+
+
+      if( sizeSend != 0){
+        for(const estudiante of lista){
+          const {Celular, CodePhone, Nombres, NombreCurso, FechaPago, Nivel, NumDiasHolaguraMora, ModuloActual } = estudiante;
+          const Numero = `${CodePhone}${Celular}`.replace('+','').concat('@c.us').trim();
+          const Message = `¡Hola *${Nombres}* 👋!\nTe escribimos para recordarte que tienes un pago pendiente por el *módulo ${ModuloActual}* del curso de *${NombreCurso.toUpperCase()} ${Nivel.toUpperCase()}*, cuya fecha límite de pago es el día *${moment(FechaPago).add(NumDiasHolaguraMora,'days').format('D [de] MMMM [de] YYYY')}*.\nPor favor, asegúrate de realizar el pago a tiempo para evitar inconvenientes y evitar pagos con mora, asimismo no perder acceso al contenido del curso. Si ya realizaste el pago, por favor ignora este mensaje.\nQuedamos atentos a cualquier duda o consulta que tengas.\n*Saludos cordiales CEIDBOT del CEID*`;
+          const whatsAppDto:BotSendDto = { Numero, Nombres, Message };
+          try {
+            await this.sendMessageWhatsapp(whatsAppDto);
+            countSend++;
+            console.log("Mensaje enviado a " + Nombres);
+          } catch (e) {
+            console.error("Error al enviar mensaje a " + Nombres + ": ", e.message);
           }
         }
+
+        if(countSend == sizeSend){
+          this.server.emit('message-send-notification', { msg:`Siendo ${fechaHoraFormateada} horas han realizado el envio de ${countSend} notificaciones de pago correctamente y ${sizeSend-countSend} mensajes truncados`});
+          return;
+        }
+
       }
+
+      if(sizeSend==0){
+        this.server.emit('message-send-notification', { msg:`Siendo ${fechaHoraFormateada} horas no se realizaron ningún envió de notificaciones`});
+        return;
+      }
+
     } catch (e) {
       console.log(e.menssage)
-      throw new InternalServerErrorException("ERROR SEND MESSAGE ESTUDIANTE")
+      throw new InternalServerErrorException("ERROR SEND MESSAGES ESTUDIANTE")
     }
   }
 
