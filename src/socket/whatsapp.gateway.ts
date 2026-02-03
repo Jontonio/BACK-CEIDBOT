@@ -30,34 +30,34 @@ export class WhatsappGateway {
   }
 
   async afterInit(server: Server) {
-    this.server = server;
-    this.client = new Client({ puppeteer: { 
-      headless: true,
-      args: ['--no-sandbox'] 
-    },
-    authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
-    });
+    // this.server = server;
+    // this.client = new Client({ puppeteer: { 
+    //   headless: true,
+    //   args: ['--no-sandbox'] 
+    // },
+    // authStrategy: new LocalAuth({ dataPath:'auth-whatsapp' }),
+    // });
     
-    this.whatsapp();
+    // this.whatsapp();
 
   }
 
   handleConnection(client: Socket) {
 
-    console.log("Cliente whatsappGatway ", client.id)
+    // console.log("Cliente whatsappGatway ", client.id)
 
-    if(this.isAuth){
-      this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo ⚡⚡. Listo para recibir mensajes.', null, true) 
-      this.emitStatusServerBot(this.server, this.messageStatusBot);
-      this.showQR = false;
-    }
+    // if(this.isAuth){
+    //   this.messageStatusBot = new MessageStatusBot('Activo','CEIDBOT está activo ⚡⚡. Listo para recibir mensajes.', null, true) 
+    //   this.emitStatusServerBot(this.server, this.messageStatusBot);
+    //   this.showQR = false;
+    // }
 
-    if(this.showQR){
-      this.messageStatusBot = new MessageStatusBot('Apagado','Tiene que generar el código QR para continuar con CEIDBOT.', null, false, true);
-      this.emitStatusServerBot(this.server, this.messageStatusBot);
-    }
+    // if(this.showQR){
+    //   this.messageStatusBot = new MessageStatusBot('Apagado','Tiene que generar el código QR para continuar con CEIDBOT.', null, false, true);
+    //   this.emitStatusServerBot(this.server, this.messageStatusBot);
+    // }
 
-    this.server.emit('change_state_whatsApp',{ state:this.state });
+    // this.server.emit('change_state_whatsApp',{ state:this.state });
 
   }
 

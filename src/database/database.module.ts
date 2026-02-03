@@ -15,7 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           password: configService.get('DB_PASSWORD'), // Password del servidor BD 
           database: configService.get('DB_NAME'), // Nombre de la BD 
           entities: [__dirname + '/../**/*.entity{.ts,.js}'], // Configuración automática 
-          synchronize: false, // La sincronización no usar en producción
+          synchronize: true, // La sincronización no usar en producción
         })
       }) 
     ]

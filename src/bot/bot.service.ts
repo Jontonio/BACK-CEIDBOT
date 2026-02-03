@@ -19,8 +19,8 @@ export class BotService {
     constructor(@InjectRepository(ConfigNotification) 
                 private confNotificationModel:Repository<ConfigNotification>,
                 private whatsappGateway:WhatsappGateway){
-        this.getDataConfigNotification();
-        this.setNewTimeNotificacions(this.HoraNotificacion, this.MinutoNotificacion);
+        // this.getDataConfigNotification();
+        // this.setNewTimeNotificacions(this.HoraNotificacion, this.MinutoNotificacion);
     }
 
     /**

@@ -66,6 +66,5 @@ export class Usuario {
 
     @Column()
     rolId: number;
-    
 
 }

@@ -10,6 +10,9 @@ export class Rol{
     @Column({type:'varchar', length:40})
     TipoRol:string;
 
+    @Column({type:'varchar', length:100})
+    descripcion:string;
+
     @CreateDateColumn()
     createdAt:Date;
 
